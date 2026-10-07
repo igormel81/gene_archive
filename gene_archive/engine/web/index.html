@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="index, follow">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%238a4b2a%27/%3E%3Cpath d=%27M16 7v18M16 13l-6-4M16 13l6-4M16 19l-7-3M16 19l7-3%27 stroke=%27%23fff%27 stroke-width=%272.4%27 stroke-linecap=%27round%27 fill=%27none%27/%3E%3C/svg%3E">
+<script>
+{{prefetch}}
+</script>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+</head>
+<body class="tree-mode">
+<a class="skip" href="#main-content">К содержанию</a>
+<header class="bar">
+  <div class="brand">
+    <a class="eyebrow brand-home" href="#/tree">{{brand}}</a>
+  </div>
+  <div class="search">
+    <button id="search-toggle" class="search-toggle" type="button" aria-label="Найти человека" title="Найти человека" aria-expanded="false" aria-controls="search-panel">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
+    </button>
+    <div id="search-panel" class="search-panel" hidden>
+      <input id="search" type="search" placeholder="Найти человека…" aria-label="Найти человека" autocomplete="off">
+      <ul id="search-results" class="search-results" hidden></ul>
+    </div>
+    <button class="mail-link share-btn" id="share-btn" type="button" title="Поделиться ссылкой на то, что открыто" aria-label="Поделиться ссылкой на то, что открыто">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="m7.5 7.5 4.5-4.5 4.5 4.5"></path><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path></svg>
+      <span class="share-label">Поделиться</span>
+    </button>{{contact}}
+    <details class="more-menu" id="more-menu">
+      <summary aria-label="Ещё разделы">Ещё <span aria-hidden="true">▾</span></summary>
+      <nav class="more-list" aria-label="Ещё разделы">
+        {{more_links}}
+      </nav>
+    </details>
+  </div>
+  <nav class="tabs" role="tablist">{{news_tab}}
+    <button role="tab" data-view="tree" aria-selected="true">Древо</button>
+    <button role="tab" data-view="people">Люди</button>
+    <button role="tab" data-view="places">Места</button>
+    <button role="tab" data-view="sources">Архив</button>
+    {{story_tab}}
+    <button role="tab" data-view="questions">Вопросы и обсуждение <span class="pill" id="c-count"></span></button>
+  </nav>
+</header>
+
+<main id="main-content" tabindex="-1">
+  <section id="view-tree" class="view active">
+    <aside class="tree-side" aria-label="Ветви и фамилии">
+      <div class="tree-side-bar">
+        <button class="btn branches-toggle" id="branches-toggle" type="button" aria-expanded="false" aria-controls="branches">Ветви и фамилии ▾</button>
+        <button class="btn orient" id="orient" type="button"><svg class="orient-ic" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"></path></svg><span>Горизонтально</span></button>
+      </div>
+      <div class="branches" id="branches"></div>
+    </aside>
+    <div class="tree-main">
+    <div class="canvas" id="canvas">
+      <div class="zoom overlay">
+        <button id="zoom-out" aria-label="Уменьшить">−</button>
+        <button id="zoom-in" aria-label="Увеличить">+</button>
+        <button id="zoom-fit">Вписать</button>
+        <button id="zoom-save" class="zoom-save" type="button" aria-label="Сохранить древо картинкой" title="Сохранить древо картинкой"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"></path></svg></button>
+      </div>
+      <p class="tree-loading">Загружаем древо…</p>
+      <div class="stage" id="stage">
+        <svg class="links" id="links"></svg>
+        <div id="cards"></div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <section id="view-wide" class="view">
+    <div class="tree-tools">
+      <button class="btn" id="wide-back" type="button">← Архив</button>
+      <div class="wide-note">Все ветви сразу: влево — младшие, вправо — старшие поколения. Нажмите на человека, чтобы открыть карточку.</div>
+    </div>
+    <div class="canvas wide-canvas" id="wide-canvas">
+      <div class="zoom overlay">
+        <button id="wide-out" aria-label="Уменьшить">−</button>
+        <button id="wide-in" aria-label="Увеличить">+</button>
+        <button id="wide-fit">Вписать</button>
+        <button id="wide-full">⛶ На весь экран</button>
+      </div>
+      <div class="stage" id="wide-stage">
+        <svg class="links" id="wide-links"></svg>
+        <div id="wide-cards"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-story" class="view">
+    <div class="page story">
+      <h2>История семьи</h2>
+      <div id="story"><p class="sub">Загружаем…</p></div>
+    </div>
+  </section>
+
+  <section id="view-people" class="view">
+    <div class="page">
+      <h2>Все люди</h2>
+      <p class="sub" id="people-sub"></p>
+      <div class="people-modes" role="group" aria-label="Отображение людей">
+        <button class="btn" data-people-mode="list" aria-pressed="true">Список</button>
+        <button class="btn" data-people-mode="bios" aria-pressed="false">Биографии</button>
+        <button class="btn" data-people-mode="surnames" aria-pressed="false">Фамилии</button>
+        <button class="btn" data-people-mode="calendar" aria-pressed="false">Календарь</button>
+        <button class="btn" data-people-mode="zodiac" aria-pressed="false">Гороскоп</button>
+      </div>
+      <input id="people-filter" class="filter" type="search" placeholder="Фильтр по имени, родству, году…" aria-label="Фильтр">
+      <div id="people-list" class="plist"></div>
+      <div id="people-surnames" class="fam-grid" hidden></div>
+      <div id="people-bios" class="bios story" hidden></div>
+      <section id="people-calendar" class="family-calendar" hidden aria-label="Календарь дней рождения и дат смерти">
+        <div class="calendar-toolbar">
+          <h3 id="calendar-title" aria-live="polite"></h3>
+          <div class="calendar-navigation">
+            <button class="btn" id="calendar-prev" aria-label="Предыдущий месяц">←</button>
+            <select id="calendar-month" aria-label="Выбрать месяц"></select>
+            <button class="btn" id="calendar-next" aria-label="Следующий месяц">→</button>
+            <button class="btn" id="calendar-today">Текущий месяц</button>
+          </div>
+        </div>
+        <div id="calendar-upcoming" class="calendar-upcoming" aria-label="Ближайшие семейные даты"></div>
+        <div class="calendar-types" role="group" aria-label="Тип семейной даты">
+          <button class="btn" data-calendar-kind="all" aria-pressed="true">Все даты</button>
+          <button class="btn" data-calendar-kind="birth" aria-pressed="false"><span class="calendar-mark birth" aria-hidden="true"></span>Дни рождения</button>
+          <button class="btn" data-calendar-kind="death" aria-pressed="false"><span class="calendar-mark death" aria-hidden="true"></span>Даты смерти</button>
+        </div>
+        <div class="calendar-layout">
+          <div class="calendar-month-grid">
+            <div class="calendar-weekdays" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+            <div id="calendar-days" class="calendar-days" role="group" aria-labelledby="calendar-title"></div>
+            <button class="btn calendar-leap" id="calendar-leap" hidden>29 февраля — дата високосного года</button>
+          </div>
+          <div class="calendar-agenda">
+            <div class="calendar-agenda-heading">
+              <h3 id="calendar-agenda-title"></h3>
+              <button class="btn" id="calendar-all-days" hidden>Все даты месяца</button>
+            </div>
+            <p class="calendar-note" id="calendar-summary" role="status"></p>
+            <div id="calendar-events"></div>
+          </div>
+        </div>
+        <p class="calendar-note calendar-foot">В календаре — даты с известными днём и месяцем. Варианты из разных источников отмечены; календарный стиль сохранён как в записи.</p>
+      </section>
+      <section id="people-zodiac" class="family-zodiac" hidden aria-labelledby="zodiac-title">
+        <h3 id="zodiac-title">Состав семьи по гороскопу</h3>
+        <p class="zodiac-intro">Нажмите на сектор или знак, чтобы посмотреть людей. Доли рассчитаны среди людей с известным знаком.</p>
+        <div class="zodiac-layout">
+          <div class="zodiac-visual">
+            <div class="zodiac-wheel">
+              <svg id="zodiac-chart" viewBox="0 0 400 400" role="group" aria-label="Состав семьи по знакам зодиака"></svg>
+              <div class="zodiac-center" aria-hidden="true">
+                <strong id="zodiac-center-count"></strong>
+                <span id="zodiac-center-label"></span>
+              </div>
+            </div>
+            <p id="zodiac-coverage" class="zodiac-coverage" role="status"></p>
+            <div id="zodiac-elements" class="zodiac-elements" role="group" aria-label="Стихии знаков зодиака"></div>
+          </div>
+          <div id="zodiac-signs" class="zodiac-signs" role="group" aria-label="Знаки зодиака"></div>
+        </div>
+        <div id="zodiac-missing" class="zodiac-missing" role="group" aria-label="Даты для уточнения"></div>
+        <p class="zodiac-note">Использованы календарные границы западного зодиака. Каждый человек учитывается один раз; если варианты рождения дают разные знаки, знак требует уточнения. Люди без установленной связи с семьёй в расчёт не входят.</p>
+        <div class="zodiac-details" id="zodiac-details" hidden>
+          <div class="zodiac-details-heading">
+            <h3 id="zodiac-details-title"></h3>
+            <button class="btn" id="zodiac-reset" hidden>Все знаки</button>
+          </div>
+          <p id="zodiac-selection-summary" class="zodiac-note" role="status"></p>
+          <div id="zodiac-people" class="zodiac-people"></div>
+          <button class="btn" id="zodiac-more" hidden>Показать ещё</button>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section id="view-questions" class="view">
+    <div class="page qa">
+      <h2>Вопросы и обсуждение</h2>
+      <p class="sub">Здесь родственники задают вопросы и отвечают на них, делятся воспоминаниями и поправками. Ответ на вопрос о человеке появится и в его карточке.</p>
+      <nav class="subnav" id="qa-nav">
+        <button data-go="qa-talk">Обсуждение <span class="pill" id="c-count2"></span></button>
+        <button data-go="qa-questions">Вопросы к семье <span class="pill" id="q-count"></span></button>
+        <button data-go="qa-leads">Наводки и направления поиска</button>
+      </nav>
+      <section id="qa-talk">
+        <div class="general-form" id="general-form"></div>
+        <h3>Последние комментарии</h3>
+        <div id="feed" class="feed"></div>
+      </section>
+      <section id="qa-questions">
+        <h3>Вопросы к семье</h3>
+        <p class="sub">Этого мы пока не знаем. Если помните хоть что-то, даже приблизительно, ответьте прямо здесь.</p>
+        <div id="questions" class="cards"></div>
+      </section>
+      <section id="qa-leads">
+        <h3>Наводки и направления поиска</h3>
+        <p class="sub">Совпадения и архивные адреса, которые ещё не подтверждены. В древо они не внесены.</p>
+        <div id="leads" class="cards"></div>
+      </section>
+    </div>
+  </section>
+
+  <section id="view-places" class="view">
+    <div class="page routes">
+      <header class="routes-head">
+        <h2>Места</h2>
+        <p class="sub">Места жизни, учёбы, службы и погребения наших родных. Выберите ветвь: в карточках — события, документы и сведения, которые ещё требуют проверки.</p>
+        <div id="place-filters" class="route-filters" role="group" aria-label="Выбрать ветвь семьи"></div>
+        <details class="place-index" id="place-index-box"><summary>Указатель мест <span class="pill" id="place-index-count"></span></summary><div id="place-index" class="place-index-list"></div></details>
+      </header>
+      <div class="routes-body">
+        <div class="routes-list">
+          <div id="places"></div>
+          <section class="place-unmatched" aria-labelledby="place-unmatched-title"><h3 id="place-unmatched-title">Что ещё нужно уточнить</h3><p class="sub">Эти места известны из документов, но точная современная привязка пока не проверена.</p><div id="place-suggestions"></div></section>
+        </div>
+        <div class="routes-map">
+          <div id="place-map" class="route-map" role="region" aria-label="Карта мест семьи"></div>
+          <p class="route-map-note">Точки — сёла и города, иногда ориентиры. Пунктир показывает переезды, указанные в источниках, по прямой между местами. Места без проверенных координат доступны в карточках.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-sources" class="view">
+    <div class="page archive">
+      <h2>Семейный архив</h2>
+      <p class="sub">Все документы, фотографии, рукописи и справки, на которых основано древо. Нажмите на карточку, чтобы открыть документ, прочитать описание и увидеть, к кому он относится. <a href="family_tree.ged" download>Скачать древо в формате GEDCOM</a> — для MyHeritage, Gramps и других программ.</p>
+      <div class="arch-tabs" role="tablist" aria-label="Разделы архива"><button type="button" role="tab" data-mode="docs" aria-selected="true">Документы и фотографии</button><button type="button" role="tab" data-mode="restored" aria-selected="false" id="arch-tab-restored" hidden>Отреставрированные фото</button><button type="button" role="tab" data-mode="corrections" aria-selected="false" id="arch-tab-corrections">Журнал исправлений</button></div>
+      <div id="arch-docs">
+      <div class="arch-tools">
+        <input id="arch-q" class="filter" type="search" placeholder="Поиск по архиву: имя, место, год, слово из документа…" aria-label="Поиск по архиву">
+        <details class="arch-filters" id="arch-filters" open>
+          <summary class="btn">Фильтры</summary>
+          <div class="arch-row"><span class="arch-lbl">Вид</span><div class="pl-chips" id="arch-kind"></div></div>
+          <div class="arch-row"><span class="arch-lbl">Род</span><div class="pl-chips" id="arch-line"></div></div>
+          <div class="arch-row"><span class="arch-lbl">Порядок</span><div class="pl-chips" id="arch-sort"></div></div>
+        </details>
+        <span class="arch-count" id="arch-count"></span>
+      </div>
+      <button class="arch-wide" id="open-wide" type="button">
+        <span class="arch-wide-t">Всё древо на одной схеме</span>
+        <span class="arch-wide-s">Все ветви и поколения сразу: влево — младшие, вправо — старшие. Можно развернуть на весь экран.</span>
+      </button>
+      <div id="sources" class="arch-grid"></div>
+      <h3>Журнал поиска</h3>
+      <p class="sub">Что и где искали, с каким результатом — чтобы не повторять.</p>
+      <div id="research-log" class="rlog"></div>
+      </div>
+      <section class="arch-corrections" id="arch-corrections" hidden>
+        <h3>Журнал исправлений</h3>
+        <p class="sub">Каждое изменение в древе: что было записано раньше, что стало, почему и на каком документе это основано. Новые правки — сверху. Имя открывает карточку человека, номер — документ.</p>
+        <div class="tblwrap"><table id="corrections"><thead><tr><th>Запись</th><th>Поле</th><th>Было</th><th>Стало</th><th>Почему</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <section class="arch-restored" id="arch-restored" hidden>
+        <div class="rest-head"><h3>Отреставрированные фотографии</h3><div class="rest-switch rest-sort" id="rest-sort" role="group" aria-label="Порядок"><button type="button" data-s="year" aria-pressed="true">По времени</button><button type="button" data-s="line" aria-pressed="false">По фамилиям</button></div><div class="rest-switch rest-all" id="rest-all" role="group" aria-label="Все снимки"><button type="button" data-v="color" aria-pressed="true">Цвет</button><button type="button" data-v="bw" aria-pressed="false">Ч/б</button><button type="button" data-v="orig" aria-pressed="false">Оригинал</button></div></div>
+        <p class="sub">Копии старых семейных снимков без заломов и пятен — в чёрно-белом варианте и раскрашенные. Цвета в раскрашенных — догадка реставратора, а документом остаётся оригинал: его можно открыть по номеру.</p>
+        <div class="restored-grid" id="restored-grid"></div>
+      </section>
+    </div>
+  </section>
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="panel-close" id="panel-close" aria-label="Закрыть">×</button>
+  <div id="panel-body"></div>
+</aside>
+<div class="scrim" id="scrim" hidden></div>
+
+<div class="doc" id="doc" hidden role="dialog" aria-modal="true" aria-labelledby="doc-title">
+  <div class="doc-inner">
+    <button class="panel-close" id="doc-close" aria-label="Закрыть">×</button>
+    <div class="doc-view" id="doc-view"></div>
+    <div class="doc-meta" id="doc-meta"></div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button class="panel-close" id="lightbox-close" aria-label="Закрыть">×</button>
+  <img id="lightbox-img" alt="">
+  <p id="lightbox-cap"></p>
+</div>
+
+{{scripts}}
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+# Copy this file to .github/workflows/site.yml in the repository with YOUR family site
+# (family_tree.json, site.json, sources/, content/ at the top level of the repository).
+# Then: Settings → Pages → Source: "GitHub Actions". Every push publishes the site.
+#
+# Скопируйте этот файл в .github/workflows/site.yml в репозиторий с ВАШИМ сайтом
+# (family_tree.json, site.json, sources/, content/ в корне репозитория).
+# Затем: Settings → Pages → Source: «GitHub Actions». Каждый push публикует сайт.
+#
+# Mind privacy: a public repository shows family_tree.json to everyone, including
+# living people's details that the built site hides. Keep the data repository private —
+# GitHub Pages can publish from private repositories on paid plans; otherwise build
+# locally and upload only the _site folder.
+name: Family site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - run: pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@main"
+      - id: pages
+        uses: actions/configure-pages@v5
+      - run: gene build . -o _site --base-url "${{ steps.pages.outputs.base_url }}/"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4

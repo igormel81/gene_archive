@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - run: pip install ".[images]"
+      - run: python -m unittest discover tests -v
+      - name: The CLI works from an installed package
+        run: |
+          cd "$RUNNER_TEMP"
+          gene --version
+          gene init new-site --lang en
+          gene validate new-site
+          gene build new-site
+          test -f new-site/_site/index.html -a -f new-site/_site/ru/index.html
+
+  browsers:
+    name: Browser checks (Chromium, WebKit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ".[images]"
+      - run: gene build example
+      - run: npm install --no-save playwright && npx playwright install --with-deps chromium webkit
+      - run: SMOKE_ENGINES=chromium,webkit node tests/smoke.mjs

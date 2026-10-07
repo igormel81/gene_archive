@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gene-archive"
+version = "0.1.0"
+description = "Static site generator for a family history archive: tree, people, places, documents, story — in Russian, English and Romanian"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Igor Melnikov"}]
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["genealogy", "family tree", "gedcom", "static site", "family history", "родословная"]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Sociology :: Genealogy",
+  "Natural Language :: Russian",
+  "Natural Language :: English",
+  "Natural Language :: Romanian",
+]
+
+[project.optional-dependencies]
+images = ["Pillow>=10"]
+
+[project.scripts]
+gene = "gene_archive.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/igormel81/gene_archive"
+Documentation = "https://github.com/igormel81/gene_archive/tree/main/docs"
+
+[tool.setuptools]
+packages = ["gene_archive"]
+
+[tool.setuptools.package-data]
+gene_archive = ["engine/*.html", "engine/web/*", "engine/web/vendor/leaflet/*", "engine/i18n/*.json"]

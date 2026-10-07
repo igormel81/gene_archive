@@ -1,0 +1,168 @@
+{
+  "title": "The Harper & Novak family archive",
+  "short_title": "Harper & Novak",
+  "description": "A fictional demonstration archive: an Irish family from County Mayo and a Slovak family from Kapušany who met in Pittsburgh, told through records, photographs and family memories.",
+  "base_url": "https://example.org/family/",
+  "languages": [
+    "en",
+    "ru",
+    "ro"
+  ],
+  "root_person": "I35",
+  "start_person": "I22",
+  "quick_focus": [
+    {
+      "label": "Michael Harper, the emigrant from Mayo",
+      "person": "I3"
+    },
+    {
+      "label": "Josef Novak, from Kapušany to Windber",
+      "person": "I12"
+    }
+  ],
+  "branches": [
+    {
+      "id": "harper",
+      "title": "Harpers",
+      "focus": "I3",
+      "about": "Tenant farmers from Louisburgh, County Mayo, and three generations of steelworkers in Lawrenceville, Pittsburgh."
+    },
+    {
+      "id": "novak",
+      "title": "Novaks",
+      "focus": "I12",
+      "about": "Slovaks from Kapušany near Prešov who came by way of Hamburg, Chicago and the Windber coal fields to Pittsburgh's South Side."
+    }
+  ],
+  "questions": [
+    {
+      "person": "I6",
+      "text": "Does anyone know the names of Kate Doyle's parents, or where in New York she was born?"
+    },
+    {
+      "person": "I41",
+      "text": "Did anyone in the family ever mention an aunt Honora (Nora) Harper who lived in Pittsburgh in the 1880s?"
+    },
+    {
+      "person": "I42",
+      "text": "Was there a Michal (Michael) Novák in the family who came to America with Josef in 1892?"
+    },
+    {
+      "person": "I5",
+      "text": "Does anyone have letters from Thomas Harper, ‘the brother who went to Liverpool’?"
+    },
+    {
+      "person": "I18",
+      "text": "Do any photographs of Rose's birth parents, the Sabos of Windber, survive?"
+    },
+    {
+      "person": "I9",
+      "text": "Did Daniel Harper's letters home from France in 1918 survive? Who had them last?"
+    }
+  ],
+  "story": {
+    "timeline": [
+      [
+        "1847",
+        "The famine years",
+        "s-famine"
+      ],
+      [
+        "1880",
+        "Queenstown to New York",
+        "s-crossing"
+      ],
+      [
+        "1884",
+        "Wedding at St. Patrick's",
+        "s-wedding"
+      ],
+      [
+        "1892",
+        "Josef leaves Kapušany",
+        "s-kapusany"
+      ],
+      [
+        "1898",
+        "Coal in Windber",
+        "s-windber"
+      ],
+      [
+        "1918",
+        "Daniel in France",
+        "s-wars"
+      ],
+      [
+        "1949",
+        "A Harper meets a Novak",
+        "s-meeting"
+      ],
+      [
+        "1985",
+        "How the archive began",
+        "s-archive"
+      ]
+    ],
+    "places": [
+      [
+        "Pittsburgh",
+        "Pittsburgh|Allegheny|Lawrenceville|South Side"
+      ],
+      [
+        "Louisburgh",
+        "Louisburgh|Mayo"
+      ],
+      [
+        "Kapušany",
+        "Kapu[sš]any|Prešov"
+      ],
+      [
+        "Windber",
+        "Windber|Somerset"
+      ],
+      [
+        "Chicago",
+        "Chicago"
+      ]
+    ],
+    "branch_tags": {
+      "s-famine": [
+        "harper"
+      ],
+      "s-crossing": [
+        "harper"
+      ],
+      "s-wedding": [
+        "harper"
+      ],
+      "s-kapusany": [
+        "novak"
+      ],
+      "s-windber": [
+        "novak"
+      ],
+      "s-wars": [
+        "harper"
+      ],
+      "s-meeting": [
+        "harper",
+        "novak"
+      ],
+      "s-archive": [
+        "harper",
+        "novak"
+      ]
+    },
+    "branch_names": {
+      "harper": "Harpers",
+      "novak": "Novaks"
+    }
+  },
+  "privacy": {
+    "living_years": 100
+  },
+  "comments": false,
+  "surname_variants": {
+    "Novák": "Novak"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "description": "Browser checks of gene-archive (Playwright). Python is all you need to build sites.",
+  "scripts": {
+    "smoke": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

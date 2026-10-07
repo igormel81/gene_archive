@@ -1,0 +1,3479 @@
+{
+ "schema_version": "1.0",
+ "root_person_id": "I35",
+ "people": [
+  {
+   "id": "I1",
+   "given_names": "Patrick",
+   "surname": "Harper",
+   "display_name": "Patrick Harper",
+   "sex": "M",
+   "relation": "3× great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Pádraig Harper",
+    "Patt Harper"
+   ],
+   "identity_source_ids": [
+    "S2"
+   ],
+   "birth": {
+    "date": "ABT 1832",
+    "place_as_recorded": "Louisburgh parish, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S16"
+    ],
+    "note": "From the age remembered at his death"
+   },
+   "birth_alternatives": [
+    {
+     "date": "ABT 1834",
+     "place_as_recorded": "Louisburgh, Co. Mayo",
+     "place_slugs": [
+      "louisburgh"
+     ],
+     "status": "calculated_from_age",
+     "source_ids": [
+      "S2"
+     ],
+     "note": "Aged 22 at his marriage in February 1856"
+    }
+   ],
+   "death": {
+    "date": "ABT 1891",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16",
+     "S15"
+    ],
+    "note": "‘The winter Parnell died’; Bridget is a widow in 1901"
+   },
+   "burial": {
+    "place_as_recorded": "Old graveyard of Kilgeever, Louisburgh",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Townland near Louisburgh, tenant farm",
+     "date": "1856–1891",
+     "place_slugs": [
+      "louisburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S2",
+      "S1"
+     ]
+    }
+   ],
+   "profiles": [
+    {
+     "site": "ExampleTree",
+     "url": "https://example.org/tree/patrick-harper-1832",
+     "match": "probable"
+    }
+   ],
+   "notes": [
+    "Patrick Harper was a small tenant farmer on the western edge of Louisburgh parish, County Mayo, where the hills run down to Clew Bay. He was a boy of about fifteen in the famine winter of 1847; family tradition says the Harpers survived it by working on the relief road along the coast and that two of Patrick's younger brothers did not.",
+    "In February 1856 he married Bridget Walsh in the parish chapel (S2). The register gives his age as 22, which would put his birth around 1834; the age at death that the family remembers points to about 1832, and we keep both versions until a baptism turns up.",
+    "Patrick never left Mayo. He saw his eldest son Michael off to Queenstown in the spring of 1880 and, as far as anyone knows, never saw him again. The family says he died 'the winter Parnell died', that is 1891; the 1901 census lists Bridget as a widow (S15, S16)."
+   ]
+  },
+  {
+   "id": "I2",
+   "given_names": "Bridget",
+   "surname": "Harper",
+   "display_name": "Bridget Harper",
+   "sex": "F",
+   "relation": "3× great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Bridget Walsh",
+    "Biddy Harper"
+   ],
+   "identity_source_ids": [
+    "S1",
+    "S15"
+   ],
+   "birth": {
+    "date": "ABT 1836",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S15"
+    ],
+    "note": "Aged 65 in the 1901 census"
+   },
+   "death": {
+    "date": "1902",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "probable",
+    "source_ids": [
+     "S16"
+    ],
+    "note": "From a remembered letter; no death record found yet"
+   },
+   "residences": [
+    {
+     "place": "Louisburgh, with daughter Mary",
+     "date": "1901",
+     "place_slugs": [
+      "louisburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S15"
+     ]
+    }
+   ],
+   "notes": [
+    "Bridget Walsh grew up two miles from the Harpers and married Patrick in February 1856 (S2). Her maiden name is confirmed by the baptism of her son Michael, where she appears as 'Bridget Walsh' (S1).",
+    "In the 1901 census she is a widow of 65, living with her unmarried daughter Mary, and she signs with a mark (S15). She was not alive at the next census; a letter remembered in the family told Michael of her death in 1902."
+   ]
+  },
+  {
+   "id": "I3",
+   "given_names": "Michael",
+   "surname": "Harper",
+   "display_name": "Michael Harper",
+   "sex": "M",
+   "relation": "great-great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Mick Harper",
+    "Michl. Harper"
+   ],
+   "identity_source_ids": [
+    "S1",
+    "S10"
+   ],
+   "birth": {
+    "date": "1858-09-29",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S1"
+    ],
+    "note": "Baptised 3 October 1858; entry 212"
+   },
+   "death": {
+    "date": "1924-03-02",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S10"
+    ]
+   },
+   "burial": {
+    "date": "1924-03-05",
+    "place_as_recorded": "Calvary Cemetery, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "gravestone",
+    "source_ids": [
+     "S19"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Embarked at Queenstown (Cobh) for New York",
+     "date": "April 1880",
+     "place_slugs": [
+      "cobh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S4"
+     ]
+    },
+    {
+     "place": "Landed at Castle Garden, New York",
+     "date": "April 1880",
+     "place_slugs": [
+      "new-york"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S4"
+     ]
+    },
+    {
+     "place": "Pittsburgh, Sixth Ward, boarding house",
+     "date": "1880",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S14"
+     ]
+    },
+    {
+     "place": "Pittsburgh, Lawrenceville, Butler Street",
+     "date": "1884–1924",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S10",
+      "S3"
+     ]
+    }
+   ],
+   "profiles": [
+    {
+     "site": "ExampleTree",
+     "url": "https://example.org/tree/michael-harper-1858",
+     "match": "confirmed"
+    },
+    {
+     "site": "Example Memorials",
+     "url": "https://example.org/memorial/harper-michael-1924",
+     "match": "confirmed"
+    }
+   ],
+   "notes": [
+    "Michael Harper was born in September 1858 and baptised a few days later in Louisburgh, the son of Patrick Harper and Bridget Walsh (S1). He grew up on the family farm and, as the eldest son, could have inherited it; instead, at twenty-one, he took the coach to Castlebar and the train to Queenstown.",
+    "He sailed in April 1880 and landed at Castle Garden in New York (S4). By the June census he was boarding in Pittsburgh's Sixth Ward and working as a labourer at a rolling mill (S14). Four years later he married Catherine 'Kate' Doyle at St. Patrick's church; their wedding portrait, with the inscription on the back, is one of the oldest photographs in the archive (S3).",
+    "Michael worked in the mills of the Strip District for nearly forty years and rose to be a roller. He and Kate raised three children in a narrow brick house in Lawrenceville. He died in March 1924; the obituary calls him 'a native of the County Mayo and a man well liked on Butler Street' (S10). He is buried with Kate at Calvary Cemetery (S19)."
+   ]
+  },
+  {
+   "id": "I4",
+   "given_names": "Mary",
+   "surname": "Harper",
+   "display_name": "Mary Harper",
+   "sex": "F",
+   "relation": "sister of Michael Harper",
+   "placeholder": false,
+   "aliases": [],
+   "identity_source_ids": [
+    "S15"
+   ],
+   "birth": {
+    "date": "ABT 1862",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S15"
+    ],
+    "note": "Aged 39 in 1901"
+   },
+   "death": {
+    "date": "BET 1930 AND 1939",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Louisburgh, with her mother",
+     "date": "1901",
+     "place_slugs": [
+      "louisburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S15"
+     ]
+    }
+   ],
+   "notes": [
+    "Mary stayed in Louisburgh, never married, and looked after her mother Bridget in old age; in 1901 she is 39 and keeps house (S15). Letters from her to Michael in Pittsburgh are remembered in the family but have not been found. She is believed to have died in Louisburgh in the 1930s."
+   ]
+  },
+  {
+   "id": "I5",
+   "given_names": "Thomas",
+   "surname": "Harper",
+   "display_name": "Thomas Harper",
+   "sex": "M",
+   "relation": "possibly a brother of Michael Harper",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "EST 1864",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "A Thomas Harper, son of Patrick, is remembered by Kate Harper as 'the brother who went to Liverpool' (S16). No baptism has been found, so his place in the family is probable rather than proven."
+   ]
+  },
+  {
+   "id": "I6",
+   "given_names": "Catherine",
+   "surname": "Harper",
+   "display_name": "Catherine Harper",
+   "sex": "F",
+   "relation": "great-great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Kate Doyle",
+    "Catherine Doyle"
+   ],
+   "identity_source_ids": [
+    "S3",
+    "S19"
+   ],
+   "birth": {
+    "date": "1862",
+    "place_as_recorded": "New York",
+    "place_slugs": [
+     "new-york"
+    ],
+    "status": "gravestone",
+    "source_ids": [
+     "S19"
+    ]
+   },
+   "death": {
+    "date": "1931",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "gravestone",
+    "source_ids": [
+     "S19"
+    ]
+   },
+   "burial": {
+    "place_as_recorded": "Calvary Cemetery, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "gravestone",
+    "source_ids": [
+     "S19"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, Lawrenceville",
+     "date": "1884–1931",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S3",
+      "S10"
+     ]
+    }
+   ],
+   "notes": [
+    "Catherine 'Kate' Doyle was born in New York to Irish parents whose names we do not yet know; she and her brother Owen moved to Pittsburgh as teenagers. She married Michael Harper at St. Patrick's in June 1884, and her copperplate hand on the back of their wedding portrait is the earliest family handwriting we have (S3).",
+    "Kate outlived Michael by seven years and kept the Lawrenceville house full of boarders. She died in 1931 and shares his gravestone at Calvary (S19)."
+   ]
+  },
+  {
+   "id": "I40",
+   "given_names": "Owen",
+   "surname": "Doyle",
+   "display_name": "Owen Doyle",
+   "sex": "M",
+   "relation": "brother of Catherine Doyle",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "ABT 1860",
+    "place_as_recorded": "New York",
+    "place_slugs": [
+     "new-york"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1915",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Owen Doyle, Kate's elder brother, was a teamster in Pittsburgh and stood as witness at her wedding in 1884 (S3). Their parents are unknown, so the two appear in the tree as siblings without parents."
+   ]
+  },
+  {
+   "id": "I10",
+   "given_names": "Ján",
+   "surname": "Novák",
+   "display_name": "Ján Novák",
+   "sex": "M",
+   "relation": "3× great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Johannes Novák",
+    "János Novák"
+   ],
+   "identity_source_ids": [
+    "S6"
+   ],
+   "birth": {
+    "date": "ABT 1838",
+    "place_as_recorded": "Kapušany, Sáros county",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "probable",
+    "source_ids": [
+     "S6"
+    ],
+    "note": "Estimated from his marriage and the birth of his children"
+   },
+   "death": {
+    "date": "BEF 1904",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "probable",
+    "source_ids": [
+     "S26"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Kapušany, house no. 31",
+     "date": "1866",
+     "place_slugs": [
+      "kapusany"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S6"
+     ]
+    }
+   ],
+   "notes": [
+    "Ján Novák was a smallholder and carter in Kapušany, a village on the road north of Prešov in what was then the Kingdom of Hungary. He appears as the father in the baptism of his son Jozef in 1866 (S6). Nothing is known of his own parents yet.",
+    "He did not emigrate. The family believes he died before his son's naturalization in 1904, because Josef named no living father in the papers (S26)."
+   ]
+  },
+  {
+   "id": "I11",
+   "given_names": "Anna",
+   "surname": "Nováková",
+   "display_name": "Anna Nováková",
+   "sex": "F",
+   "relation": "3× great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Anna Hudáková",
+    "Anna Novak"
+   ],
+   "identity_source_ids": [
+    "S6"
+   ],
+   "birth": {
+    "date": "ABT 1842",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "probable"
+   },
+   "death": {
+    "date": "AFT 1906",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "probable",
+    "source_ids": [
+     "S8"
+    ],
+    "note": "Still alive when the Windber photograph was sent to her"
+   },
+   "notes": [
+    "Anna Hudáková married Ján Novák in Kapušany; the baptism of her son Jozef names her with her maiden name (S6). A photograph sent from Windber in 1906 was addressed to her — 'sent to Kapušany' is written on the back (S8)."
+   ]
+  },
+  {
+   "id": "I12",
+   "given_names": "Josef",
+   "surname": "Novak",
+   "display_name": "Josef Novak",
+   "sex": "M",
+   "relation": "great-great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Jozef Novák",
+    "Joseph Novak",
+    "Josef Nowak"
+   ],
+   "identity_source_ids": [
+    "S6",
+    "S26"
+   ],
+   "birth": {
+    "date": "1866-03-19",
+    "place_as_recorded": "Kapušany, Sáros county",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S6"
+    ]
+   },
+   "birth_alternatives": [
+    {
+     "date": "ABT 1867",
+     "place_as_recorded": "Kapušany",
+     "place_slugs": [
+      "kapusany"
+     ],
+     "status": "calculated_from_age",
+     "source_ids": [
+      "S5"
+     ],
+     "note": "Aged 25 on the Ellis Island manifest, May 1892"
+    }
+   ],
+   "death": {
+    "date": "1931-08-14",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S22"
+    ]
+   },
+   "burial": {
+    "place_as_recorded": "St. Matthew's Slovak cemetery, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S22"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Hamburg, emigrant lodging halls",
+     "date": "May 1892",
+     "place_slugs": [
+      "hamburg"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S9"
+     ]
+    },
+    {
+     "place": "Ellis Island, New York",
+     "date": "May 1892",
+     "place_slugs": [
+      "new-york"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S5"
+     ]
+    },
+    {
+     "place": "Chicago, near the Union Stock Yards",
+     "date": "1892–1898",
+     "place_slugs": [
+      "chicago"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S7"
+     ]
+    },
+    {
+     "place": "Windber, company house on 10th Street",
+     "date": "1898–1912",
+     "place_slugs": [
+      "windber"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S26",
+      "S8"
+     ]
+    },
+    {
+     "place": "Pittsburgh, South Side",
+     "date": "1912–1931",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S22"
+     ]
+    }
+   ],
+   "profiles": [
+    {
+     "site": "ExampleTree",
+     "url": "https://example.org/tree/josef-novak-1866",
+     "match": "confirmed"
+    }
+   ],
+   "notes": [
+    "Jozef Novák was born in Kapušany in March 1866 and baptised in the parish church (S6). In the spring of 1892 he walked and rode to Hamburg, where his name was entered in the emigrant lists together with a Michal Novák from the same village (S9), and sailed to New York. The Ellis Island manifest gives his age as 25 (S5), which is why older family trees say he was born in 1867.",
+    "He went first to Chicago, where Slovak boarding houses clustered around the stockyards, and in 1894 married Mária Kováčová there (S7). In 1898 the young family moved to the new coal town of Windber in Somerset County, where Josef dug coal for fourteen years. He became an American citizen in 1904 (S26). The Windber photograph of 1906 shows him with Mária, their children Frank and Helen, and little Rose, the orphan they took in (S8, S13).",
+    "In 1912 the Novaks moved to Pittsburgh, and Josef worked as a watchman at a steel works until his lungs gave out. He died in August 1931 (S22)."
+   ]
+  },
+  {
+   "id": "I13",
+   "given_names": "Štefan",
+   "surname": "Novák",
+   "display_name": "Štefan Novák",
+   "sex": "M",
+   "relation": "brother of Josef Novak",
+   "placeholder": false,
+   "aliases": [
+    "Stephen Novak",
+    "Stefan Novak"
+   ],
+   "identity_source_ids": [
+    "S7"
+   ],
+   "birth": {
+    "date": "1870",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1930",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Chicago, Southwest Side",
+     "date": "1893–1930",
+     "place_slugs": [
+      "chicago"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S7"
+     ]
+    }
+   ],
+   "notes": [
+    "Štefan followed his brother to America in 1893 and stayed in Chicago when Josef left for the coal fields. He worked at a packing house, married Zuzana Bartošová in 1899, and lived the rest of his life on the Southwest Side. He was a witness at Josef's wedding in 1894 (S7)."
+   ]
+  },
+  {
+   "id": "I19",
+   "given_names": "Zuzana",
+   "surname": "Novák",
+   "display_name": "Zuzana Novák",
+   "sex": "F",
+   "relation": "wife of Štefan Novák",
+   "placeholder": false,
+   "aliases": [
+    "Zuzana Bartošová",
+    "Susan Novak"
+   ],
+   "birth": {
+    "date": "ABT 1876",
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1949",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Zuzana Bartošová came from a village near Bardejov and married Štefan Novák in Chicago in 1899. The family knows her mainly from Christmas cards kept by Helen Novak."
+   ]
+  },
+  {
+   "id": "I44",
+   "given_names": "Paul",
+   "surname": "Novak",
+   "display_name": "Paul Novak",
+   "sex": "M",
+   "relation": "cousin of Frank Novak",
+   "placeholder": false,
+   "aliases": [
+    "Pavol Novák"
+   ],
+   "birth": {
+    "date": "1901",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1975",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Paul, the only son of Štefan and Zuzana, became a streetcar motorman in Chicago. He visited the Pittsburgh Novaks for Helen's retirement party in 1962, the last time the two branches met."
+   ]
+  },
+  {
+   "id": "I14",
+   "given_names": "Mary",
+   "surname": "Novak",
+   "display_name": "Mary Novak",
+   "sex": "F",
+   "relation": "great-great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Mária Kováčová",
+    "Maria Kovac",
+    "Mária Nováková"
+   ],
+   "identity_source_ids": [
+    "S7"
+   ],
+   "birth": {
+    "date": "1872-08-02",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S7"
+    ],
+    "note": "Age and birthplace from the marriage certificate"
+   },
+   "death": {
+    "date": "1944-01-27",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Chicago",
+     "date": "1893–1898",
+     "place_slugs": [
+      "chicago"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S7"
+     ]
+    },
+    {
+     "place": "Windber, boarding house",
+     "date": "1898–1912",
+     "place_slugs": [
+      "windber"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S8",
+      "S13"
+     ]
+    },
+    {
+     "place": "Pittsburgh, South Side",
+     "date": "1912–1944",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S25"
+     ]
+    }
+   ],
+   "notes": [
+    "Mária Kováčová also came from Kapušany; she and Josef knew each other as children, and she followed him to Chicago in 1893. They married in October 1894 (S7). Her name appears in American records as Mary Novak.",
+    "In Windber she ran a boarding house for single miners and raised three children of her own and one she chose. When the widowed Sabo family next door lost their mother as well in 1909, she took in four-year-old Rose and later adopted her formally (S13). Mary died in Pittsburgh in 1944."
+   ]
+  },
+  {
+   "id": "I7",
+   "given_names": "John Joseph",
+   "surname": "Harper",
+   "display_name": "John Joseph Harper",
+   "sex": "M",
+   "relation": "great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Jack Harper",
+    "J. J. Harper"
+   ],
+   "identity_source_ids": [
+    "S24"
+   ],
+   "birth": {
+    "date": "1886-01-17",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S24"
+    ]
+   },
+   "death": {
+    "date": "1952-11-08",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, Lawrenceville",
+     "date": "1886–1952",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S24"
+     ]
+    }
+   ],
+   "notes": [
+    "John Joseph, called Jack, was the eldest child of Michael and Kate, born in Lawrenceville in January 1886. He left school at fourteen for the mill, like his father. In 1917 he registered for the draft as a married steelworker with a child, and was not called (S24).",
+    "In 1912 he married Nora Flynn, a dressmaker from the Hill District. They had three children; the eldest, James, was killed in Normandy in 1944, a loss Jack never spoke about. He died in November 1952."
+   ]
+  },
+  {
+   "id": "I20",
+   "given_names": "Nora",
+   "surname": "Harper",
+   "display_name": "Nora Harper",
+   "sex": "F",
+   "relation": "great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Nora Flynn",
+    "Honora Flynn"
+   ],
+   "birth": {
+    "date": "1890",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1964",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Nora Flynn was a dressmaker who sewed Dorothy Novak's wedding dress in 1949 — one of the first ties between the two families (S25). She married Jack Harper in 1912 and died in 1964."
+   ]
+  },
+  {
+   "id": "I8",
+   "given_names": "Margaret",
+   "surname": "Harper",
+   "display_name": "Margaret Harper",
+   "sex": "F",
+   "relation": "great-great-aunt",
+   "placeholder": false,
+   "aliases": [
+    "Peg Harper",
+    "Margaret Shea"
+   ],
+   "birth": {
+    "date": "1889-05-12",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1967",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Chicago",
+     "date": "1925–1967",
+     "place_slugs": [
+      "chicago"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S16"
+     ]
+    }
+   ],
+   "notes": [
+    "Margaret, called Peg, was Michael and Kate's only daughter. In 1915 she married William Shea, a railway clerk, and their son Robert was born in 1919. The marriage did not last: the couple were divorced in 1925, rare enough in a Catholic family that it was hardly spoken of afterwards (S21).",
+    "Peg moved to Chicago, worked for thirty years at a mail-order house, and died there in 1967. Kate Harper remembers her as 'the aunt who sent the best birthday cards' (S16)."
+   ]
+  },
+  {
+   "id": "I24",
+   "given_names": "William",
+   "surname": "Shea",
+   "display_name": "William Shea",
+   "sex": "M",
+   "relation": "former husband of Margaret Harper",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "ABT 1885",
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1950",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "uncertain_family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "William Shea was a clerk with the Pennsylvania Railroad. After the divorce in 1925 he stayed in Pittsburgh with their son Robert. He died in 1950."
+   ]
+  },
+  {
+   "id": "I25",
+   "given_names": "Robert",
+   "surname": "Shea",
+   "display_name": "Robert Shea",
+   "sex": "M",
+   "relation": "first cousin of Thomas Harper",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1919",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1990",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Robert grew up with his father in Pittsburgh but spent summers with his Harper cousins. He became a high-school chemistry teacher and died in 1990."
+   ]
+  },
+  {
+   "id": "I9",
+   "given_names": "Daniel",
+   "surname": "Harper",
+   "display_name": "Daniel Harper",
+   "sex": "M",
+   "relation": "great-great-uncle",
+   "placeholder": false,
+   "aliases": [
+    "Danny Harper"
+   ],
+   "identity_source_ids": [
+    "S12"
+   ],
+   "birth": {
+    "date": "1892-07-04",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1918-10-12",
+    "place_as_recorded": "Meuse-Argonne, France",
+    "status": "documented",
+    "source_ids": [
+     "S12"
+    ],
+    "note": "Died of wounds"
+   },
+   "death_alternatives": [
+    {
+     "date": "1918-10-08",
+     "place_as_recorded": "France",
+     "status": "publication",
+     "source_ids": [
+      "S11"
+     ],
+     "note": "Date given by the newspaper; probably the day he was wounded"
+    }
+   ],
+   "profiles": [
+    {
+     "site": "Example War Graves",
+     "url": "https://example.org/war-graves/harper-daniel-1918",
+     "match": "confirmed"
+    }
+   ],
+   "notes": [
+    "Daniel, the youngest of Michael's children, was born on the Fourth of July 1892, which his father thought a very good sign. He enlisted in 1917 and went to France with an infantry division raised in western Pennsylvania.",
+    "He was wounded in the Meuse-Argonne offensive. The Pittsburgh paper reported that he died on 8 October 1918 (S11); the War Department card says he died of wounds on 12 October (S12). We keep both dates: the newspaper was probably reporting the day he was wounded. He is buried in France."
+   ]
+  },
+  {
+   "id": "I45",
+   "given_names": "(unknown child)",
+   "surname": "Harper",
+   "display_name": "Unknown child Harper",
+   "sex": "U",
+   "relation": "child of Michael and Kate Harper",
+   "placeholder": true,
+   "aliases": [],
+   "birth": {
+    "date": "BET 1886 AND 1892",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "probable"
+   },
+   "notes": [
+    "The 1900 census says Kate Harper had borne four children, three of them living. The fourth child, probably born between 1886 and 1892, died young; no name or record has been found."
+   ]
+  },
+  {
+   "id": "I15",
+   "given_names": "Frank",
+   "surname": "Novak",
+   "display_name": "Frank Novak",
+   "sex": "M",
+   "relation": "great-grandfather",
+   "placeholder": false,
+   "aliases": [
+    "František Novák",
+    "Frantisek Novak"
+   ],
+   "birth": {
+    "date": "1895-02-23",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "death": {
+    "date": "1960-05-30",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Windber",
+     "date": "1898–1912",
+     "place_slugs": [
+      "windber"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S8"
+     ]
+    },
+    {
+     "place": "Pittsburgh, South Side",
+     "date": "1912–1960",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S25"
+     ]
+    }
+   ],
+   "notes": [
+    "František, always Frank in America, was born in Chicago in February 1895 and grew up in Windber, where he went down the mine at thirteen as a door boy. He is the eldest of the children standing beside their parents in the 1906 photograph (S8).",
+    "After the move to Pittsburgh he became a machinist. In 1922 he married Anna Hrušková, who had come from Slovakia only two years before. Frank was a pillar of St. Matthew's Slovak parish and sang in its choir for forty years. He died in 1960."
+   ]
+  },
+  {
+   "id": "I16",
+   "given_names": "Helen",
+   "surname": "Novak",
+   "display_name": "Helen Novak",
+   "sex": "F",
+   "relation": "great-great-aunt",
+   "placeholder": false,
+   "aliases": [
+    "Helena Nováková",
+    "Aunt Helen"
+   ],
+   "identity_source_ids": [
+    "S23"
+   ],
+   "birth": {
+    "date": "1897-11-30",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "death": {
+    "date": "1985-09-17",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, South Side",
+     "date": "1912–1985",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S23"
+     ]
+    }
+   ],
+   "notes": [
+    "Helen was the scholar of the family: she finished high school in Pittsburgh, trained as a teacher, and taught at a South Side grade school from 1920 to 1962. The photograph of her class of 1925 shows her standing in the middle of the back row (S23).",
+    "She never married, and she was the family's memory: it was Aunt Helen who kept the Windber photograph and the Christmas cards from Chicago, and who told Dorothy the stories that Dorothy later wrote down (S25). She died in 1985, a few months after her great-great-nephew Daniel was born."
+   ]
+  },
+  {
+   "id": "I17",
+   "given_names": "Andrew",
+   "surname": "Novak",
+   "display_name": "Andrew Novak",
+   "sex": "M",
+   "relation": "great-great-uncle",
+   "placeholder": false,
+   "aliases": [
+    "Ondrej Novák"
+   ],
+   "birth": {
+    "date": "1900-06",
+    "place_as_recorded": "Windber, Pennsylvania",
+    "place_slugs": [
+     "windber"
+    ],
+    "status": "publication",
+    "source_ids": [
+     "S20"
+    ]
+   },
+   "death": {
+    "date": "1902-01",
+    "place_as_recorded": "Windber, Pennsylvania",
+    "place_slugs": [
+     "windber"
+    ],
+    "status": "publication",
+    "source_ids": [
+     "S20"
+    ]
+   },
+   "notes": [
+    "Andrew, Ondrej in the parish books, was born in Windber in June 1900 and died of diphtheria in January 1902. His burial is listed in the jubilee history of the Windber parish (S20)."
+   ]
+  },
+  {
+   "id": "I18",
+   "given_names": "Rose",
+   "surname": "Novak",
+   "display_name": "Rose Novak",
+   "sex": "F",
+   "relation": "adopted daughter of Josef and Mary Novak",
+   "placeholder": false,
+   "aliases": [
+    "Rose Sabo",
+    "Rozália Sabová"
+   ],
+   "identity_source_ids": [
+    "S13"
+   ],
+   "birth": {
+    "date": "1905-03-08",
+    "place_as_recorded": "Windber, Pennsylvania",
+    "place_slugs": [
+     "windber"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S13"
+    ]
+   },
+   "death": {
+    "date": "1993",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Windber",
+     "date": "1905–1912",
+     "place_slugs": [
+      "windber"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S13"
+     ]
+    }
+   ],
+   "notes": [
+    "Rose was born Rozália Sabová in Windber in 1905. Her father died in a mine accident in 1907 and her mother two years later; Mary Novak took her in, and in 1910 the Orphans' Court of Somerset County confirmed the adoption (S13). She is the little girl at the right of the 1906 photograph, taken when she was still the neighbours' child (S8).",
+    "Rose grew up as Helen's younger sister in everything but birth. She worked as a telephone operator, married late, and died in 1993."
+   ]
+  },
+  {
+   "id": "I26",
+   "given_names": "Anna",
+   "surname": "Novak",
+   "display_name": "Anna Novak",
+   "sex": "F",
+   "relation": "great-grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Anna Hrušková",
+    "Ann Hruska"
+   ],
+   "birth": {
+    "date": "1899",
+    "place_as_recorded": "near Prešov",
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "death": {
+    "date": "1979",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "notes": [
+    "Anna Hrušková came to Pittsburgh in 1920 from a village near Prešov to join an aunt. She met Frank Novak at a parish dance and married him in 1922. Dorothy remembered her mother's poppy-seed rolls and her refusal ever to speak about the war years at home (S25). She died in 1979."
+   ]
+  },
+  {
+   "id": "I46",
+   "given_names": "George",
+   "surname": "Kollar",
+   "display_name": "George Kollar",
+   "sex": "M",
+   "relation": "husband of Rose Novak",
+   "placeholder": false,
+   "aliases": [
+    "Juraj Kollár"
+   ],
+   "birth": {
+    "date": "1898",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "death": {
+    "date": "1970",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "notes": [
+    "George Kollar, a widowed printer from the South Side, married Rose Novak in 1938. They had no children of their own; Dorothy remembered him as the uncle who could fix any radio (S25)."
+   ]
+  },
+  {
+   "id": "I21",
+   "given_names": "James Patrick",
+   "surname": "Harper",
+   "display_name": "James Patrick Harper",
+   "sex": "M",
+   "relation": "great-great-uncle",
+   "placeholder": false,
+   "aliases": [
+    "Jimmy Harper"
+   ],
+   "identity_source_ids": [
+    "S18"
+   ],
+   "birth": {
+    "date": "1914-02-19",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "1944-06-15",
+    "place_as_recorded": "Normandy, France",
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Jimmy, the eldest son of Jack and Nora, was drafted in 1942 and trained at Camp Shelby; the oval studio portrait from 1943 is the last photograph of him (S18). He landed in Normandy in June 1944 and was killed nine days later. His younger brother Thomas named his first son Michael James in his memory."
+   ]
+  },
+  {
+   "id": "I22",
+   "given_names": "Thomas",
+   "surname": "Harper",
+   "display_name": "Thomas Harper",
+   "sex": "M",
+   "relation": "grandfather",
+   "placeholder": false,
+   "aliases": [
+    "Tom Harper"
+   ],
+   "identity_source_ids": [
+    "S17"
+   ],
+   "birth": {
+    "date": "1921-09-05",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S17"
+    ]
+   },
+   "birth_alternatives": [
+    {
+     "date": "1920-09-05",
+     "place_as_recorded": "Pittsburgh",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "status": "family_report",
+     "source_ids": [
+      "S16"
+     ],
+     "note": "Year remembered by Kate Harper; the marriage record has 1921"
+    }
+   ],
+   "death": {
+    "date": "1998-12-02",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, Brookline",
+     "date": "1950–1998",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S16"
+     ]
+    }
+   ],
+   "notes": [
+    "Thomas, called Tom, was born in Lawrenceville in September 1921. He served as a navy radio operator in the Pacific and came home in 1946 to a job with the electric company. At a St. Matthew's parish dance on the South Side — he had gone with a Slovak friend from work — he met Dorothy Novak.",
+    "They married at St. Matthew's in June 1949, and the Irish and Slovak sides of the family stood together on the church steps for the first time (S17). Tom and Dottie had three children and lived for forty years in a frame house in Brookline. Tom died in December 1998."
+   ]
+  },
+  {
+   "id": "I23",
+   "given_names": "Eileen",
+   "surname": "Harper",
+   "display_name": "Eileen Harper",
+   "sex": "F",
+   "relation": "great-aunt",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1924",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "2011",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Eileen, the youngest of Jack and Nora's children, was a nurse at Mercy Hospital for forty years. She never married and was godmother to her nephew Michael."
+   ]
+  },
+  {
+   "id": "I27",
+   "given_names": "Dorothy",
+   "surname": "Harper",
+   "display_name": "Dorothy Harper",
+   "sex": "F",
+   "relation": "grandmother",
+   "placeholder": false,
+   "aliases": [
+    "Dorothy Novak",
+    "Dottie Harper"
+   ],
+   "identity_source_ids": [
+    "S17",
+    "S25"
+   ],
+   "birth": {
+    "date": "1926-04-11",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S17"
+    ]
+   },
+   "death": {
+    "date": "2016-01-20",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, South Side",
+     "date": "1926–1949",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S25"
+     ]
+    },
+    {
+     "place": "Pittsburgh, Brookline",
+     "date": "1950–2016",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S16"
+     ]
+    }
+   ],
+   "profiles": [
+    {
+     "site": "Example Memorials",
+     "url": "https://example.org/memorial/harper-dorothy-2016",
+     "match": "confirmed"
+    }
+   ],
+   "notes": [
+    "Dorothy Novak was born on the South Side in April 1926, the daughter of Frank and Anna. She worked as a bookkeeper until her marriage to Tom Harper in 1949 (S17), and later, when the children were grown, at the parish office.",
+    "In the year Tom died she filled a school notebook with everything she remembered from Aunt Helen and her parents: Kapušany, the boat from Hamburg, the boarding house in Windber, Rose's adoption. That notebook is the backbone of the Novak half of this archive (S25). Dorothy died in January 2016."
+   ]
+  },
+  {
+   "id": "I28",
+   "given_names": "Joseph",
+   "surname": "Novak",
+   "display_name": "Joseph Novak",
+   "sex": "M",
+   "relation": "great-uncle",
+   "placeholder": false,
+   "aliases": [
+    "Joe Novak"
+   ],
+   "birth": {
+    "date": "1928",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "death": {
+    "date": "2001",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Joe, Dorothy's younger brother, ran a hardware store in Mount Washington for thirty years. He married Ruth Miller in 1953."
+   ]
+  },
+  {
+   "id": "I29",
+   "given_names": "Ruth",
+   "surname": "Novak",
+   "display_name": "Ruth Novak",
+   "sex": "F",
+   "relation": "wife of Joseph Novak",
+   "placeholder": false,
+   "aliases": [
+    "Ruth Miller"
+   ],
+   "birth": {
+    "date": "1930",
+    "place_as_recorded": "Erie, Pennsylvania",
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "2012",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Ruth Miller, a schoolteacher from Erie, married Joe Novak in 1953."
+   ]
+  },
+  {
+   "id": "I30",
+   "given_names": "Michael James",
+   "surname": "Harper",
+   "display_name": "Michael James Harper",
+   "sex": "M",
+   "relation": "father",
+   "placeholder": false,
+   "aliases": [
+    "Mike Harper"
+   ],
+   "birth": {
+    "date": "1951-06-22",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "death": {
+    "date": "2019-03-11",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "notes": [
+    "Michael James Harper, named for his great-grandfather and for his uncle Jimmy, was born in June 1951. He studied engineering, worked for thirty years on the city's bridges, and in 1982 married Susan Brennan.",
+    "It was Michael who first asked his mother to write down what she remembered, and who began collecting the family's photographs into albums; this archive grew out of his boxes. He died in March 2019."
+   ]
+  },
+  {
+   "id": "I34",
+   "given_names": "Susan",
+   "surname": "Harper",
+   "display_name": "Susan Harper",
+   "sex": "F",
+   "relation": "mother",
+   "placeholder": false,
+   "aliases": [
+    "Susan Brennan"
+   ],
+   "birth": {
+    "date": "1956-02-14",
+    "place_as_recorded": "Erie, Pennsylvania"
+   },
+   "notes": [
+    "Susan grew up in Erie and married Michael Harper in 1982."
+   ]
+  },
+  {
+   "id": "I31",
+   "given_names": "Catherine",
+   "surname": "Harper",
+   "display_name": "Catherine Harper",
+   "sex": "F",
+   "relation": "aunt",
+   "placeholder": false,
+   "aliases": [
+    "Kate Harper"
+   ],
+   "birth": {
+    "date": "1954-08-30",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Kate, Michael's sister, is the family's storyteller on the Harper side; her recorded recollections are one of the main sources of this archive (S16)."
+   ]
+  },
+  {
+   "id": "I32",
+   "given_names": "Peter",
+   "surname": "Harper",
+   "display_name": "Peter Harper",
+   "sex": "M",
+   "relation": "uncle",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1957-12-03",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Peter, the youngest of Tom and Dorothy's children, lives in Ohio."
+   ]
+  },
+  {
+   "id": "I33",
+   "given_names": "Linda",
+   "surname": "Novak",
+   "display_name": "Linda Novak",
+   "sex": "F",
+   "relation": "first cousin of Michael Harper",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1955",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Linda, the daughter of Joe and Ruth Novak, has kept the Novak family Bible."
+   ]
+  },
+  {
+   "id": "I35",
+   "given_names": "Daniel",
+   "surname": "Harper",
+   "display_name": "Daniel Harper",
+   "sex": "M",
+   "relation": "keeper of this archive",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1985-03-14",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Daniel keeps this archive. He was named after his great-great-uncle Daniel, who died in France in 1918."
+   ]
+  },
+  {
+   "id": "I36",
+   "given_names": "Claire",
+   "surname": "Harper",
+   "display_name": "Claire Harper",
+   "sex": "F",
+   "relation": "sister",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "1988-07-09",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Claire is Daniel's younger sister."
+   ]
+  },
+  {
+   "id": "I37",
+   "given_names": "Elena",
+   "surname": "Harper",
+   "display_name": "Elena Harper",
+   "sex": "F",
+   "relation": "wife",
+   "placeholder": false,
+   "aliases": [
+    "Elena Marchetti"
+   ],
+   "birth": {
+    "date": "1986-10-02"
+   },
+   "notes": [
+    "Elena married Daniel in 2011."
+   ]
+  },
+  {
+   "id": "I38",
+   "given_names": "Nora",
+   "surname": "Harper",
+   "display_name": "Nora Harper",
+   "sex": "F",
+   "relation": "daughter",
+   "placeholder": false,
+   "aliases": [],
+   "birth": {
+    "date": "2013-05-21",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Nora is named after her great-great-grandmother Nora Flynn."
+   ]
+  },
+  {
+   "id": "I39",
+   "given_names": "Samuel",
+   "surname": "Harper",
+   "display_name": "Samuel Harper",
+   "sex": "M",
+   "relation": "son",
+   "placeholder": false,
+   "aliases": [
+    "Sam Harper"
+   ],
+   "birth": {
+    "date": "2016-11-04",
+    "place_as_recorded": "Pittsburgh, Pennsylvania",
+    "place_slugs": [
+     "pittsburgh"
+    ]
+   },
+   "notes": [
+    "Sam is the youngest member of the family in this archive."
+   ]
+  },
+  {
+   "id": "I41",
+   "given_names": "Honora",
+   "surname": "Harper",
+   "display_name": "Honora Harper",
+   "sex": "F",
+   "relation": "possible relative (1880 census)",
+   "placeholder": false,
+   "aliases": [],
+   "research_status": "unlinked_candidate",
+   "research_note": "Found in the 1880 census next door to Michael (S14). Same surname and county of origin are not proof of kinship; we are looking for her death record, which might name her parents.",
+   "birth": {
+    "date": "ABT 1840",
+    "place_as_recorded": "Ireland",
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S14"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Pittsburgh, Sixth Ward",
+     "date": "1880",
+     "place_slugs": [
+      "pittsburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S14"
+     ]
+    }
+   ],
+   "notes": [
+    "In the June 1880 census an Honora Harper, 40, born in Ireland, a widow and laundress, lives two doors from the boarding house where Michael Harper had just arrived (S14). She may be a sister of Patrick Harper — which would explain why Michael went straight to Pittsburgh — but nothing yet connects them."
+   ]
+  },
+  {
+   "id": "I42",
+   "given_names": "Michal",
+   "surname": "Novák",
+   "display_name": "Michal Novák",
+   "sex": "M",
+   "relation": "possible relative (Hamburg list)",
+   "placeholder": false,
+   "aliases": [
+    "Michael Novak"
+   ],
+   "research_status": "unlinked_candidate",
+   "research_note": "Same village and same ship as Josef in the Hamburg list (S9), but he is not in Ján and Anna's family in any record we have. Possibly a brother, possibly a cousin, possibly unrelated.",
+   "birth": {
+    "date": "ABT 1869",
+    "place_as_recorded": "Kapušany",
+    "place_slugs": [
+     "kapusany"
+    ],
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S9"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Hamburg, emigrant halls",
+     "date": "May 1892",
+     "place_slugs": [
+      "hamburg"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S9"
+     ]
+    }
+   ],
+   "notes": [
+    "Michal Novák, 23, labourer from Kapušany, is entered in the Hamburg emigrant list on the same page as Josef in May 1892 (S9). He could be a younger brother or a cousin; Novák is a very common name, and he does not appear on the Ellis Island manifest with Josef."
+   ]
+  },
+  {
+   "id": "I43",
+   "given_names": "Martin",
+   "surname": "Harper",
+   "display_name": "Martin Harper",
+   "sex": "M",
+   "relation": "possible relative (1901 census)",
+   "placeholder": false,
+   "aliases": [],
+   "research_status": "unlinked_candidate",
+   "research_note": "Next-door household in 1901 (S15); age fits a son born around 1863. Not proven.",
+   "birth": {
+    "date": "ABT 1863",
+    "place_as_recorded": "Louisburgh, Co. Mayo",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "calculated_from_age",
+    "source_ids": [
+     "S15"
+    ]
+   },
+   "residences": [
+    {
+     "place": "Louisburgh, farm next to Bridget Harper",
+     "date": "1901",
+     "place_slugs": [
+      "louisburgh"
+     ],
+     "place_event_kind": "residence",
+     "source_ids": [
+      "S15"
+     ]
+    }
+   ],
+   "notes": [
+    "In the 1901 census of Ireland a Martin Harper, 38, farmer, unmarried, heads the household next to Bridget's in the same townland (S15). He is probably a son of Patrick and Bridget who took over the farm, but the census does not say so and no baptism has been found."
+   ]
+  }
+ ],
+ "families": [
+  {
+   "id": "F1",
+   "partners": [
+    "I1",
+    "I2"
+   ],
+   "children": [
+    "I3",
+    "I4",
+    "I5",
+    "I43"
+   ],
+   "adopted_children": [],
+   "probable_children": [
+    "I5",
+    "I43"
+   ],
+   "probable_note": "Thomas is known only from family memory (S16); Martin only from the 1901 census, where he lives next door to Bridget (S15). Neither has a baptism yet.",
+   "relation": "spouses",
+   "marriage": {
+    "date": "1856-02-12",
+    "place_as_recorded": "Louisburgh chapel",
+    "place_slugs": [
+     "louisburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S2"
+    ]
+   },
+   "source_ids": [
+    "S1",
+    "S2",
+    "S15"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F2",
+   "partners": [
+    "I3",
+    "I6"
+   ],
+   "children": [
+    "I7",
+    "I45",
+    "I8",
+    "I9"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1884-06-10",
+    "place_as_recorded": "St. Patrick's church, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S3"
+    ]
+   },
+   "source_ids": [
+    "S3",
+    "S19"
+   ],
+   "notes": [
+    "Married at St. Patrick's in the Strip District; Owen Doyle was a witness."
+   ]
+  },
+  {
+   "id": "F3",
+   "partners": [
+    "I10",
+    "I11"
+   ],
+   "children": [
+    "I12",
+    "I13",
+    "I42"
+   ],
+   "adopted_children": [],
+   "probable_children": [
+    "I42"
+   ],
+   "probable_note": "Michal Novák from Kapušany travelled with Josef in 1892 (S9); he may be a brother or a cousin.",
+   "relation": "spouses",
+   "source_ids": [
+    "S6"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F4",
+   "partners": [
+    "I12",
+    "I14"
+   ],
+   "children": [
+    "I15",
+    "I16",
+    "I17"
+   ],
+   "adopted_children": [
+    "I18"
+   ],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1894-10-20",
+    "place_as_recorded": "Chicago, Cook County, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S7"
+    ]
+   },
+   "source_ids": [
+    "S7",
+    "S8",
+    "S13"
+   ],
+   "notes": [
+    "Rose Sabo was taken in in 1909 and adopted in 1910 (S13)."
+   ]
+  },
+  {
+   "id": "F5",
+   "partners": [
+    "I13",
+    "I19"
+   ],
+   "children": [
+    "I44"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1899",
+    "place_as_recorded": "Chicago, Illinois",
+    "place_slugs": [
+     "chicago"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "source_ids": [
+    "S16"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F6",
+   "partners": [
+    "I7",
+    "I20"
+   ],
+   "children": [
+    "I21",
+    "I22",
+    "I23"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1912-09-14",
+    "place_as_recorded": "St. Mary's church, Lawrenceville",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "source_ids": [
+    "S24"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F7",
+   "partners": [
+    "I24",
+    "I8"
+   ],
+   "children": [
+    "I25"
+   ],
+   "adopted_children": [],
+   "relation": "divorced",
+   "marriage": {
+    "date": "1915",
+    "place_as_recorded": "Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "source_ids": [
+    "S16"
+   ],
+   "notes": [
+    "Divorced in 1925."
+   ]
+  },
+  {
+   "id": "F8",
+   "partners": [
+    "I15",
+    "I26"
+   ],
+   "children": [
+    "I27",
+    "I28"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1922",
+    "place_as_recorded": "St. Matthew's church, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "source_ids": [
+    "S25"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F9",
+   "partners": [
+    "I22",
+    "I27"
+   ],
+   "children": [
+    "I30",
+    "I31",
+    "I32"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1949-06-18",
+    "place_as_recorded": "St. Matthew's church, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "documented",
+    "source_ids": [
+     "S17"
+    ]
+   },
+   "source_ids": [
+    "S17",
+    "S25"
+   ],
+   "notes": [
+    "The marriage that joined the Harpers and the Novaks."
+   ]
+  },
+  {
+   "id": "F10",
+   "partners": [
+    "I28",
+    "I29"
+   ],
+   "children": [
+    "I33"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1953",
+    "place_as_recorded": "Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S16"
+    ]
+   },
+   "source_ids": [],
+   "notes": []
+  },
+  {
+   "id": "F11",
+   "partners": [
+    "I30",
+    "I34"
+   ],
+   "children": [
+    "I35",
+    "I36"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1982"
+   },
+   "source_ids": [],
+   "notes": []
+  },
+  {
+   "id": "F12",
+   "partners": [
+    "I35",
+    "I37"
+   ],
+   "children": [
+    "I38",
+    "I39"
+   ],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "2011"
+   },
+   "source_ids": [],
+   "notes": []
+  },
+  {
+   "id": "F15",
+   "partners": [
+    "I46",
+    "I18"
+   ],
+   "children": [],
+   "adopted_children": [],
+   "relation": "spouses",
+   "marriage": {
+    "date": "1938",
+    "place_as_recorded": "St. Matthew's church, Pittsburgh",
+    "place_slugs": [
+     "pittsburgh"
+    ],
+    "status": "family_report",
+    "source_ids": [
+     "S25"
+    ]
+   },
+   "source_ids": [
+    "S25"
+   ],
+   "notes": []
+  },
+  {
+   "id": "F13",
+   "partners": [],
+   "children": [
+    "I6",
+    "I40"
+   ],
+   "adopted_children": [],
+   "relation": "siblings",
+   "source_ids": [
+    "S3"
+   ],
+   "notes": [
+    "Kate and Owen Doyle, born in New York to parents we have not identified."
+   ]
+  },
+  {
+   "id": "F14",
+   "partners": [],
+   "children": [
+    "I1",
+    "I41"
+   ],
+   "adopted_children": [],
+   "relation": "siblings",
+   "probable_children": [
+    "I41"
+   ],
+   "probable_note": "Honora Harper lived next door to Michael in 1880 (S14); she may be Patrick's sister.",
+   "source_ids": [
+    "S14"
+   ],
+   "notes": []
+  }
+ ],
+ "sources": [
+  {
+   "id": "S1",
+   "title": "Baptism register of Louisburgh parish, 1858",
+   "kind": "church_record",
+   "file": "sources/louisburgh-baptisms-1858.jpg",
+   "locator": "Parish of Kilgeever (Louisburgh), baptisms 1850–1870, p. 41, entry 212 — fictional citation",
+   "scope": "3 October 1858: Michael, son of Patrick Harper and Bridget Walsh, born 29 September; sponsors Thomas Walsh and Honor Gibbons. Proves Michael's parents and Bridget's maiden name."
+  },
+  {
+   "id": "S2",
+   "title": "Marriage register of Louisburgh parish, 1856",
+   "kind": "church_record",
+   "url": "https://example.org/records/louisburgh-marriages-1856",
+   "locator": "Parish of Kilgeever, marriages 1849–1880, entry 9 — fictional citation",
+   "scope": "12 February 1856: Patrick Harper, 22, and Bridget Walsh, both of this parish. The only record of Patrick's age before 1880."
+  },
+  {
+   "id": "S3",
+   "title": "Photo: Michael and Kate Harper on their wedding day, 1884",
+   "kind": "family_photo",
+   "file": "sources/harper-wedding-1884.jpg",
+   "back": "sources/harper-wedding-1884-back.jpg",
+   "locator": "Harper family album, page 1",
+   "scope": "Cabinet card from a Pittsburgh studio: Kate seated, Michael standing. Inscription on the back: «Michael & Kate, married 10 June 1884, St. Patrick's, Pittsburgh». Owen Doyle, Kate's brother, was a witness at the wedding."
+  },
+  {
+   "id": "S4",
+   "title": "Passenger list, Queenstown to New York, April 1880",
+   "kind": "online_reference",
+   "url": "https://example.org/records/passenger-lists/1880-04-queenstown",
+   "locator": "SS Atlantic Star (fictional ship), arrived Castle Garden 24 April 1880, line 118",
+   "scope": "Michael Harper, 21, labourer, Ireland, destination Pittsburgh."
+  },
+  {
+   "id": "S5",
+   "title": "Ellis Island manifest, May 1892",
+   "kind": "online_reference",
+   "url": "https://example.org/records/ellis-island/1892-05-elbe-queen",
+   "locator": "SS Elbe Queen (fictional ship) from Hamburg, arrived 21 May 1892, sheet 7, line 22",
+   "scope": "Jozef Novák, 25, laborer, Hungary, last residence Kapušany, going to a cousin in Chicago. The age gives a birth year of about 1867."
+  },
+  {
+   "id": "S6",
+   "title": "Baptism register of Kapušany parish, 1866",
+   "kind": "church_record",
+   "file": "sources/kapusany-baptisms-1866.jpg",
+   "locator": "Roman Catholic parish of Kapušany, baptisms 1860–1875, fol. 22 — fictional citation",
+   "scope": "19 March 1866: Josephus, son of Joannes Novák and Anna Hudák, house no. 31. Latin register; the entry proves Josef's parents and his date of birth."
+  },
+  {
+   "id": "S7",
+   "title": "Marriage certificate of Josef Novak and Mary Kovac, Chicago, 1894",
+   "kind": "civil_record_copy",
+   "file": "sources/chicago-marriage-1894.jpg",
+   "locator": "Cook County marriage certificate no. 21877 (fictional number), certified copy",
+   "scope": "20 October 1894: Joseph Novak, 28, born Kapušany, and Mary Kovac, 22, born Kapušany. Witnesses Stephen Novak and Anna Kovac."
+  },
+  {
+   "id": "S8",
+   "title": "Photo: the Novak family in Windber, 1906",
+   "kind": "family_photo",
+   "file": "sources/novak-family-windber-1906.jpg",
+   "back": "sources/novak-family-windber-1906-back.jpg",
+   "locator": "Kept by Helen Novak, now in Dorothy Harper's album",
+   "scope": "Outdoor photograph in front of the company houses: Josef, Mary, Frank (11), Helen (9) and Rose Sabo (1). Inscription on the back: «Windber 1906 — Josef, Mary, Frank, Helen & little Rosie (sent to Kapušany)». The photograph came back to America with a later emigrant."
+  },
+  {
+   "id": "S9",
+   "title": "Hamburg emigrant list, May 1892",
+   "kind": "online_reference",
+   "url": "https://example.org/records/hamburg-emigrants/1892-05-06",
+   "locator": "Hamburg passenger lists, vol. 1892/5, p. 314 — fictional citation",
+   "scope": "Josef Novák, 25, and Michal Novák, 23, both labourers from Kapušany, Hungary, bound for New York."
+  },
+  {
+   "id": "S10",
+   "title": "Obituary of Michael Harper, 1924",
+   "kind": "newspaper",
+   "file": "sources/pittsburgh-obituary-1924.jpg",
+   "locator": "The Pittsburgh Evening Leader (fictional newspaper), 4 March 1924, p. 18",
+   "scope": "HARPER — On Sunday, March 2, 1924, Michael Harper, beloved husband of Catherine Doyle Harper, in his 66th year, a native of the County Mayo, Ireland. Funeral from the family residence on Butler Street."
+  },
+  {
+   "id": "S11",
+   "title": "“Local Boy Falls in France”, 1918",
+   "kind": "newspaper",
+   "file": "sources/daniel-harper-1918.jpg",
+   "locator": "The Pittsburgh Evening Leader (fictional newspaper), 2 November 1918, p. 3",
+   "scope": "Private Daniel Harper, son of Mr. and Mrs. Michael Harper of Butler Street, killed in action on October 8. Gives a date four days earlier than the War Department card (S12)."
+  },
+  {
+   "id": "S12",
+   "title": "War Department burial card of Daniel Harper",
+   "kind": "online_military_record",
+   "url": "https://example.org/records/war-department/harper-daniel-1918",
+   "locator": "Burial case file card (fictional reference no. 4471-H)",
+   "scope": "Pvt. Daniel Harper, infantry, died of wounds 12 October 1918; buried in an American military cemetery in France."
+  },
+  {
+   "id": "S13",
+   "title": "Petition and decree of adoption of Rose Sabo, 1910",
+   "kind": "civil_record_copy",
+   "file": "sources/rose-sabo-adoption-1910.pdf",
+   "preview_page": 1,
+   "locator": "Orphans' Court of Somerset County, adoption docket 1910, no. 12 — fictional citation; 2 pages",
+   "scope": "Page 1: petition of Joseph and Mary Novak of Windber to adopt Rose Sabo, born 8 March 1905, both of whose parents are deceased. Page 2: decree of 14 June 1910 granting the adoption; the child to bear the name Rose Novak."
+  },
+  {
+   "id": "S14",
+   "title": "United States census of 1880, Pittsburgh, Sixth Ward",
+   "kind": "online_reference",
+   "url": "https://example.org/records/census/1880/pittsburgh-ward-6",
+   "locator": "Enumeration district 112 (fictional), sheet 14",
+   "scope": "Michael Harper, 21, boarder, works in rolling mill, born Ireland. Two dwellings away: Honora Harper, 40, widow, laundress, born Ireland."
+  },
+  {
+   "id": "S15",
+   "title": "Census of Ireland, 1901, Louisburgh",
+   "kind": "online_reference",
+   "url": "https://example.org/records/census/1901/mayo/louisburgh",
+   "locator": "Co. Mayo, District Electoral Division of Louisburgh, house 7 and 8 (fictional)",
+   "scope": "House 7: Bridget Harper, 65, widow, cannot read; Mary Harper, 39, daughter, single. House 8: Martin Harper, 38, farmer, single."
+  },
+  {
+   "id": "S16",
+   "title": "Recollections of Kate Harper, recorded 2025",
+   "kind": "family_report",
+   "locator": "Audio recording and notes, family archive",
+   "scope": "Kate Harper (b. 1954) on the Harper side: Patrick dying ‘the winter Parnell died’, the brother Thomas who went to Liverpool, Aunt Peg's divorce, Uncle Jimmy, and dates for her parents' generation."
+  },
+  {
+   "id": "S17",
+   "title": "Photo: Tom and Dorothy Harper's wedding, 1949",
+   "kind": "family_photo",
+   "file": "sources/harper-novak-wedding-1949.jpg",
+   "back": "sources/harper-novak-wedding-1949-back.jpg",
+   "locator": "Dorothy Harper's album",
+   "scope": "Studio portrait taken after the wedding at St. Matthew's. Inscription on the back: «Tom & Dottie, St. Matthew's, 18 June 1949, love to Aunt Helen». The marriage record (copy in the same album) gives Tom's birth date as 5 September 1921."
+  },
+  {
+   "id": "S18",
+   "title": "Photo: James Patrick Harper in uniform, 1943",
+   "kind": "family_photo",
+   "file": "sources/james-harper-1943.jpg",
+   "locator": "Harper family album",
+   "scope": "Oval studio portrait, inscribed on the mount «Jimmy, Camp Shelby 1943»."
+  },
+  {
+   "id": "S19",
+   "title": "Gravestone of Michael and Catherine Harper, Calvary Cemetery",
+   "kind": "gravestone",
+   "file": "sources/harper-gravestone-calvary.jpg",
+   "locator": "Calvary Cemetery, Pittsburgh, section 12 (photographed 2025)",
+   "scope": "HARPER — Michael 1858–1924 — his wife Catherine 1862–1931 — Rest in peace."
+  },
+  {
+   "id": "S20",
+   "title": "Golden Jubilee of St. Mary's Slovak parish, Windber, 1897–1947",
+   "kind": "publication",
+   "locator": "Parish booklet (fictional), 1947, pp. 12–15: list of early baptisms and burials",
+   "scope": "Lists the burial of ‘Ondrej Novák, child of Jozef and Mária, January 1902’ and names Josef Novak among the founding members of the parish society."
+  },
+  {
+   "id": "S21",
+   "title": "Letter from Margaret Shea to her mother, 1925",
+   "kind": "family_archive_document",
+   "file": "sources/margaret-letter-1925.jpg",
+   "hidden": true,
+   "locator": "Harper family papers",
+   "scope": "Private letter about the end of Margaret's marriage. The family asked that it not be published."
+  },
+  {
+   "id": "S22",
+   "title": "Death certificate of Joseph Novak, 1931",
+   "kind": "civil_record_copy",
+   "file": "sources/novak-death-certificate-1931.jpg",
+   "locator": "Pennsylvania death certificate, file no. 77314 (fictional number)",
+   "scope": "Joseph Novak, died 14 August 1931, Pittsburgh, aged 65, born Kapušany, Czechoslovakia; watchman; cause: chronic lung disease. Informant Frank Novak."
+  },
+  {
+   "id": "S23",
+   "title": "Photo: Helen Novak with her class, 1925",
+   "kind": "family_photo",
+   "file": "sources/helen-novak-class-1925.jpg",
+   "locator": "Kept by Helen Novak",
+   "scope": "School photograph, caption on the mount «Miss Novak's class, 1925». Helen stands in the middle."
+  },
+  {
+   "id": "S24",
+   "title": "WWI draft registration card of John Joseph Harper, 1917",
+   "kind": "online_military_record",
+   "url": "https://example.org/records/draft-cards/1917/harper-john-joseph",
+   "locator": "Allegheny County, local board 9 (fictional), card 1204",
+   "scope": "John Joseph Harper, born 17 January 1886, Pittsburgh; roller's helper; married, one child."
+  },
+  {
+   "id": "S25",
+   "title": "Dorothy Harper's notebook “What I remember”, 1998",
+   "kind": "family_manuscript",
+   "file": "sources/dorothy-memoir-notebook.jpg",
+   "locator": "School notebook, 48 pages, family archive",
+   "scope": "Dorothy's recollections of the Novak side as told by her parents and Aunt Helen: Kapušany, the voyage from Hamburg, Windber, Rose's adoption, family dates. Shown: the first page."
+  },
+  {
+   "id": "S26",
+   "title": "Certificate of naturalization of Joseph Novak, 1904",
+   "kind": "civil_record_copy",
+   "file": "sources/novak-naturalization-1904.jpg",
+   "locator": "Court of Common Pleas of Somerset County, naturalization vol. 3, p. 88 — fictional citation",
+   "scope": "Joseph Novak of Windber, miner, native of Hungary, admitted a citizen of the United States, 2 May 1904. Arrival given as New York, May 1892."
+  }
+ ],
+ "places": [
+  {
+   "slug": "louisburgh",
+   "name": "Louisburgh",
+   "where": "County Mayo, Ireland",
+   "lat": 53.763,
+   "lon": -9.809,
+   "geo_note": "village centre",
+   "period": "1830s–1901",
+   "then": "Parish of Kilgeever, barony of Murrisk",
+   "now": "Louisburgh, County Mayo, Ireland",
+   "aliases": [
+    "louisburgh",
+    "kilgeever",
+    "co. mayo"
+   ],
+   "groups": [
+    "harper"
+   ],
+   "sort_year": 1832,
+   "text": "A village between Croagh Patrick and the Atlantic where the Harpers farmed. Patrick and Bridget married and raised their children here (S2, S1); Michael left for America in 1880.",
+   "details": [
+    "The Harper story begins here with Patrick, born about 1832. The famine of 1845–1849 hit the west of Mayo hard, and the family remembers relief work on the coast road.",
+    "After Michael emigrated, his mother and sister Mary stayed on; in 1901 they lived next to a Martin Harper who may be another son (S15)."
+   ],
+   "people": [
+    "I1",
+    "I2",
+    "I3",
+    "I4",
+    "I5",
+    "I43"
+   ],
+   "sources": [
+    "S1",
+    "S2",
+    "S15"
+   ],
+   "timeline": [
+    {
+     "date": "1847",
+     "text": "Famine winter; Patrick works on the relief road",
+     "people": [
+      "I1"
+     ],
+     "sources": [
+      "S16"
+     ]
+    },
+    {
+     "date": "1856-02-12",
+     "text": "Marriage of Patrick Harper and Bridget Walsh",
+     "people": [
+      "I1",
+      "I2"
+     ],
+     "sources": [
+      "S2"
+     ]
+    },
+    {
+     "date": "1858-10-03",
+     "text": "Baptism of Michael Harper",
+     "people": [
+      "I3"
+     ],
+     "sources": [
+      "S1"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Louisburgh — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Louisburgh"
+    },
+    {
+     "label": "Great Famine (Ireland) — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Great_Famine_(Ireland)"
+    }
+   ]
+  },
+  {
+   "slug": "cobh",
+   "name": "Cobh (Queenstown)",
+   "where": "County Cork, Ireland",
+   "lat": 51.85,
+   "lon": -8.294,
+   "geo_note": "harbour",
+   "period": "1880",
+   "then": "Queenstown",
+   "now": "Cobh, County Cork",
+   "aliases": [
+    "cobh",
+    "queenstown"
+   ],
+   "groups": [
+    "harper"
+   ],
+   "sort_year": 1880,
+   "text": "The port from which Michael Harper sailed for New York in April 1880 (S4).",
+   "details": [
+    "Queenstown was the last port of call for transatlantic liners and the departure point for most emigrants from the west of Ireland. Michael travelled here by coach and train from Mayo."
+   ],
+   "people": [
+    "I3"
+   ],
+   "sources": [
+    "S4"
+   ],
+   "timeline": [
+    {
+     "date": "1880-04",
+     "text": "Michael Harper embarks for New York",
+     "people": [
+      "I3"
+     ],
+     "sources": [
+      "S4"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Cobh — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Cobh"
+    }
+   ]
+  },
+  {
+   "slug": "new-york",
+   "name": "New York harbour",
+   "where": "New York, USA",
+   "lat": 40.699,
+   "lon": -74.04,
+   "geo_note": "Ellis Island",
+   "period": "1860–1892",
+   "then": "Castle Garden (to 1890), Ellis Island (from 1892)",
+   "now": "Ellis Island National Museum of Immigration",
+   "aliases": [
+    "new york",
+    "castle garden",
+    "ellis island"
+   ],
+   "groups": [
+    "harper",
+    "novak"
+   ],
+   "sort_year": 1880,
+   "text": "Both lines of the family entered America here: Michael Harper at Castle Garden in 1880 (S4), Josef Novák at the new Ellis Island station in 1892 (S5). Kate Doyle was born in the city.",
+   "details": [
+    "Castle Garden at the tip of Manhattan handled immigrants until 1890; Ellis Island opened on 1 January 1892, a few months before Josef arrived."
+   ],
+   "people": [
+    "I3",
+    "I12",
+    "I6",
+    "I40"
+   ],
+   "sources": [
+    "S4",
+    "S5"
+   ],
+   "timeline": [
+    {
+     "date": "1880-04-24",
+     "text": "Michael Harper lands at Castle Garden",
+     "people": [
+      "I3"
+     ],
+     "sources": [
+      "S4"
+     ]
+    },
+    {
+     "date": "1892-05-21",
+     "text": "Josef Novák passes through Ellis Island",
+     "people": [
+      "I12"
+     ],
+     "sources": [
+      "S5"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Ellis Island — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Ellis_Island"
+    },
+    {
+     "label": "Castle Clinton — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Castle_Clinton"
+    }
+   ]
+  },
+  {
+   "slug": "pittsburgh",
+   "name": "Pittsburgh",
+   "where": "Allegheny County, Pennsylvania, USA",
+   "lat": 40.441,
+   "lon": -79.996,
+   "geo_note": "city centre",
+   "period": "1880–today",
+   "then": "City of Pittsburgh and Allegheny City",
+   "now": "Pittsburgh, Pennsylvania",
+   "aliases": [
+    "pittsburgh",
+    "allegheny",
+    "lawrenceville",
+    "south side",
+    "brookline"
+   ],
+   "groups": [
+    "harper",
+    "novak"
+   ],
+   "sort_year": 1880,
+   "text": "The steel city where the Irish Harpers of Lawrenceville and the Slovak Novaks of the South Side lived for decades before Tom Harper and Dorothy Novak married at St. Matthew's in 1949 (S17).",
+   "details": [
+    "Michael Harper arrived in 1880 and worked in the mills of the Strip District (S14, S10). The Novaks came from Windber in 1912.",
+    "Lawrenceville was an Irish and German mill neighbourhood along the Allegheny River; the South Side, across the Monongahela, was home to Slovak, Polish and Ukrainian parishes."
+   ],
+   "people": [
+    "I3",
+    "I6",
+    "I7",
+    "I12",
+    "I14",
+    "I15",
+    "I16",
+    "I22",
+    "I27",
+    "I30"
+   ],
+   "sources": [
+    "S3",
+    "S10",
+    "S14",
+    "S17",
+    "S19",
+    "S22"
+   ],
+   "timeline": [
+    {
+     "date": "1884-06-10",
+     "text": "Michael Harper marries Kate Doyle at St. Patrick's",
+     "people": [
+      "I3",
+      "I6"
+     ],
+     "sources": [
+      "S3"
+     ]
+    },
+    {
+     "date": "1912",
+     "text": "The Novaks move to the South Side from Windber",
+     "people": [
+      "I12",
+      "I14"
+     ],
+     "sources": [
+      "S25"
+     ]
+    },
+    {
+     "date": "1949-06-18",
+     "text": "Tom Harper marries Dorothy Novak at St. Matthew's",
+     "people": [
+      "I22",
+      "I27"
+     ],
+     "sources": [
+      "S17"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Pittsburgh — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Pittsburgh"
+    },
+    {
+     "label": "Lawrenceville (Pittsburgh) — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Lawrenceville_(Pittsburgh)"
+    }
+   ]
+  },
+  {
+   "slug": "kapusany",
+   "name": "Kapušany",
+   "where": "near Prešov, Slovakia",
+   "lat": 49.046,
+   "lon": 21.329,
+   "geo_note": "village church",
+   "period": "1838–1893",
+   "then": "Kapi, Sáros county, Kingdom of Hungary",
+   "now": "Kapušany, Prešov District, Slovakia",
+   "aliases": [
+    "kapušany",
+    "kapusany",
+    "kapi",
+    "prešov",
+    "presov",
+    "sáros"
+   ],
+   "groups": [
+    "novak"
+   ],
+   "sort_year": 1838,
+   "text": "The village under a ruined castle north-east of Prešov where Ján and Anna Novák lived and their sons were baptised (S6). Josef left in 1892, Mária Kováčová a year later.",
+   "details": [
+    "In the 1880s and 1890s thousands of young men from Sáros county went to work in American mines and mills, often planning to return. The Novak brothers stayed."
+   ],
+   "people": [
+    "I10",
+    "I11",
+    "I12",
+    "I13",
+    "I14",
+    "I42"
+   ],
+   "sources": [
+    "S6",
+    "S9"
+   ],
+   "timeline": [
+    {
+     "date": "1866-03-19",
+     "text": "Baptism of Josef Novák",
+     "people": [
+      "I12"
+     ],
+     "sources": [
+      "S6"
+     ]
+    },
+    {
+     "date": "1892-04",
+     "text": "Josef and Michal Novák leave for Hamburg",
+     "people": [
+      "I12",
+      "I42"
+     ],
+     "sources": [
+      "S9"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Kapušany — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Kapu%C5%A1any"
+    },
+    {
+     "label": "Sáros County — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/S%C3%A1ros_County"
+    }
+   ]
+  },
+  {
+   "slug": "hamburg",
+   "name": "Hamburg",
+   "where": "Germany",
+   "lat": 53.541,
+   "lon": 9.985,
+   "geo_note": "harbour",
+   "period": "1892",
+   "then": "Free and Hanseatic City of Hamburg, German Empire",
+   "now": "Hamburg, Germany",
+   "aliases": [
+    "hamburg"
+   ],
+   "groups": [
+    "novak"
+   ],
+   "sort_year": 1892,
+   "text": "The port where Josef Novák's name was entered in the emigrant lists in May 1892, on the same page as Michal Novák (S9).",
+   "details": [
+    "Emigrants from Upper Hungary usually travelled by rail through Galicia or Vienna to Hamburg or Bremen and waited in lodging halls by the harbour for their ship."
+   ],
+   "people": [
+    "I12",
+    "I42"
+   ],
+   "sources": [
+    "S9"
+   ],
+   "timeline": [
+    {
+     "date": "1892-05-06",
+     "text": "Josef and Michal Novák in the emigrant list",
+     "people": [
+      "I12",
+      "I42"
+     ],
+     "sources": [
+      "S9"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "BallinStadt — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/BallinStadt"
+    }
+   ]
+  },
+  {
+   "slug": "chicago",
+   "name": "Chicago",
+   "where": "Cook County, Illinois, USA",
+   "lat": 41.878,
+   "lon": -87.63,
+   "geo_note": "city centre",
+   "period": "1892–1975",
+   "then": "Chicago, Cook County",
+   "now": "Chicago, Illinois",
+   "aliases": [
+    "chicago",
+    "cook county"
+   ],
+   "groups": [
+    "novak"
+   ],
+   "sort_year": 1892,
+   "text": "Josef Novak's first American home and the place of his marriage in 1894 (S7). His brother Štefan's family stayed in Chicago for good.",
+   "details": [
+    "Slovak immigrants in the 1890s found work in the packing houses around the Union Stock Yards. Frank and Helen Novak were born here before the family moved to the coal fields.",
+    "Margaret Harper moved to Chicago after her divorce in 1925."
+   ],
+   "people": [
+    "I12",
+    "I13",
+    "I14",
+    "I15",
+    "I16",
+    "I19",
+    "I44",
+    "I8"
+   ],
+   "sources": [
+    "S7"
+   ],
+   "timeline": [
+    {
+     "date": "1894-10-20",
+     "text": "Josef Novak marries Mary Kovac",
+     "people": [
+      "I12",
+      "I14"
+     ],
+     "sources": [
+      "S7"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Union Stock Yards — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Union_Stock_Yards"
+    }
+   ]
+  },
+  {
+   "slug": "windber",
+   "name": "Windber",
+   "where": "Somerset County, Pennsylvania, USA",
+   "lat": 40.24,
+   "lon": -78.835,
+   "geo_note": "borough centre",
+   "period": "1898–1912",
+   "then": "Coal company town",
+   "now": "Windber, Somerset County, Pennsylvania",
+   "aliases": [
+    "windber",
+    "somerset county"
+   ],
+   "groups": [
+    "novak"
+   ],
+   "sort_year": 1898,
+   "text": "A coal town founded in 1897, where Josef Novak dug coal for fourteen years and Mary ran a boarding house (S26, S8). Andrew Novak died here as a baby; Rose Sabo was adopted here (S13).",
+   "details": [
+    "The town was built by a coal company for miners from Central and Eastern Europe; Slovak, Hungarian and Italian parishes stood within a few streets of each other.",
+    "The Novak family photograph of 1906 was taken in front of the company houses (S8)."
+   ],
+   "people": [
+    "I12",
+    "I14",
+    "I15",
+    "I16",
+    "I17",
+    "I18"
+   ],
+   "sources": [
+    "S8",
+    "S13",
+    "S20",
+    "S26"
+   ],
+   "timeline": [
+    {
+     "date": "1898",
+     "text": "The Novaks arrive from Chicago",
+     "people": [
+      "I12",
+      "I14"
+     ],
+     "sources": [
+      "S25"
+     ]
+    },
+    {
+     "date": "1904-05-02",
+     "text": "Josef Novak naturalized",
+     "people": [
+      "I12"
+     ],
+     "sources": [
+      "S26"
+     ]
+    },
+    {
+     "date": "1910-06-14",
+     "text": "Adoption of Rose Sabo",
+     "people": [
+      "I18"
+     ],
+     "sources": [
+      "S13"
+     ]
+    }
+   ],
+   "materials": [
+    {
+     "label": "Windber, Pennsylvania — Wikipedia",
+     "url": "https://en.wikipedia.org/wiki/Windber,_Pennsylvania"
+    }
+   ]
+  }
+ ],
+ "place_groups": [
+  {
+   "id": "harper",
+   "name": "Harpers",
+   "color": "#2f7d4f",
+   "about": "County Mayo, Queenstown and Lawrenceville"
+  },
+  {
+   "id": "novak",
+   "name": "Novaks",
+   "color": "#9a4f2a",
+   "about": "Kapušany, Hamburg, Chicago and the coal fields"
+  }
+ ],
+ "place_routes": [
+  {
+   "group": "harper",
+   "from_place": "louisburgh",
+   "to_place": "cobh",
+   "label": "Michael leaves Mayo, 1880",
+   "sources": [
+    "S4"
+   ]
+  },
+  {
+   "group": "harper",
+   "from_place": "cobh",
+   "to_place": "new-york",
+   "label": "Queenstown to Castle Garden, April 1880",
+   "sources": [
+    "S4"
+   ]
+  },
+  {
+   "group": "novak",
+   "from_place": "hamburg",
+   "to_place": "new-york",
+   "label": "Hamburg to Ellis Island, May 1892",
+   "sources": [
+    "S5",
+    "S9"
+   ]
+  },
+  {
+   "group": "novak",
+   "from_place": "windber",
+   "to_place": "pittsburgh",
+   "label": "From the coal town to the city, 1912",
+   "sources": [
+    "S22"
+   ]
+  }
+ ],
+ "research_leads": [
+  {
+   "id": "L1",
+   "title": "Was Honora Harper Patrick's sister?",
+   "status": "open",
+   "person_id": "I41",
+   "record": "Honora Harper, 40, widow, lives two doors from Michael in the 1880 census (S14).",
+   "source_ids": [
+    "S14"
+   ],
+   "limitations": "Same surname and origin only. Her death record or a baptism in Louisburgh would settle it.",
+   "url": "https://example.org/records/census/1880/pittsburgh-ward-6"
+  },
+  {
+   "id": "L2",
+   "title": "Michal Novák in the Hamburg list",
+   "status": "candidate_unlinked",
+   "person_id": "I42",
+   "record": "Travelled with Josef from Kapušany in May 1892 (S9).",
+   "source_ids": [
+    "S9"
+   ],
+   "limitations": "Not on the Ellis Island manifest with Josef; the Kapušany baptism register for 1866–1872 still needs to be searched."
+  },
+  {
+   "id": "L3",
+   "title": "Daniel Harper's date of death",
+   "status": "closed",
+   "person_id": "I9",
+   "record": "Newspaper gives 8 October 1918 (S11), War Department card 12 October (S12).",
+   "source_ids": [
+    "S11",
+    "S12"
+   ],
+   "resolution": "The card says ‘died of wounds’; the newspaper date is taken to be the day he was wounded. 12 October kept as the main date, 8 October as an alternative."
+  },
+  {
+   "id": "L4",
+   "title": "Josef Novak's year of birth: 1866 or 1867?",
+   "status": "closed",
+   "person_id": "I12",
+   "record": "Ellis Island manifest age 25 in 1892 (S5) against the baptism register (S6).",
+   "source_ids": [
+    "S5",
+    "S6"
+   ],
+   "resolution": "The baptism of 19 March 1866 is the primary record; 1867 kept as an alternative version."
+  },
+  {
+   "id": "L5",
+   "title": "Martin Harper in the 1901 census",
+   "status": "to_verify",
+   "person_id": "I43",
+   "record": "Martin Harper, 38, farmer, next door to Bridget in 1901 (S15).",
+   "source_ids": [
+    "S15"
+   ],
+   "limitations": "The Louisburgh baptisms for 1860–1865 are partly illegible; the 1911 census may show him with a wife who knew his parents."
+  },
+  {
+   "id": "L6",
+   "title": "Where was Kate Doyle born?",
+   "status": "open",
+   "person_id": "I6",
+   "record": "Gravestone gives only the year 1862 (S19); family says ‘New York’.",
+   "source_ids": [
+    "S19",
+    "S3"
+   ],
+   "limitations": "Her parents are unknown; a New York baptism or the 1870 census of Pittsburgh may help."
+  }
+ ],
+ "corrections": [
+  {
+   "person_id": "I12",
+   "field": "birth",
+   "previous": "1867",
+   "current": "1866-03-19",
+   "reason": "Baptism register found; the manifest age of 25 was approximate",
+   "source_ids": [
+    "S6",
+    "S5"
+   ]
+  },
+  {
+   "person_id": "I9",
+   "field": "death",
+   "previous": "1918-10-08",
+   "current": "1918-10-12",
+   "reason": "War Department card says died of wounds on 12 October; the newspaper date kept as an alternative",
+   "source_ids": [
+    "S12",
+    "S11"
+   ]
+  },
+  {
+   "person_id": "I2",
+   "field": "surname (maiden)",
+   "previous": "Welsh",
+   "current": "Walsh",
+   "reason": "Spelling as in Michael's baptism register",
+   "source_ids": [
+    "S1"
+   ]
+  },
+  {
+   "person_id": "I22",
+   "field": "birth",
+   "previous": "1920-09-05",
+   "current": "1921-09-05",
+   "reason": "Year on the 1949 marriage record; Kate's memory of 1920 kept as an alternative",
+   "source_ids": [
+    "S17",
+    "S16"
+   ]
+  },
+  {
+   "family_id": "F4",
+   "field": "adopted_children",
+   "previous": "Rose listed as a biological daughter",
+   "current": "Rose Sabo, adopted 1910",
+   "reason": "Adoption decree found in the Orphans' Court docket",
+   "source_ids": [
+    "S13"
+   ]
+  }
+ ],
+ "research_log": [
+  {
+   "date": "2025-03-02",
+   "action": "Recorded Kate Harper's recollections of the Harper side",
+   "result": "Two hours of audio; names and dates for three generations",
+   "scope": "S16"
+  },
+  {
+   "date": "2025-04-11",
+   "action": "Photographed the gravestone at Calvary Cemetery",
+   "result": "Years for Michael and Catherine Harper confirmed",
+   "scope": "S19"
+  },
+  {
+   "date": "2025-06-20",
+   "action": "Searched the 1880 US census for Michael Harper in Pittsburgh",
+   "result": "Found as a boarder in the Sixth Ward; Honora Harper two doors away",
+   "scope": "S14, I41"
+  },
+  {
+   "date": "2025-09-08",
+   "action": "Searched Louisburgh parish registers 1850–1870",
+   "result": "Michael's baptism (1858) and his parents' marriage (1856) found; no baptism for Thomas",
+   "scope": "S1, S2"
+  },
+  {
+   "date": "2025-11-15",
+   "action": "Read Dorothy Harper's notebook and transcribed the Novak dates",
+   "result": "Dates for Frank, Helen, Andrew and Rose; the Windber story",
+   "scope": "S25"
+  },
+  {
+   "date": "2026-01-10",
+   "action": "Searched Hamburg emigrant lists for 1892",
+   "result": "Josef Novák found with Michal Novák from the same village",
+   "scope": "S9, I42"
+  },
+  {
+   "date": "2026-02-03",
+   "action": "Searched Kapušany baptisms 1860–1875",
+   "result": "Josef's baptism of 19 March 1866 found; birth year corrected from 1867",
+   "scope": "S6"
+  },
+  {
+   "date": "2026-03-22",
+   "action": "Requested the adoption file from the Orphans' Court of Somerset County",
+   "result": "Petition and decree of 1910 received as a two-page copy",
+   "scope": "S13"
+  },
+  {
+   "date": "2026-05-14",
+   "action": "Compared the 1918 newspaper report with the War Department card",
+   "result": "Main death date for Daniel Harper set to 12 October 1918",
+   "scope": "S11, S12"
+  },
+  {
+   "date": "2026-08-30",
+   "action": "Searched the 1901 census of Ireland for Harpers in Louisburgh",
+   "result": "Bridget and Mary found; Martin Harper next door added as a possible relative",
+   "scope": "S15, I43"
+  }
+ ],
+ "surnames": {
+  "Harper": {
+   "history": [
+    "In Mayo, Harper is an English name among Irish ones; it was probably brought by a soldier or tradesman in the 1700s, and by Patrick's time the family was Catholic and Irish-speaking.",
+    "In Pittsburgh the Harpers were a Lawrenceville family for three generations, from Michael's arrival in 1880 to Tom's move to Brookline in 1950."
+   ]
+  },
+  "Novak": {
+   "history": [
+    "Novák means ‘the new man’ — a newcomer to the village — and is one of the most common surnames in Slovakia and the Czech lands. In Hungarian records it appears as Novák, in Latin registers as Novák or Nowak, and in America simply as Novak.",
+    "The women of the family appear in Slovak records with the feminine ending -ová: Anna Nováková, born Hudáková; Mária Nováková, born Kováčová."
+   ]
+  }
+ }
+}

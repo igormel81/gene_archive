@@ -1,0 +1,15 @@
+# Example: the family site in ./my-family, comments kept in a named volume.
+services:
+  gene:
+    build: .
+    ports:
+      - "127.0.0.1:8111:8111"
+    volumes:
+      - ./my-family:/site:ro
+      - gene-state:/state
+    environment:
+      GENE_MODERATE: "0"      # "1": new comments wait for `gene comments approve`
+      # GENE_PIN: "1234"      # uncomment for a private archive
+    restart: unless-stopped
+volumes:
+  gene-state:

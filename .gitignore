@@ -1,0 +1,17 @@
+# built sites and caches
+_site/
+_site.*/
+.cache/
+.gene-state/
+example/_site*/
+example/.cache/
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+.venv/
+# Node (browser checks)
+node_modules/
+.DS_Store
