@@ -1,5 +1,10 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- Guide on filling the site with Claude Code or Codex; `gene init` and `gene import` write `AGENTS.md` and `CLAUDE.md`.
+  Инструкция по наполнению сайта с Claude Code или Codex; `gene init` и `gene import` создают `AGENTS.md` и `CLAUDE.md`.
+
 ## 0.1.0 — 2026-10-07
 
 First public release, extracted from the family archive at igoruan.ru/gene.

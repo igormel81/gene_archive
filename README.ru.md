@@ -68,6 +68,8 @@ gene build my-family              # сайт — в папке my-family/_site
 сложите сканы в `sources/`, а рассказ напишите в `content/story.html`
 ([страницы с текстом](docs/content.ru.md)).
 
+**Работаете с ИИ-помощником?** [Как наполнять сайт с помощью Claude или Codex](docs/ai-assistants.ru.md): настройка, правила для агента (`AGENTS.md`), готовые запросы.
+
 **Только начинаете?** Прочитайте [Как начать искать историю своей семьи](docs/research-guide.ru.md):
 расспросы родных, домашний архив, базы в интернете, архивы, проверка находок и как их записывать.
 
@@ -76,6 +78,7 @@ gene build my-family              # сайт — в папке my-family/_site
 | | Русский | English |
 |---|---|---|
 | С чего начать поиск | [research-guide.ru.md](docs/research-guide.ru.md) | [research-guide.md](docs/research-guide.md) |
+| Как наполнять сайт с помощью Claude или Codex | [ai-assistants.ru.md](docs/ai-assistants.ru.md) | [ai-assistants.md](docs/ai-assistants.md) |
 | Формат данных (`family_tree.json`) | [data-format.ru.md](docs/data-format.ru.md) | [data-format.md](docs/data-format.md) |
 | Настройки (`site.json`) | [configuration.ru.md](docs/configuration.ru.md) | [configuration.md](docs/configuration.md) |
 | История, биографии, новости | [content.ru.md](docs/content.ru.md) | [content.md](docs/content.md) |

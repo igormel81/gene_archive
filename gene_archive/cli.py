@@ -23,6 +23,18 @@ from .messages import m
 EXAMPLE = Path(__file__).resolve().parent.parent / "example"
 
 
+TEMPLATES = Path(__file__).resolve().parent / "templates"
+
+
+def write_agent_rules(dest, lang):
+    """AGENTS.md (read by Codex and others) and CLAUDE.md (read by Claude Code) for AI assistants."""
+    if not (dest / "AGENTS.md").exists():
+        src = TEMPLATES / ("AGENTS.ru.md" if lang == "ru" else "AGENTS.en.md")
+        (dest / "AGENTS.md").write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+    if not (dest / "CLAUDE.md").exists():
+        (dest / "CLAUDE.md").write_text("@AGENTS.md\n", encoding="utf-8")
+
+
 def cmd_init(args):
     dest = Path(args.folder)
     if dest.exists() and any(dest.iterdir()):
@@ -31,6 +43,7 @@ def cmd_init(args):
         if not EXAMPLE.is_dir():
             sys.exit(m("the example is not installed with this copy (clone the repository)", "пример не установлен (склонируйте репозиторий)"))
         shutil.copytree(EXAMPLE, dest, dirs_exist_ok=True, ignore=shutil.ignore_patterns("_site*", ".cache"))
+        write_agent_rules(dest, "en")
         print(m(f"Demo site copied to {dest}. Next: gene serve {dest}", f"Пример скопирован в {dest}. Дальше: gene serve {dest}"))
         return
     lang = args.lang
@@ -50,6 +63,7 @@ def cmd_init(args):
             "comments": False, "questions": [], "branches": []}
     (dest / "site.json").write_text(json.dumps(site, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (dest / ".gitignore").write_text("_site/\n_site.*/\n.cache/\n.gene-state/\n", encoding="utf-8")
+    write_agent_rules(dest, lang)
     print(m(f"New site in {dest}. Edit family_tree.json and site.json, then: gene serve {dest}\n"
             "How to start the research: docs/research-guide.md",
             f"Новый сайт в {dest}. Заполните family_tree.json и site.json, затем: gene serve {dest}\n"
@@ -70,6 +84,7 @@ def cmd_import(args):
         title = m("Family archive", "Семейный архив")
         (dest / "site.json").write_text(json.dumps({"title": title, "languages": [args.lang] + [x for x in ("en", "ru") if x != args.lang][:1],
                                                     "comments": False}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_agent_rules(dest, args.lang)
     for w in warnings:
         print(m("warning: ", "предупреждение: ") + w)
     print(m(f"{len(data['people'])} people, {len(data['families'])} families, {len(data['sources'])} sources → {tree}",

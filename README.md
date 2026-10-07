@@ -70,6 +70,8 @@ Then fill in `family_tree.json` (people, families, documents, places — see
 put scans into `sources/`, and write the story in `content/story.html`
 ([content pages](docs/content.md)).
 
+**Working with an AI assistant?** [Filling the site with Claude or Codex](docs/ai-assistants.md): setup, rules for the agent (`AGENTS.md`), ready-made requests.
+
 **New to genealogy?** Read [How to start researching your family history](docs/research-guide.md):
 interviews, home documents, online databases, archives, evidence and how to record it.
 
@@ -78,6 +80,7 @@ interviews, home documents, online databases, archives, evidence and how to reco
 | | English | Русский |
 |---|---|---|
 | How to start the research | [research-guide.md](docs/research-guide.md) | [research-guide.ru.md](docs/research-guide.ru.md) |
+| Filling the site with Claude or Codex | [ai-assistants.md](docs/ai-assistants.md) | [ai-assistants.ru.md](docs/ai-assistants.ru.md) |
 | Data format (`family_tree.json`) | [data-format.md](docs/data-format.md) | [data-format.ru.md](docs/data-format.ru.md) |
 | Settings (`site.json`) | [configuration.md](docs/configuration.md) | [configuration.ru.md](docs/configuration.ru.md) |
 | Story, biographies, news | [content.md](docs/content.md) | [content.ru.md](docs/content.ru.md) |

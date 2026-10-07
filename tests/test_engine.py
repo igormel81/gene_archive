@@ -257,6 +257,8 @@ class ContentTranslation(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             site = Path(tmp, "s")
             cli.main(["init", str(site), "--lang", "ru"])
+            self.assertIn("Правила доказательности", (site / "AGENTS.md").read_text(encoding="utf-8"))
+            self.assertEqual((site / "CLAUDE.md").read_text(encoding="utf-8"), "@AGENTS.md\n")
             data = json.loads((site / "family_tree.json").read_text(encoding="utf-8"))
             data["people"][0].update(living=False, notes=["Родился в деревне."])
             (site / "family_tree.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")

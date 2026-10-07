@@ -1,12 +1,10 @@
 # Publishes the fictional demo family on GitHub Pages.
-# One-time setup: Settings → Pages → Source: "GitHub Actions".
+# One-time setup: Settings → Pages → Source: "GitHub Actions", then Actions → Demo site → Run workflow.
+# (Manual only, so that main does not turn red while Pages is switched off.)
 name: Demo site
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ["gene_archive/**", "example/**", ".github/workflows/demo.yml"]
 
 permissions:
   contents: read
