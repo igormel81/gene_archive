@@ -91,9 +91,10 @@ WantedBy=multi-user.target
 ### Docker
 
 ```sh
-docker build -t gene-archive .
-docker run -d -p 127.0.0.1:8111:8111 -v "$PWD/my-family:/site:ro" -v gene-state:/state gene-archive
+docker run -d -p 127.0.0.1:8111:8111 -v "$PWD/my-family:/site:ro" -v gene-state:/state ghcr.io/igormel81/gene_archive:latest
 ```
+
+(или соберите образ сами: `docker build -t gene-archive .`)
 
 или `docker compose up -d` с [`docker-compose.yml`](../docker-compose.yml). После правки данных
 перезапустите контейнер — при старте он пересобирает сайт.
@@ -119,3 +120,21 @@ gene comments my-family done 12 "внесено в древо"   # «✓ Учт�
 
 Комментарий — до 4000 знаков, не больше 30 за 10 минут с одного адреса; скрытое поле формы
 отсеивает простых ботов. Делайте резервную копию `comments.db` вместе с данными.
+
+## Релизы (для сопровождающих)
+
+```sh
+# поднимите версию в pyproject.toml, перенесите «Unreleased» из CHANGELOG под новую версию, закоммитьте, затем:
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+Workflow `Release` проверяет, что тег совпадает с версией в `pyproject.toml`, прогоняет тесты, создаёт
+релиз на GitHub с разделом CHANGELOG и файлами пакета и публикует Docker-образ
+`ghcr.io/igormel81/gene_archive:<версия>` (и `:latest`).
+
+Публикация на PyPI выключена, пока её один раз не настроить:
+1. На pypi.org → *Your projects* → *Publishing* → добавьте pending trusted publisher: проект `gene-archive`,
+   владелец `igormel81`, репозиторий `gene_archive`, workflow `release.yml`, environment `pypi`.
+2. На GitHub → Settings → Environments → создайте `pypi`; Settings → Secrets and variables → Actions →
+   *Variables* → `PYPI_PUBLISH` = `true`.
+Со следующим тегом пакет опубликуется и на PyPI, и заработает `pip install gene-archive`.

@@ -1,0 +1,82 @@
+# A version tag (git tag v0.2.0 && git push origin v0.2.0) makes a release:
+#  - checks that the tag matches the version in pyproject.toml and that the tests pass;
+#  - builds the Python package and creates a GitHub release with the CHANGELOG section and the files;
+#  - publishes the Docker image ghcr.io/igormel81/gene_archive:<version> and :latest;
+#  - publishes to PyPI only when the repository variable PYPI_PUBLISH is "true"
+#    (set up trusted publishing on pypi.org first: docs/deploy.md → "Releases").
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The tag matches pyproject.toml
+        run: |
+          version=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          test "v$version" = "$GITHUB_REF_NAME" || { echo "::error::tag $GITHUB_REF_NAME, pyproject.toml $version"; exit 1; }
+      - run: pip install ".[images]" build && python -m unittest discover tests
+      - run: python -m build
+      - name: Release notes from CHANGELOG.md
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## "v" " {on=1; next} on && /^## / {exit} on {print}' CHANGELOG.md > notes.md
+          test -s notes.md || echo "See CHANGELOG.md" > notes.md
+          printf '\n**Install:** `pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@%s"` · **Docker:** `ghcr.io/igormel81/gene_archive:%s` · **Demo:** https://igormel81.github.io/gene_archive/\n' "$GITHUB_REF_NAME" "$v" >> notes.md
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "gene-archive $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  docker:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Build and push
+        run: |
+          image=ghcr.io/${GITHUB_REPOSITORY,,}
+          v="${GITHUB_REF_NAME#v}"
+          docker build -t "$image:$v" -t "$image:latest" \
+            --label org.opencontainers.image.source="https://github.com/$GITHUB_REPOSITORY" \
+            --label org.opencontainers.image.licenses=MIT \
+            --label org.opencontainers.image.description="Family archive site generator with a comments server" .
+          docker push "$image:$v"
+          docker push "$image:latest"
+
+  pypi:
+    needs: release
+    if: vars.PYPI_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/gene-archive
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
