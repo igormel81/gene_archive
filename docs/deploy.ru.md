@@ -128,6 +128,8 @@ gene comments my-family done 12 "внесено в древо"   # «✓ Учт�
 git tag v0.2.0 && git push origin v0.2.0
 ```
 
+или запустите Actions → Release → *Run workflow*: тег `v<версия>` на текущем `main` он поставит сам.
+
 Workflow `Release` проверяет, что тег совпадает с версией в `pyproject.toml`, прогоняет тесты, создаёт
 релиз на GitHub с разделом CHANGELOG и файлами пакета и публикует Docker-образ
 `ghcr.io/igormel81/gene_archive:<версия>` (и `:latest`).

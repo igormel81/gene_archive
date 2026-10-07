@@ -129,6 +129,8 @@ field catches simple bots. Back up `comments.db` together with your data.
 git tag v0.2.0 && git push origin v0.2.0
 ```
 
+or run Actions → Release → *Run workflow*: it creates the tag `v<version>` on the current `main` itself.
+
 The `Release` workflow checks that the tag matches `pyproject.toml`, runs the tests, creates the
 GitHub release with the CHANGELOG section and the package files, and publishes the Docker image
 `ghcr.io/igormel81/gene_archive:<version>` (and `:latest`).

@@ -1,4 +1,6 @@
-# A version tag (git tag v0.2.0 && git push origin v0.2.0) makes a release:
+# A release is made by a version tag (git tag v0.2.0 && git push origin v0.2.0) or by running this
+# workflow by hand (Actions → Release → Run workflow): then the tag v<version from pyproject.toml>
+# is created on the current main. Either way:
 #  - checks that the tag matches the version in pyproject.toml and that the tests pass;
 #  - builds the Python package and creates a GitHub release with the CHANGELOG section and the files;
 #  - publishes the Docker image ghcr.io/igormel81/gene_archive:<version> and :latest;
@@ -9,12 +11,15 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,19 +28,25 @@ jobs:
       - name: The tag matches pyproject.toml
         run: |
           version=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
-          test "v$version" = "$GITHUB_REF_NAME" || { echo "::error::tag $GITHUB_REF_NAME, pyproject.toml $version"; exit 1; }
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then tag="v$version"; else tag="$GITHUB_REF_NAME"; fi
+          test "v$version" = "$tag" || { echo "::error::tag $tag, pyproject.toml $version"; exit 1; }
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+        id: tag
       - run: pip install ".[images]" build && python -m unittest discover tests
       - run: python -m build
       - name: Release notes from CHANGELOG.md
         run: |
-          v="${GITHUB_REF_NAME#v}"
+          v="${TAG#v}"
           awk -v v="$v" '$0 ~ "^## "v" " {on=1; next} on && /^## / {exit} on {print}' CHANGELOG.md > notes.md
           test -s notes.md || echo "See CHANGELOG.md" > notes.md
-          printf '\n**Install:** `pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@%s"` · **Docker:** `ghcr.io/igormel81/gene_archive:%s` · **Demo:** https://igormel81.github.io/gene_archive/\n' "$GITHUB_REF_NAME" "$v" >> notes.md
+          printf '\n**Install:** `pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@%s"` · **Docker:** `ghcr.io/igormel81/gene_archive:%s` · **Demo:** https://igormel81.github.io/gene_archive/\n' "$TAG" "$v" >> notes.md
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --title "gene-archive $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then where="--target $GITHUB_SHA"; else where="--verify-tag"; fi
+          gh release create "$TAG" dist/* --title "gene-archive $TAG" --notes-file notes.md $where
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -55,9 +66,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
       - name: Build and push
+        env:
+          TAG: ${{ needs.release.outputs.tag }}
         run: |
           image=ghcr.io/${GITHUB_REPOSITORY,,}
-          v="${GITHUB_REF_NAME#v}"
+          v="${TAG#v}"
           docker build -t "$image:$v" -t "$image:latest" \
             --label org.opencontainers.image.source="https://github.com/$GITHUB_REPOSITORY" \
             --label org.opencontainers.image.licenses=MIT \
