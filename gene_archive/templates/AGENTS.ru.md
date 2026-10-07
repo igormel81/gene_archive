@@ -16,6 +16,7 @@
 | `_site/` | собранный сайт — не правь руками, он пересобирается |
 
 Формат данных: https://github.com/igormel81/gene_archive/blob/main/docs/data-format.ru.md
+Запросы для поиска в базах и архивах: https://github.com/igormel81/gene_archive/blob/main/docs/research-prompts.ru.md
 Схема для проверки и подсказок: https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/family_tree.schema.json
 
 ## Как работать

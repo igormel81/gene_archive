@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Collection of AI requests for research in open sources and archives (docs/research-prompts).
+  Сборник запросов к ИИ для поиска в открытых источниках и архивах (docs/research-prompts).
 - GEDCOM 5.5.1 export by default (7.0 with `gedcom_version` or `gene gedcom --version 7.0`); `gene gedcom` command.
   Выгрузка GEDCOM 5.5.1 по умолчанию (7.0 — через `gedcom_version` или `gene gedcom --version 7.0`); команда `gene gedcom`.
 - JSON Schemas for `family_tree.json` and `site.json`: hints and checks in editors.

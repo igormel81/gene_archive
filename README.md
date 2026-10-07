@@ -99,6 +99,7 @@ More ready-made requests and the rules for reviewing the agent's work:
 | | English | Русский |
 |---|---|---|
 | How to start the research | [research-guide.md](docs/research-guide.md) | [research-guide.ru.md](docs/research-guide.ru.md) |
+| AI requests for research in open sources and archives | [research-prompts.md](docs/research-prompts.md) | [research-prompts.ru.md](docs/research-prompts.ru.md) |
 | Filling the site with Claude or Codex | [ai-assistants.md](docs/ai-assistants.md) | [ai-assistants.ru.md](docs/ai-assistants.ru.md) |
 | Data format (`family_tree.json`) | [data-format.md](docs/data-format.md) | [data-format.ru.md](docs/data-format.ru.md) |
 | Settings (`site.json`) | [configuration.md](docs/configuration.md) | [configuration.ru.md](docs/configuration.ru.md) |

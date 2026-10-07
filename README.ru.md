@@ -97,6 +97,7 @@ gene build my-family              # сайт — в папке my-family/_site
 | | Русский | English |
 |---|---|---|
 | С чего начать поиск | [research-guide.ru.md](docs/research-guide.ru.md) | [research-guide.md](docs/research-guide.md) |
+| Запросы к ИИ для поиска в открытых источниках и архивах | [research-prompts.ru.md](docs/research-prompts.ru.md) | [research-prompts.md](docs/research-prompts.md) |
 | Как наполнять сайт с помощью Claude или Codex | [ai-assistants.ru.md](docs/ai-assistants.ru.md) | [ai-assistants.md](docs/ai-assistants.md) |
 | Формат данных (`family_tree.json`) | [data-format.ru.md](docs/data-format.ru.md) | [data-format.md](docs/data-format.md) |
 | Настройки (`site.json`) | [configuration.ru.md](docs/configuration.ru.md) | [configuration.md](docs/configuration.md) |

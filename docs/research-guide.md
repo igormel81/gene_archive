@@ -7,7 +7,8 @@ and how to record what you find in `family_tree.json`.
 The data format itself is described in [data-format.md](data-format.md). This guide
 covers what to do **before** anything goes into the data, and how to write it down.
 A Russian version with more detail on Russian Empire and Soviet sources is in
-[research-guide.ru.md](research-guide.ru.md).
+[research-guide.ru.md](research-guide.ru.md). Ready-made requests to an AI assistant for every step are in
+[the collection of research requests](research-prompts.md).
 
 ---
 

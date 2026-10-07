@@ -131,6 +131,8 @@ The agent shows the transcription — **compare it line by line with the scan** 
 > step-by-step research plan (archives, databases, years and parishes) and record it in
 > `research_leads`. Do not add anything to the tree.
 
+More requests for searching databases and archives — in [a separate collection](research-prompts.md).
+
 It helps to give the agent the [research guide](research-guide.md):
 "Read docs/research-guide.md of gene-archive and make the plan by it".
 
