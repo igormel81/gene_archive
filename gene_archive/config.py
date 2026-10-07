@@ -34,6 +34,7 @@ DEFAULTS = {
     "head_html": "",               # extra HTML for <head> of every page (analytics, verification meta tags)
     "strict_translations": False,  # fail the build when a content string has no translation
     "min_surname_page": 3,         # surname pages for surnames with at least N people
+    "gedcom_version": "5.5.1",     # family_tree.ged on the site: "5.5.1" (read by most programs) or "7.0"
 }
 
 
@@ -67,6 +68,8 @@ def load(site_dir):
         raise ConfigError(f"site.json: no interface translation for {bad}; available: {sorted(UI_LANGUAGES)}")
     if len(set(langs)) != len(langs):
         raise ConfigError("site.json: languages repeat")
+    if cfg["gedcom_version"] not in ("5.5.1", "7.0"):
+        raise ConfigError('site.json: gedcom_version must be "5.5.1" or "7.0"')
     cfg["content_language"] = cfg["content_language"] or langs[0]
     cfg["short_title"] = cfg["short_title"] or cfg["title"]
     if cfg["base_url"] and not cfg["base_url"].endswith("/"):

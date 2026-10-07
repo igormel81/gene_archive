@@ -117,6 +117,7 @@ More ready-made requests and the rules for reviewing the agent's work:
 | `gene build [folder] [-o out] [--base-url URL]` | build the static site |
 | `gene serve [folder] [--pin 1234] [--moderate]` | build and serve with comments |
 | `gene comments <folder> list\|approve ID\|hide ID\|done ID "note"` | moderate comments |
+| `gene gedcom [folder] [-o file.ged] [--version 5.5.1\|7.0]` | GEDCOM for MyHeritage, Ancestry, Gramps… (`--full`: with living people, for your own backup) |
 | `gene translations <folder> <lang>` | your texts that have no translation yet |
 
 Messages are in Russian when the system language is Russian (or `GENE_LANG=ru`).

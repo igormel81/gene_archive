@@ -311,7 +311,7 @@ def build(site_dir, out=None, base_url=None):
         "bios": re.findall(r'<article class="bio" id="bio-(I\d+)"', bios),
     }
     (tmp / "data.json").write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
-    (tmp / "family_tree.ged").write_text(ged_export.build(data, cfg["title"]), encoding="utf-8")
+    (tmp / "family_tree.ged").write_text(ged_export.build(data, cfg["title"], version=cfg["gedcom_version"]), encoding="utf-8")
 
     pages = discovery.Pages(tmp, data, cfg, living, bool(story), bool(news))
     pages.build(story, news, help_page.read_text(encoding="utf-8") if help_page.exists() else "")

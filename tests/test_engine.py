@@ -121,22 +121,48 @@ class Gedcom(unittest.TestCase):
 
     def test_structure(self):
         data, _ = build.public_data(CFG, copy.deepcopy(DATA))
-        ged = ged_export.build(data, "Test")
-        lines = ged.splitlines()
-        self.assertEqual(lines[0], "0 HEAD")
-        self.assertEqual(lines[-1], "0 TRLR")
-        for line in lines:
-            self.assertRegex(line, r"^\d+ (@\w+@ )?[A-Z_]+( .*)?$")
-        defined = set(re.findall(r"^0 @(\w+)@", ged, re.M))
-        used = set(re.findall(r"^[1-9] \w+ @(\w+)@", ged, re.M))
-        self.assertEqual(used - defined, set())
+        for version in ged_export.VERSIONS:
+            with self.subTest(version):
+                ged = ged_export.build(data, "Test", version=version)
+                lines = ged.splitlines()
+                self.assertEqual(lines[0], "0 HEAD")
+                self.assertIn(f"2 VERS {version}", lines[:4])
+                self.assertEqual(lines[-1], "0 TRLR")
+                for line in lines:
+                    self.assertRegex(line, r"^\d+ (@\w+@ )?[A-Z_]+( .*)?$")
+                defined = set(re.findall(r"^0 @(\w+)@", ged, re.M))
+                used = set(re.findall(r"^[1-9] \w+ @(\w+)@", ged, re.M))
+                self.assertEqual(used - defined, set())
+
+    def test_551_line_limits_and_escaping(self):
+        long_note = "Ж" * 300 + " @home " + "word " * 80
+        data = {"people": [{"id": "I1", "given_names": "Anna", "surname": "Nováková", "display_name": "Nováková Anna",
+                            "sex": "F", "notes": [long_note, "line one\nline two"]}],
+                "families": [], "sources": []}
+        ged = ged_export.build(data, "T", version="5.5.1")
+        self.assertLessEqual(max(len(x.encode()) for x in ged.splitlines()), 255)
+        self.assertIn("@@home", ged)
+        self.assertIn("2 CONT line two", ged)
+        self.assertIn("1 SUBM @SUBM1@", ged)
+        ged7 = ged_export.build(data, "T", version="7.0")
+        self.assertNotIn(" CONC ", ged7)
+        self.assertNotIn("@@home", ged7)
 
     def test_import_export_round_trip(self):
         from gene_archive.ged_import import import_gedcom
         data, _ = build.public_data(CFG, copy.deepcopy(DATA))
-        back = import_gedcom(ged_export.build(data))
-        self.assertEqual(len(back["people"]), len(data["people"]))
-        self.assertEqual(len(back["families"]), len(data["families"]))
+        for version in ged_export.VERSIONS:
+            with self.subTest(version):
+                back = import_gedcom(ged_export.build(data, version=version))
+                self.assertEqual(len(back["people"]), len(data["people"]))
+                self.assertEqual(len(back["families"]), len(data["families"]))
+                self.assertEqual(len(back["sources"]), len(data["sources"]))
+                # long notes split with CONC come back whole
+                original = {p["id"]: p["notes"] for p in data["people"] if p.get("notes")}
+                restored = {p["gedcom_id"].strip("@"): p["notes"] for p in back["people"]}
+                name = max(original, key=lambda k: max(len(n) for n in original[k]))
+                longest = max(original[name], key=len)
+                self.assertTrue(any(longest in n for n in restored[name]), name)
 
 
 class Translations(unittest.TestCase):

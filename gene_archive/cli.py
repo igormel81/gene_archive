@@ -6,6 +6,7 @@
   gene build <folder> [-o out]     build the static site into <folder>/_site
   gene serve <folder>              build, then serve the site with comments on http://127.0.0.1:8111
   gene comments <folder> list|approve ID|hide ID|done ID "note"   moderate relatives' comments
+  gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
 
 Messages are in Russian when the system language is Russian (or GENE_LANG=ru).
@@ -21,6 +22,7 @@ from . import __version__
 from .messages import m
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "example"
+SCHEMAS = "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/"
 
 
 TEMPLATES = Path(__file__).resolve().parent / "templates"
@@ -52,7 +54,7 @@ def cmd_init(args):
     (dest / "content").mkdir(exist_ok=True)
     you = {"ru": ("Иван Петрович", "Иванов", "Иванов Иван Петрович"), "en": ("John", "Smith", "Smith John")}.get(lang, ("John", "Smith", "Smith John"))
     data = {
-        "schema_version": "1.0", "root_person_id": "I1",
+        "$schema": SCHEMAS + "family_tree.schema.json", "schema_version": "1.0", "root_person_id": "I1",
         "people": [{"id": "I1", "given_names": you[0], "surname": you[1], "display_name": you[2], "sex": "M",
                     "relation": m("compiler of the tree", "составитель древа"), "identity_source_ids": [], "aliases": [], "notes": []}],
         "families": [], "sources": [], "places": [], "place_groups": [], "place_routes": [],
@@ -60,7 +62,7 @@ def cmd_init(args):
     }
     (dest / "family_tree.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     title = {"ru": "Семейный архив", "en": "Family archive"}.get(lang, "Family archive")
-    site = {"title": title, "description": "", "languages": [lang] + [x for x in ("en", "ru") if x != lang][:1],
+    site = {"$schema": SCHEMAS + "site.schema.json", "title": title, "description": "", "languages": [lang] + [x for x in ("en", "ru") if x != lang][:1],
             "comments": False, "questions": [], "branches": []}
     (dest / "site.json").write_text(json.dumps(site, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (dest / ".gitignore").write_text("_site/\n_site.*/\n.cache/\n.gene-state/\n", encoding="utf-8")
@@ -78,12 +80,13 @@ def cmd_import(args):
     if tree.exists() and not args.force:
         sys.exit(m(f"{tree} exists (use --force to overwrite)", f"{tree} уже есть (перезаписать: --force)"))
     data, warnings = ged_import.import_gedcom_with_warnings(args.gedcom, root=args.root)
+    data = {"$schema": SCHEMAS + "family_tree.schema.json", **data}
     dest.mkdir(parents=True, exist_ok=True)
     (dest / "sources").mkdir(exist_ok=True)
     tree.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if not (dest / "site.json").exists():
         title = m("Family archive", "Семейный архив")
-        (dest / "site.json").write_text(json.dumps({"title": title, "languages": [args.lang] + [x for x in ("en", "ru") if x != args.lang][:1],
+        (dest / "site.json").write_text(json.dumps({"$schema": SCHEMAS + "site.schema.json", "title": title, "languages": [args.lang] + [x for x in ("en", "ru") if x != args.lang][:1],
                                                     "comments": False}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_agent_rules(dest, args.lang)
     for w in warnings:
@@ -168,6 +171,27 @@ def cmd_comments(args):
         print("ok")
 
 
+def cmd_gedcom(args):
+    from . import ged_export
+    from .build import load_site, public_data
+    from .validate import validate
+    cfg, raw = load_site(args.folder)
+    errors, _ = validate(raw, Path(args.folder), cfg)
+    if errors:
+        sys.exit(m("family_tree.json has errors (see `gene validate`)", "в family_tree.json ошибки (подробно: `gene validate`)"))
+    if args.full:   # your own backup: living people included, hidden documents still left out
+        from .privacy import without_hidden
+        data, living = without_hidden(raw), set()
+    else:
+        data, living = public_data(cfg, raw)
+    out = Path(args.out or "family_tree.ged")
+    out.write_text(ged_export.build(data, cfg["title"], version=args.version or cfg["gedcom_version"]), encoding="utf-8")
+    print(m(f"{out}: GEDCOM {args.version or cfg['gedcom_version']}, {len(data['people'])} people"
+            + ("" if args.full else f" ({len(living)} living, details hidden)"),
+            f"{out}: GEDCOM {args.version or cfg['gedcom_version']}, {len(data['people'])} человек"
+            + ("" if args.full else f" (живых — {len(living)}, сведения скрыты)")))
+
+
 def cmd_translations(args):
     from . import localize
     from .build import BuildError, build
@@ -228,6 +252,13 @@ def main(argv=None):
     s.add_argument("note", nargs="?")
     s.add_argument("--state")
     s.set_defaults(fn=cmd_comments)
+    s = sub.add_parser("gedcom", help=m("export GEDCOM for genealogy programs", "выгрузить GEDCOM для программ-родословных"))
+    s.add_argument("folder", nargs="?", default=".")
+    s.add_argument("-o", "--out", help="family_tree.ged")
+    s.add_argument("--version", choices=["5.5.1", "7.0"])
+    s.add_argument("--full", action="store_true", help=m("include living people's details (for your own backup, do not publish)",
+                                                        "со сведениями о живых (для своей резервной копии, не публиковать)"))
+    s.set_defaults(fn=cmd_gedcom)
     s = sub.add_parser("translations", help=m("texts without a translation", "тексты без перевода"))
     s.add_argument("folder")
     s.add_argument("lang")

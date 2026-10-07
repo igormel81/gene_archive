@@ -3,7 +3,7 @@
 **[English version](configuration.md)**
 
 `site.json` лежит рядом с `family_tree.json`. Все ключи необязательны, кроме `title`;
-незнакомый ключ — ошибка, чтобы опечатка не прошла незамеченной. Полный пример —
+незнакомый ключ — ошибка, чтобы опечатка не прошла незамеченной. Со строкой `"$schema"` (её добавляет `gene init`) редактор подсказывает ключи и их смысл. Полный пример —
 [`example/site.json`](../example/site.json).
 
 ```json
@@ -32,7 +32,8 @@
   "links": [{"label": "Наш фотоальбом", "href": "https://example.org/album"}],
   "head_html": "",
   "strict_translations": false,
-  "min_surname_page": 3
+  "min_surname_page": 3,
+  "gedcom_version": "5.5.1"
 }
 ```
 
@@ -59,6 +60,7 @@
 | `head_html` | "" | HTML, который добавляется в `<head>` каждой страницы: счётчики, метки подтверждения |
 | `strict_translations` | `false` | останавливать сборку, если у какого-то вашего текста нет перевода (см. [переводы](translations.ru.md)) |
 | `min_surname_page` | `3` | страницы фамилий делаются для фамилий, у которых не меньше стольких людей |
+| `gedcom_version` | `"5.5.1"` | версия `family_tree.ged` на странице «Архив»: `"5.5.1"` (читают MyHeritage, Ancestry, Geni, Gramps и большинство программ) или `"7.0"` |
 
 ## Страница «История»
 

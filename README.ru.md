@@ -115,6 +115,7 @@ gene build my-family              # сайт — в папке my-family/_site
 | `gene build [папка] [-o куда] [--base-url адрес]` | собрать сайт |
 | `gene serve [папка] [--pin 1234] [--moderate]` | собрать и запустить с комментариями |
 | `gene comments <папка> list\|approve N\|hide N\|done N "что сделано"` | модерация комментариев |
+| `gene gedcom [папка] [-o файл.ged] [--version 5.5.1\|7.0]` | GEDCOM для MyHeritage, Ancestry, Gramps… (`--full` — с живыми, для своей резервной копии) |
 | `gene translations <папка> <язык>` | ваши тексты, у которых ещё нет перевода |
 
 Сообщения команд — по-русски, если язык системы русский (или `GENE_LANG=ru`).

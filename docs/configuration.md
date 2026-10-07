@@ -3,7 +3,7 @@
 **[Русская версия](configuration.ru.md)**
 
 `site.json` lives next to `family_tree.json`. Every key is optional except `title`;
-an unknown key is an error, so typos do not go unnoticed. A complete example:
+an unknown key is an error, so typos do not go unnoticed. With the `"$schema"` line (added by `gene init`) your editor suggests the keys and their meaning. A complete example:
 [`example/site.json`](../example/site.json).
 
 ```json
@@ -32,7 +32,8 @@ an unknown key is an error, so typos do not go unnoticed. A complete example:
   "links": [{"label": "Our photo album", "href": "https://example.org/album"}],
   "head_html": "",
   "strict_translations": false,
-  "min_surname_page": 3
+  "min_surname_page": 3,
+  "gedcom_version": "5.5.1"
 }
 ```
 
@@ -59,6 +60,7 @@ an unknown key is an error, so typos do not go unnoticed. A complete example:
 | `head_html` | "" | extra HTML added to `<head>` of every page: analytics, verification tags |
 | `strict_translations` | `false` | fail the build when one of your texts has no translation (see [translations](translations.md)) |
 | `min_surname_page` | `3` | surname pages are made for surnames with at least this many people |
+| `gedcom_version` | `"5.5.1"` | version of `family_tree.ged` offered on the Archive page: `"5.5.1"` (read by MyHeritage, Ancestry, Geni, Gramps and most programs) or `"7.0"` |
 
 ## The Story page
 
