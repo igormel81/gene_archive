@@ -20,6 +20,7 @@
 | `gene_archive/server.py` | сервер комментариев (только стандартная библиотека) |
 | `gene_archive/engine/web/` | приложение в браузере: шаблон `index.html`, `app.js`, `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | словари интерфейса |
+| `schemas/` | JSON Schema для `family_tree.json` и `site.json` — дополняйте при каждом новом поле |
 | `example/` | вымышленная демонстрационная семья, на ней же работают тесты |
 | `tests/` | тесты `unittest` и браузерные проверки (`smoke.mjs`) |
 

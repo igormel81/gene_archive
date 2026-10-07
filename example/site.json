@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/site.schema.json",
   "title": "The Harper & Novak family archive",
   "short_title": "Harper & Novak",
   "description": "A fictional demonstration archive: an Irish family from County Mayo and a Slovak family from Kapušany who met in Pittsburgh, told through records, photographs and family memories.",

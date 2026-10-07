@@ -7,6 +7,15 @@ A site is one folder with `site.json` (settings, see [configuration.md](configur
 `content/` pages. `gene validate` checks everything below; `gene build` refuses to build
 when there are errors.
 
+**Hints in your editor.** `gene init` puts a `"$schema"` line at the top of `family_tree.json`
+and `site.json`. VS Code, Cursor, JetBrains editors and others then suggest field names, show
+descriptions and underline mistakes as you type — an unknown `sex`, a date like "before the war".
+The schemas are in [`schemas/`](../schemas/); for an older file add the line yourself:
+
+```json
+{"$schema": "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/family_tree.schema.json", …}
+```
+
 All text fields are plain text in the language of your content. Numbers like `S12` inside
 any text (`notes`, `scope`, place texts…) become clickable links to that document.
 

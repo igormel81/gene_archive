@@ -1,0 +1,798 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/family_tree.schema.json",
+  "title": "gene-archive family_tree.json",
+  "description": "Data of a family archive site. Full description: docs/data-format.md / Данные сайта семейного архива. Полное описание: docs/data-format.ru.md",
+  "type": "object",
+  "required": [
+    "root_person_id",
+    "people",
+    "families",
+    "sources"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "root_person_id": {
+      "$ref": "#/$defs/personId"
+    },
+    "people": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/person"
+      },
+      "description": "people / люди"
+    },
+    "families": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/family"
+      },
+      "description": "families / семьи"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      },
+      "description": "documents and photos / документы и снимки"
+    },
+    "places": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/place"
+      },
+      "description": "places / места"
+    },
+    "place_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": ""
+          },
+          "name": {
+            "type": "string",
+            "description": ""
+          },
+          "color": {
+            "type": "string",
+            "description": "",
+            "pattern": "^#[0-9a-fA-F]{3,8}$"
+          },
+          "about": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "description": "family branches on the map / ветви семьи на карте"
+    },
+    "place_routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "from_place",
+          "to_place"
+        ],
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": ""
+          },
+          "from_place": {
+            "$ref": "#/$defs/slug"
+          },
+          "to_place": {
+            "$ref": "#/$defs/slug"
+          },
+          "label": {
+            "type": "string",
+            "description": ""
+          },
+          "sources": {
+            "$ref": "#/$defs/sourceIds"
+          }
+        }
+      },
+      "description": "moves drawn on the map / переезды на карте"
+    },
+    "research_leads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "status",
+          "record"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^L\\d+$"
+          },
+          "title": {
+            "type": "string",
+            "description": ""
+          },
+          "status": {
+            "type": "string",
+            "description": "open, to_verify, accepted, closed, superseded… / open, to_verify, accepted, closed, superseded…"
+          },
+          "record": {
+            "type": "string",
+            "description": "what was found / что найдено"
+          },
+          "person_id": {
+            "$ref": "#/$defs/personId"
+          },
+          "source_ids": {
+            "$ref": "#/$defs/sourceIds"
+          },
+          "limitations": {
+            "type": "string",
+            "description": "why it is not proven / почему не доказано"
+          },
+          "url": {
+            "type": "string",
+            "description": "",
+            "format": "uri"
+          },
+          "resolution": {
+            "type": "string",
+            "description": "how it ended / чем закончилось"
+          }
+        }
+      },
+      "description": "open questions and hints / открытые вопросы и наводки"
+    },
+    "corrections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "field",
+          "previous",
+          "current",
+          "reason"
+        ],
+        "properties": {
+          "person_id": {
+            "type": "string",
+            "pattern": "^(I\\d+|\\*)$"
+          },
+          "family_id": {
+            "$ref": "#/$defs/familyId"
+          },
+          "record": {
+            "type": "string",
+            "description": ""
+          },
+          "field": {
+            "type": "string",
+            "description": ""
+          },
+          "previous": {},
+          "current": {},
+          "reason": {
+            "type": "string",
+            "description": ""
+          },
+          "source_ids": {
+            "$ref": "#/$defs/sourceIds"
+          }
+        }
+      },
+      "description": "every change of a fact / каждое изменение факта"
+    },
+    "research_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "date",
+          "action",
+          "result"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "YYYY-MM-DD",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "action": {
+            "type": "string",
+            "description": "what and where was searched / что и где искали"
+          },
+          "result": {
+            "type": "string",
+            "description": "result, including nothing found / результат, в том числе «ничего не найдено»"
+          },
+          "scope": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "description": "research log / журнал поиска"
+    },
+    "surnames": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        }
+      },
+      "description": "surname histories for surname pages / история родов для страниц фамилий"
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "description": "ISO (1899, 1899-10, 1899-10-09) or GEDCOM: ABT 1899, BEF/AFT 1950, EST/CAL 1880, BET 1900 AND 1905, FROM 1900 TO 1910, 9 OCT 1899 / ISO (1899, 1899-10, 1899-10-09) или GEDCOM: ABT 1899, BEF/AFT 1950, EST/CAL 1880, BET 1900 AND 1905, FROM 1900 TO 1910, 9 OCT 1899",
+      "pattern": "^(\\d{4}(-\\d{2}(-\\d{2})?)?|((ABT|CAL|EST|BEF|AFT) )?(\\d{1,2} )?((JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC) )?\\d{3,4}|BET .+ AND .+|FROM .+( TO .+)?)$"
+    },
+    "personId": {
+      "type": "string",
+      "pattern": "^I\\d+$",
+      "description": "person id / номер человека: I12"
+    },
+    "familyId": {
+      "type": "string",
+      "pattern": "^F\\d+$",
+      "description": "family id / номер семьи: F3"
+    },
+    "sourceId": {
+      "type": "string",
+      "pattern": "^S\\d+$",
+      "description": "document id / номер документа: S7"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "place slug / slug места: new-york"
+    },
+    "sourceIds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sourceId"
+      },
+      "description": "documents / документы"
+    },
+    "status": {
+      "enum": [
+        "documented",
+        "family_report",
+        "uncertain_family_report",
+        "calculated_from_age",
+        "gravestone",
+        "publication",
+        "probable"
+      ],
+      "description": "how we know it / откуда известно"
+    },
+    "event": {
+      "type": "object",
+      "description": "an event: birth, death, burial, marriage / событие: рождение, смерть, погребение, брак",
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "place_as_recorded": {
+          "type": "string",
+          "description": "the place as written in the source / место, как записано в источнике"
+        },
+        "place_slugs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          },
+          "description": "links to places / ссылки на места"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "note": {
+          "type": "string",
+          "description": "comment, e.g. the original wording of a date / пояснение, например исходная запись даты"
+        }
+      }
+    },
+    "residence": {
+      "type": "object",
+      "description": "where the person lived or what happened where / где жил, что где происходило",
+      "properties": {
+        "place": {
+          "type": "string",
+          "description": "place / место"
+        },
+        "date": {
+          "type": "string",
+          "description": "free-text period / период свободным текстом"
+        },
+        "place_slugs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slug"
+          },
+          "description": "links to places / ссылки на места"
+        },
+        "place_event_kind": {
+          "type": "string",
+          "description": "residence, baptism, burial, work… / проживание, крещение, погребение, работа…"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "note": {
+          "type": "string",
+          "description": ""
+        }
+      }
+    },
+    "person": {
+      "type": "object",
+      "required": [
+        "id",
+        "given_names",
+        "surname",
+        "display_name",
+        "sex",
+        "notes"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/personId"
+        },
+        "given_names": {
+          "type": "string",
+          "description": "given names (and patronymic) / имя и отчество"
+        },
+        "surname": {
+          "type": "string",
+          "description": "surname / фамилия"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "name as shown: Surname Given names / имя на сайте: Фамилия Имя Отчество"
+        },
+        "sex": {
+          "enum": [
+            "M",
+            "F",
+            "U"
+          ],
+          "description": "M, F or U (unknown) / M, F или U (неизвестно)"
+        },
+        "relation": {
+          "type": "string",
+          "description": "relation to the root person, shown on the card / кем приходится главному человеку"
+        },
+        "relation_to_igor": {
+          "type": "string",
+          "description": "old name of `relation` / старое имя поля `relation`"
+        },
+        "placeholder": {
+          "type": "boolean",
+          "description": "an unnamed placeholder (unknown child) / заглушка без имени (неизвестный ребёнок)"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "other spellings, maiden names / другие написания, девичьи фамилии"
+        },
+        "identity_source_ids": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "birth": {
+          "$ref": "#/$defs/event"
+        },
+        "death": {
+          "$ref": "#/$defs/event"
+        },
+        "burial": {
+          "$ref": "#/$defs/event"
+        },
+        "birth_alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          },
+          "description": "conflicting versions / расходящиеся версии"
+        },
+        "death_alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          },
+          "description": "conflicting versions / расходящиеся версии"
+        },
+        "residences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/residence"
+          },
+          "description": "residences and other events / места жительства и другие события"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "life story, paragraph by paragraph; S12 becomes a link / рассказ о жизни по абзацам; S12 становится ссылкой"
+        },
+        "research_status": {
+          "enum": [
+            "unlinked_candidate"
+          ],
+          "description": "possible relative, link not proven / возможная родня, связь не доказана"
+        },
+        "research_note": {
+          "type": "string",
+          "description": "why the link is uncertain / почему связь под вопросом"
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "site": {
+                "type": "string",
+                "description": ""
+              },
+              "url": {
+                "type": "string",
+                "description": "",
+                "format": "uri"
+              },
+              "match": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          },
+          "description": "profiles on other sites / профили на других сайтах"
+        },
+        "living": {
+          "type": "boolean",
+          "description": "true/false overrides the automatic living-person rule / true/false вместо автоматического правила о живых"
+        },
+        "gedcom_id": {
+          "type": "string",
+          "description": "id in the imported GEDCOM / номер в импортированном GEDCOM"
+        }
+      }
+    },
+    "family": {
+      "type": "object",
+      "required": [
+        "id",
+        "partners",
+        "children"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/familyId"
+        },
+        "partners": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/personId"
+          },
+          "description": "0–2 partners; empty for siblings with unknown parents / 0–2 партнёра; пусто — братья и сёстры с неизвестными родителями",
+          "maxItems": 2
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/personId"
+          },
+          "description": "biological children / родные дети"
+        },
+        "adopted_children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/personId"
+          },
+          "description": "adopted children / приёмные дети"
+        },
+        "probable_children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/personId"
+          },
+          "description": "children whose link is not proven (drawn dashed) / дети, связь которых не доказана (пунктир)"
+        },
+        "probable_note": {
+          "type": "string",
+          "description": "why the link is probable / почему связь вероятная"
+        },
+        "relation": {
+          "enum": [
+            "spouses",
+            "divorced",
+            "siblings",
+            ""
+          ],
+          "description": "kind of family / вид семьи"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "marriage": {
+          "$ref": "#/$defs/event"
+        },
+        "source_ids": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "paragraphs / абзацы"
+        },
+        "gedcom_id": {
+          "type": "string",
+          "description": "id in the imported GEDCOM / номер в импортированном GEDCOM"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "title": {
+          "type": "string",
+          "description": "title of the document or photo / название документа или снимка"
+        },
+        "kind": {
+          "type": "string",
+          "description": "group in the Archive filter / группа в фильтре архива",
+          "examples": [
+            "family_photo",
+            "civil_record_copy",
+            "church_record",
+            "family_archive_document",
+            "family_report",
+            "family_manuscript",
+            "newspaper",
+            "publication",
+            "online_reference",
+            "online_military_record",
+            "gravestone",
+            "census_record",
+            "immigration_record"
+          ]
+        },
+        "file": {
+          "type": "string",
+          "description": "file inside the site folder, e.g. sources/scan.jpg / файл в папке сайта, например sources/scan.jpg",
+          "pattern": "^(?!/)(?!.*\\.\\./).+"
+        },
+        "back": {
+          "type": "string",
+          "description": "back side of a photo / оборот снимка",
+          "pattern": "^(?!/)(?!.*\\.\\./).+"
+        },
+        "url": {
+          "type": "string",
+          "description": "online record / запись в интернете",
+          "format": "uri"
+        },
+        "locator": {
+          "type": "string",
+          "description": "archive, fonds, series, file, page — or who keeps it / архив, фонд, опись, дело, лист — или у кого хранится"
+        },
+        "scope": {
+          "type": "string",
+          "description": "transcription and what the document proves / расшифровка и что документ доказывает"
+        },
+        "preview_page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "PDF page for the thumbnail / страница PDF для превью"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "the family asked to remove it: never published / семья попросила убрать: не публикуется"
+        },
+        "merged_into": {
+          "$ref": "#/$defs/sourceId"
+        },
+        "gedcom_id": {
+          "type": "string",
+          "description": "id in the imported GEDCOM / номер в импортированном GEDCOM"
+        }
+      }
+    },
+    "place": {
+      "type": "object",
+      "required": [
+        "slug",
+        "name"
+      ],
+      "properties": {
+        "slug": {
+          "$ref": "#/$defs/slug"
+        },
+        "name": {
+          "type": "string",
+          "description": "name / название"
+        },
+        "where": {
+          "type": "string",
+          "description": "historical location / где (историческая привязка)"
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "geo_note": {
+          "type": "string",
+          "description": "what the point marks / что отмечает точка"
+        },
+        "period": {
+          "type": "string",
+          "description": "years the family was there / годы, когда там была семья"
+        },
+        "then": {
+          "type": "string",
+          "description": "historical name and administration / историческое название и подчинение"
+        },
+        "now": {
+          "type": "string",
+          "description": "today / сейчас"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "other names for search / другие названия для поиска"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "place group ids / группы мест"
+        },
+        "sort_year": {
+          "type": "integer"
+        },
+        "text": {
+          "type": "string",
+          "description": "short description / короткое описание"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "history, paragraphs / история, абзацы"
+        },
+        "people": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/personId"
+          },
+          "description": ""
+        },
+        "sources": {
+          "$ref": "#/$defs/sourceIds"
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string",
+                "description": ""
+              },
+              "text": {
+                "type": "string",
+                "description": ""
+              },
+              "people": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/personId"
+                },
+                "description": ""
+              },
+              "sources": {
+                "$ref": "#/$defs/sourceIds"
+              }
+            }
+          },
+          "description": "events at this place / события в этом месте"
+        },
+        "materials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string",
+                "description": ""
+              },
+              "url": {
+                "type": "string",
+                "description": "",
+                "format": "uri"
+              }
+            }
+          },
+          "description": "links for further research / ссылки для дальнейшего поиска"
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": {
+                "type": "string",
+                "description": ""
+              },
+              "caption": {
+                "type": "string",
+                "description": ""
+              },
+              "credit": {
+                "type": "string",
+                "description": ""
+              },
+              "credit_url": {
+                "type": "string",
+                "description": ""
+              }
+            }
+          },
+          "description": "pictures of the place / изображения места"
+        }
+      }
+    }
+  }
+}

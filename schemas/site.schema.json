@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/site.schema.json",
+  "title": "gene-archive site.json",
+  "description": "Site settings. Full description: docs/configuration.md / Настройки сайта. Полное описание: docs/configuration.ru.md",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "_comment": {},
+    "title": {
+      "type": "string",
+      "description": "site name / название сайта"
+    },
+    "short_title": {
+      "type": "string",
+      "description": "name in the header / название в шапке"
+    },
+    "description": {
+      "type": "string",
+      "description": "one sentence for search engines and link previews / одно предложение для поисковиков и превью"
+    },
+    "base_url": {
+      "type": "string",
+      "description": "public address ending with /; enables sitemap and canonical links / адрес сайта с / на конце; включает sitemap и канонические ссылки",
+      "pattern": "^(https?://.+/)?$"
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "ru",
+          "en",
+          "ro"
+        ]
+      },
+      "description": "interface languages; the first is at the site root / языки интерфейса; первый — в корне сайта"
+    },
+    "content_language": {
+      "type": "string",
+      "description": "language of your texts / язык ваших текстов"
+    },
+    "root_person": {
+      "type": "string",
+      "pattern": "^I\\d+$",
+      "description": "the person the archive is about / главный человек архива"
+    },
+    "start_person": {
+      "type": "string",
+      "pattern": "^I\\d+$",
+      "description": "who is in the centre when the tree opens / кто в центре, когда открывается древо"
+    },
+    "quick_focus": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "person"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": ""
+          },
+          "person": {
+            "type": "string",
+            "pattern": "^I\\d+$",
+            "description": "person id / номер человека: I12"
+          }
+        }
+      },
+      "description": "buttons above the tree / кнопки над древом"
+    },
+    "branches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "focus"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": ""
+          },
+          "title": {
+            "type": "string",
+            "description": ""
+          },
+          "focus": {
+            "type": "string",
+            "pattern": "^I\\d+$",
+            "description": "person id / номер человека: I12"
+          },
+          "about": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "description": "family branches / ветви семьи"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "person",
+          "text"
+        ],
+        "properties": {
+          "person": {
+            "type": "string",
+            "pattern": "^I\\d+$",
+            "description": "person id / номер человека: I12"
+          },
+          "text": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "description": "questions to relatives / вопросы к родственникам"
+    },
+    "story": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "navigation of the Story page / навигация страницы «История»",
+      "properties": {
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "description": "year label / год"
+              },
+              {
+                "type": "string",
+                "description": "short text / короткий текст"
+              },
+              {
+                "type": "string",
+                "description": "section id / id раздела"
+              }
+            ],
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "description": ""
+        },
+        "places": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "string",
+                "description": "label / название"
+              },
+              {
+                "type": "string",
+                "description": "regular expression / регулярное выражение"
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "description": ""
+        },
+        "branch_tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": ""
+          }
+        },
+        "branch_names": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "branch_colors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "surname_variants": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "spellings merged into one surname / написания, которые сливаются в одну фамилию"
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hide_living": {
+          "type": "boolean",
+          "description": "hide living people (default true) / скрывать живых (по умолчанию true)"
+        },
+        "living_years": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "born within this many years and no death record = living (default 100) / рождён не раньше стольких лет назад и нет записи о смерти — живой (по умолчанию 100)"
+        }
+      }
+    },
+    "comments": {
+      "type": "boolean",
+      "description": "true with the comments server (gene serve, Docker) / true с сервером комментариев (gene serve, Docker)"
+    },
+    "contact": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "",
+          "format": "email"
+        },
+        "label": {
+          "type": "string",
+          "description": ""
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "label",
+          "href"
+        ],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": ""
+          },
+          "href": {
+            "type": "string",
+            "description": ""
+          }
+        }
+      },
+      "description": "extra items of the More menu / пункты меню «Ещё»"
+    },
+    "head_html": {
+      "type": "string",
+      "description": "extra HTML for <head> / HTML для <head>"
+    },
+    "strict_translations": {
+      "type": "boolean",
+      "description": "fail the build on a missing translation / останавливать сборку без перевода"
+    },
+    "min_surname_page": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "gedcom_version": {
+      "enum": [
+        "5.5.1",
+        "7.0"
+      ],
+      "description": "version of family_tree.ged on the site / версия family_tree.ged на сайте"
+    }
+  }
+}

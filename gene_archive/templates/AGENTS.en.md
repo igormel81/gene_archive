@@ -16,6 +16,7 @@ translate. The owner of the archive reviews every change.
 | `_site/` | the built site — never edit it by hand, it is rebuilt |
 
 Data format: https://github.com/igormel81/gene_archive/blob/main/docs/data-format.md
+Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/family_tree.schema.json
 
 ## How to work
 

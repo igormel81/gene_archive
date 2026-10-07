@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- GEDCOM 5.5.1 export by default (7.0 with `gedcom_version` or `gene gedcom --version 7.0`); `gene gedcom` command.
+  Выгрузка GEDCOM 5.5.1 по умолчанию (7.0 — через `gedcom_version` или `gene gedcom --version 7.0`); команда `gene gedcom`.
+- JSON Schemas for `family_tree.json` and `site.json`: hints and checks in editors.
+  JSON Schema для `family_tree.json` и `site.json`: подсказки и проверка в редакторах.
 - Guide on filling the site with Claude Code or Codex; `gene init` and `gene import` write `AGENTS.md` and `CLAUDE.md`.
   Инструкция по наполнению сайта с Claude Code или Codex; `gene init` и `gene import` создают `AGENTS.md` и `CLAUDE.md`.
 

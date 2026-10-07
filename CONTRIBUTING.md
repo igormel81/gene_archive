@@ -20,6 +20,7 @@ living people to an issue.
 | `gene_archive/server.py` | the comments server (standard library only) |
 | `gene_archive/engine/web/` | the browser app: `index.html` template, `app.js`, `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | interface dictionaries |
+| `schemas/` | JSON Schemas of `family_tree.json` and `site.json` — update them with every new field |
 | `example/` | the fictional demo family, also used by the tests |
 | `tests/` | `unittest` tests and browser checks (`smoke.mjs`) |
 
