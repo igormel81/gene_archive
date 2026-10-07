@@ -1,0 +1,15 @@
+name: "Idea / Предложение"
+description: "A feature or an improvement / Новая возможность или улучшение"
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: "What do you need it for? / Зачем это нужно?"
+      description: "Describe the task in your family archive / Опишите задачу в вашем семейном архиве"
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: "How could it work? / Как это могло бы работать?"

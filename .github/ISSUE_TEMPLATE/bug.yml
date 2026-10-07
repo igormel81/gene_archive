@@ -1,0 +1,27 @@
+name: "Bug / Ошибка"
+description: "Something does not work / Что-то не работает"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not attach real data about living people.** A small fictional example is best.
+        **Не прикладывайте настоящие данные о живых людях.** Лучше всего — маленький вымышленный пример.
+  - type: textarea
+    id: what
+    attributes:
+      label: "What happened / Что случилось"
+      description: "The command or the page, what you expected and what you saw / Команда или страница, что ожидали и что увидели"
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: "Example / Пример"
+      description: "A fragment of family_tree.json or site.json, the error message / Фрагмент family_tree.json или site.json, текст ошибки"
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: "Version / Версия"
+      description: "gene --version, Python version, browser / версия Python, браузер"

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "Documentation / Документация"
+    url: https://github.com/igormel81/gene_archive/tree/main/docs
+    about: "Data format, settings, publishing, translations, AI assistants / Формат данных, настройки, публикация, переводы, ИИ-помощники"
+  - name: "How to start researching / С чего начать поиск"
+    url: https://github.com/igormel81/gene_archive/blob/main/docs/research-guide.ru.md
+    about: "A beginner's guide to family history research / Руководство для начинающих"
