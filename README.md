@@ -13,6 +13,8 @@ too. Living people are hidden automatically. The result is plain HTML that can b
 for free on GitHub Pages, Netlify or any web server; an optional small server adds
 comments from relatives.
 
+**Live demo:** https://igormel81.github.io/gene_archive/ — a fictional family; Russian interface: [/ru/](https://igormel81.github.io/gene_archive/ru/), Romanian: [/ro/](https://igormel81.github.io/gene_archive/ro/).
+
 ![The tree and a person's card](docs/img/tree-en.png)
 
 The engine grew out of a real family archive with ~550 people, ~500 documents and
