@@ -37,7 +37,8 @@ def write_agent_rules(dest, lang):
 
 def cmd_init(args):
     dest = Path(args.folder)
-    if dest.exists() and any(dest.iterdir()):
+    # hidden folders of editors and git (.git, .vscode, .cursor…) do not count
+    if dest.exists() and any(not x.name.startswith(".") for x in dest.iterdir()):
         sys.exit(m(f"{dest} is not empty", f"папка {dest} не пустая"))
     if args.example:
         if not EXAMPLE.is_dir():

@@ -271,3 +271,17 @@ class ContentTranslation(unittest.TestCase):
             self.assertEqual(en["people"][0]["notes"], ["Born in a village."])
             self.assertIn('<html lang="ru"', (r["out"] / "index.html").read_text(encoding="utf-8"))
             self.assertIn('<html lang="en"', (r["out"] / "en" / "index.html").read_text(encoding="utf-8"))
+
+
+class Init(unittest.TestCase):
+    def test_init_in_a_folder_with_hidden_files(self):
+        from gene_archive import cli
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, ".git").mkdir()
+            Path(tmp, ".cursor").mkdir()
+            cli.main(["init", tmp, "--lang", "en"])
+            self.assertTrue(Path(tmp, "family_tree.json").exists())
+            self.assertIn("Rules of evidence", Path(tmp, "AGENTS.md").read_text(encoding="utf-8"))
+            Path(tmp, "notes.txt").write_text("x")
+            with self.assertRaises(SystemExit):
+                cli.main(["init", tmp])

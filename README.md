@@ -70,10 +70,29 @@ Then fill in `family_tree.json` (people, families, documents, places — see
 put scans into `sources/`, and write the story in `content/story.html`
 ([content pages](docs/content.md)).
 
-**Working with an AI assistant?** [Filling the site with Claude or Codex](docs/ai-assistants.md): setup, rules for the agent (`AGENTS.md`), ready-made requests.
-
 **New to genealogy?** Read [How to start researching your family history](docs/research-guide.md):
 interviews, home documents, online databases, archives, evidence and how to record it.
+
+## Quick start with an AI assistant
+
+Works in any AI coding environment — Claude Code, Codex, Cursor, GitHub Copilot, Windsurf, Gemini CLI.
+Open an empty folder in it and paste:
+
+```text
+Set up a family archive site with gene-archive (https://github.com/igormel81/gene_archive) in this folder.
+1. Install it: pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive"
+2. Create the site: gene init . --lang en (or gene import <my file>.ged . if I give you a GEDCOM file),
+   then git init and a first commit.
+3. Read AGENTS.md and follow it in all further work: never invent facts or relationships,
+   cite a document for every fact, keep doubtful things as leads.
+4. Ask me about the family (my parents, grandparents, what documents and photos we have at home)
+   and fill family_tree.json and site.json from my answers.
+5. Run gene validate and gene serve ., give me the link and show what you changed.
+```
+
+Then just talk to it: "here is a scan of my grandfather's birth certificate", "my aunt says…".
+More ready-made requests and the rules for reviewing the agent's work:
+[docs/ai-assistants.md](docs/ai-assistants.md).
 
 ## Documentation
 
