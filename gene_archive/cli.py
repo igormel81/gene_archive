@@ -10,6 +10,7 @@
   gene comments <folder> list|approve ID|hide ID|done ID "note"   moderate relatives' comments
   gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
+  gene hints [folder] [--json]     what is missing or looks wrong: a to-do list for the research
 
 Messages are in Russian when the system language is Russian (or GENE_LANG=ru).
 """
@@ -239,6 +240,30 @@ def cmd_gedcom(args):
             + ("" if args.full else f" (живых — {len(living)}, сведения скрыты)")))
 
 
+def cmd_hints(args):
+    from .build import load_site
+    from .hints import HINTS, hints, text
+    _, data = load_site(args.folder)
+    items = hints(data)
+    if args.code:
+        items = [h for h in items if h["code"] == args.code]
+    if args.json:
+        print(json.dumps(items, ensure_ascii=False, indent=1))
+        return
+    lang = "ru" if m("en", "ru") == "ru" else "en"
+    by = {}
+    for h in items:
+        by.setdefault(h["code"], []).append(h)
+    for code, hs in by.items():
+        print(f"\n{code} · {len(hs)}")
+        for h in hs[:args.limit]:
+            print(f"  {h['id']}: {text(h, lang)}")
+        if len(hs) > args.limit:
+            print(m(f"  … and {len(hs) - args.limit} more (--code {code} --limit 1000)", f"  … и ещё {len(hs) - args.limit} (--code {code} --limit 1000)"))
+    print(m(f"\n{len(items)} hints", f"\nподсказок: {len(items)}"))
+    _ = HINTS
+
+
 def cmd_translations(args):
     from . import localize
     from .build import BuildError, build
@@ -316,6 +341,12 @@ def main(argv=None):
     s.add_argument("--full", action="store_true", help=m("include living people's details (for your own backup, do not publish)",
                                                         "со сведениями о живых (для своей резервной копии, не публиковать)"))
     s.set_defaults(fn=cmd_gedcom)
+    s = sub.add_parser("hints", help=m("gaps and doubtful facts: a to-do list", "пробелы и сомнительные факты: список задач"))
+    s.add_argument("folder", nargs="?", default=".")
+    s.add_argument("--json", action="store_true")
+    s.add_argument("--code", help=m("only this kind of hint", "только подсказки этого вида"))
+    s.add_argument("--limit", type=int, default=15, help=m("lines per kind", "строк на вид"))
+    s.set_defaults(fn=cmd_hints)
     s = sub.add_parser("translations", help=m("texts without a translation", "тексты без перевода"))
     s.add_argument("folder")
     s.add_argument("lang")

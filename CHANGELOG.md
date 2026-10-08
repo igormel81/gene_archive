@@ -10,6 +10,14 @@
   с возвратом версий, пересборка сайта. Пользователи с ролями (`gene users`), ссылки-приглашения. См. docs/editor.ru.md.
 - "Suggest a correction" on person cards (with the editor); administrators apply proposals in one click.
   «Предложить исправление» в карточке человека (с редактором); администратор применяет предложение одной кнопкой.
+- "How we are related" on person cards: the relation between any two people in Russian, English and Romanian
+  (second cousin once removed, great-uncle, half-brother, in-laws) with the chain of people between them.
+  «Как мы связаны» в карточке человека: кем приходится любому другому (троюродный дядя, двоюродная бабушка,
+  единокровный брат, свойственники) и цепочка людей между ними.
+- Research hints: `gene hints` and the "Checks" tab of the editor list impossible facts (born after the mother's death,
+  a parent aged 11) and gaps (no dates, a date without a document, people not connected to the tree, unused documents).
+  Подсказки для поиска: `gene hints` и вкладка «Проверка» в редакторе — невозможные факты (родился после смерти матери,
+  родителю 11 лет) и пробелы (нет дат, дата без документа, человек не связан с древом, документ ни к кому не привязан).
 - Docker image: git included; the editor needs the site folder mounted writable.
   Docker-образ: добавлен git; для редактора папка сайта монтируется с правом записи.
 

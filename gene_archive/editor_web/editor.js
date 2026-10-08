@@ -188,7 +188,7 @@
     var parts = location.hash.replace(/^#\/?/, '').split('/').map(decodeURIComponent);
     var t = parts[0] || 'people';
     if (KINDS[t]) tab = t;
-    else if (['proposals', 'history', 'users', 'account'].indexOf(t) >= 0) tab = t;
+    else if (['proposals', 'history', 'users', 'account', 'hints'].indexOf(t) >= 0) tab = t;
     layout();
     var pane = $('pane');
     if (KINDS[t] && parts[1] === 'new') editRecord(pane, t, null, newTemplate(t, parts[2]));
@@ -198,6 +198,7 @@
     }
     else if (t === 'proposals') showProposals(pane);
     else if (t === 'history') showHistory(pane);
+    else if (t === 'hints') showHints(pane);
     else if (t === 'users') showUsers(pane);
     else if (t === 'account') showAccount(pane);
     else add(pane, el('div', { class: 'card' }, el('h2', { text: T('Выберите запись слева') }),
@@ -219,6 +220,7 @@
     var tabs = el('div', { class: 'tabs', role: 'group', 'aria-label': T('Разделы') });
     var items = [['people', T('Люди')], ['families', T('Семьи')], ['sources', T('Документы')], ['places', T('Места')]];
     if (me.role === 'admin') items.push(['proposals', T('Предложения')]);
+    items.push(['hints', T('Проверка')]);
     items.push(['history', T('История')]);
     if (me.role === 'admin') items.push(['users', T('Пользователи')]);
     items.forEach(function (it) {
@@ -611,6 +613,32 @@
       .catch(function (err) { clear(msg).className = 'msg err'; msg.textContent = err.message + ' — ' + T('откройте запись и поправьте вручную.'); });
   }
 
+  // ---------- research hints: gaps and doubtful facts (gene_archive/hints.py)
+  var HINT_GROUPS = {
+    born_after_mother_death: 'Родился после смерти матери', born_after_father_death: 'Родился больше чем через год после смерти отца',
+    parent_young: 'Слишком молодой родитель', parent_old: 'Слишком пожилой родитель', married_young: 'Слишком ранний брак',
+    long_life: 'Очень долгая жизнь', unconnected: 'Не связаны с древом', no_documents: 'Нет ни одного документа',
+    event_no_source: 'Дата без документа', no_dates: 'Нет дат', family_no_source: 'Семья без документа', no_sex: 'Не указан пол',
+    unused_source: 'Документ ни к кому не привязан', place_no_coords: 'Место без координат'
+  };
+  function showHints(pane) {
+    clear(pane);
+    add(pane, [el('h2', { text: T('Проверка данных') }),
+      el('p', { class: 'sub', text: T('Не ошибки, а список задач: сомнительные даты и пробелы. Сначала — невозможные факты, потом — чего не хватает.') })]);
+    api('GET', 'hints').then(function (list) {
+      if (!list.length) { pane.appendChild(el('p', { class: 'msg ok', text: T('Замечаний нет.') })); return; }
+      var groups = {};
+      list.forEach(function (h) { (groups[h.code] = groups[h.code] || []).push(h); });
+      Object.keys(groups).forEach(function (code, i) {
+        var hs = groups[code];
+        pane.appendChild(el('details', { class: 'card', open: i < 2 }, el('summary', {}, el('b', { text: T(HINT_GROUPS[code] || code) }), ' · ' + hs.length),
+          el('div', { class: 'related' }, hs.slice(0, 300).map(function (h) {
+            return el('button', { type: 'button', text: h.text[lang === 'ru' ? 'ru' : 'en'], onclick: function () { go('#/' + h.kind + '/' + encodeURIComponent(h.id)); } });
+          }))));
+      });
+    }).catch(function (err) { pane.appendChild(el('p', { class: 'msg err', text: err.message })); });
+  }
+
   // ---------- history
   function showHistory(pane) {
     clear(pane);
@@ -757,6 +785,11 @@
       'Сделать администратором': 'Make administrator', 'Включить': 'Enable', 'Отключить': 'Disable', 'Логин': 'Login', 'Роль': 'Role', 'Новый пользователь': 'New user',
       'Логин (латиницей)': 'Login (latin letters)', 'Например: anna.k': 'For example: anna.k', 'Имя в истории правок': 'Name in the history', 'Например: тётя Анна': 'For example: Aunt Anna',
       'Создать и получить ссылку': 'Create and get a link', 'Смена пароля': 'Change password', 'Текущий пароль': 'Current password', 'Новый пароль (не короче 10 знаков)': 'New password (10+ characters)',
+      'Проверка': 'Checks', 'Проверка данных': 'Data checks', 'Не ошибки, а список задач: сомнительные даты и пробелы. Сначала — невозможные факты, потом — чего не хватает.': 'Not errors but a to-do list: doubtful dates and gaps. Impossible facts first, then what is missing.',
+      'Замечаний нет.': 'Nothing to report.', 'Родился после смерти матери': 'Born after the mother’s death', 'Родился больше чем через год после смерти отца': 'Born over a year after the father’s death',
+      'Слишком молодой родитель': 'Parent too young', 'Слишком пожилой родитель': 'Parent too old', 'Слишком ранний брак': 'Married too young', 'Очень долгая жизнь': 'Very long life',
+      'Не связаны с древом': 'Not connected to the tree', 'Нет ни одного документа': 'No document at all', 'Дата без документа': 'Date without a document', 'Нет дат': 'No dates',
+      'Семья без документа': 'Family without a document', 'Не указан пол': 'Sex not set', 'Документ ни к кому не привязан': 'Document not referenced', 'Место без координат': 'Place without coordinates',
       'Сменить пароль': 'Change password', 'К списку': 'Back to the list', 'Пароль изменён. Войдите с новым паролем.': 'Password changed. Sign in with the new password.'
     }
   };
@@ -812,7 +845,12 @@
     ['отключён', 'dezactivat'], ['ждёт приглашения', 'invitație în așteptare'], ['это вы', 'dvs.'], ['Новая ссылка', 'Link nou'], ['Сделать редактором', 'Fă editor'], ['Сделать администратором', 'Fă administrator'],
     ['Включить', 'Activează'], ['Отключить', 'Dezactivează'], ['Логин', 'Login'], ['Роль', 'Rol'], ['Новый пользователь', 'Utilizator nou'], ['Логин (латиницей)', 'Login (litere latine)'], ['Например: anna.k', 'De exemplu: anna.k'],
     ['Имя в истории правок', 'Numele în istoric'], ['Например: тётя Анна', 'De exemplu: mătușa Ana'], ['Создать и получить ссылку', 'Creează și obține linkul'], ['Смена пароля', 'Schimbarea parolei'], ['Текущий пароль', 'Parola actuală'],
-    ['Новый пароль (не короче 10 знаков)', 'Parola nouă (cel puțin 10 caractere)'], ['Сменить пароль', 'Schimbă parola'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
+    ['Новый пароль (не короче 10 знаков)', 'Parola nouă (cel puțin 10 caractere)'], ['Сменить пароль', 'Schimbă parola'], ['Проверка', 'Verificare'], ['Проверка данных', 'Verificarea datelor'],
+    ['Не ошибки, а список задач: сомнительные даты и пробелы. Сначала — невозможные факты, потом — чего не хватает.', 'Nu erori, ci o listă de sarcini: date îndoielnice și lipsuri. Întâi faptele imposibile, apoi ce lipsește.'],
+    ['Замечаний нет.', 'Nicio observație.'], ['Родился после смерти матери', 'Născut după moartea mamei'], ['Родился больше чем через год после смерти отца', 'Născut la peste un an după moartea tatălui'],
+    ['Слишком молодой родитель', 'Părinte prea tânăr'], ['Слишком пожилой родитель', 'Părinte prea în vârstă'], ['Слишком ранний брак', 'Căsătorie prea timpurie'], ['Очень долгая жизнь', 'Viață foarte lungă'],
+    ['Не связаны с древом', 'Neconectați la arbore'], ['Нет ни одного документа', 'Niciun document'], ['Дата без документа', 'Dată fără document'], ['Нет дат', 'Fără date'],
+    ['Семья без документа', 'Familie fără document'], ['Не указан пол', 'Sex nespecificat'], ['Документ ни к кому не привязан', 'Document neatribuit'], ['Место без координат', 'Loc fără coordonate'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
   ].forEach(function (p) { DICT.ro[p[0]] = p[1]; });
 
   // ---------- start

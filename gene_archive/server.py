@@ -297,6 +297,12 @@ def make_handler(cfg):
                 self._json(200, {"build": rebuilder.state, "version": store.version()})
             elif api == "history":
                 self._json(200, store.history())
+            elif api == "hints":
+                from .hints import hints, text
+                items = hints(store.load())
+                for h in items:
+                    h["text"] = {"ru": text(h, "ru"), "en": text(h, "en")}
+                self._json(200, items)
             elif api == "file":
                 # a scan before the next build has copied it to the site
                 rel_file = parse_qs(urlsplit(self.path).query).get("path", [""])[0]

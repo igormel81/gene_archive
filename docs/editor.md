@@ -33,6 +33,10 @@ What it does:
   picks what to correct (date or place of birth or death, the name, or "other"), writes the
   correct value and how they know. An administrator sees them under "Proposals" and applies
   one with a click, opens the record, or rejects it.
+- **Data checks** (the "Checks" tab, also `gene hints`): impossible facts (born after the
+  mother's death, a parent younger than 14, a mother over 55 or a father over 75, a marriage before 15) and gaps (no dates, a date without a
+  document, people not connected to the tree, unused documents, places without coordinates) —
+  a to-do list for the next search; every item opens its record.
 - **Uploads of scans and photos**: JPEG, PNG, WebP, GIF, PDF up to 30 MB. Photos are re-saved
   (with Pillow installed): turned upright, with camera and GPS details removed.
 

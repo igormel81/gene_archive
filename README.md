@@ -26,7 +26,9 @@ fictional family made to show every feature.
 - **Tree** — an hourglass around any person, with dashed lines for probable links,
   a whole-tree chart, export to PNG, surname lines.
 - **Person cards** — dates and places with the documents behind them, alternative versions
-  of a date, relatives, a connected life story where `S12` becomes a link to the document.
+  of a date, relatives, a connected life story where `S12` becomes a link to the document,
+  and "How we are related": the exact relation to anyone in the tree ("second cousin once
+  removed") with the chain of people between you.
 - **Archive** — every scan and photo with a transcription, the back side of a photo, PDF
   previews, filters by type and line, a research log and a log of corrections.
 - **Places** — a map (Leaflet + OpenStreetMap) with family branches, moves between places,
@@ -127,6 +129,7 @@ More ready-made requests and the rules for reviewing the agent's work:
 | `gene comments <folder> list\|approve ID\|hide ID\|done ID "note"` | moderate comments |
 | `gene gedcom [folder] [-o file.ged] [--version 5.5.1\|7.0]` | GEDCOM for MyHeritage, Ancestry, Gramps… (`--full`: with living people, for your own backup) |
 | `gene translations <folder> <lang>` | your texts that have no translation yet |
+| `gene hints [folder] [--json]` | gaps and doubtful facts — a to-do list for the research |
 
 Messages are in Russian when the system language is Russian (or `GENE_LANG=ru`).
 

@@ -936,6 +936,8 @@
     var kids = childrenOf(id);
     if (kids.length) relRow(T('Дети'), kids);
     body.appendChild(fam);
+    body.appendChild(el('h3', { class: 'p-sec', text: T('Как мы связаны') }));
+    body.appendChild(kinBlock(id));
 
     if (p.notes && p.notes.length) {
       body.appendChild(el('h3', { class: 'p-sec', text: T('Что известно') }));
@@ -987,6 +989,191 @@
     selectedPlace = null;
     document.querySelectorAll('.card.selected').forEach(function (c) { c.classList.remove('selected'); });
     syncUrl();
+  }
+
+  // ---------- kinship: «Как мы связаны» (start; tests/test_engine.py runs this block in node)
+  // g: { parents(id) → [ids], spouses(id) → [ids], children(id) → [ids], sex(id) → 'M'|'F'|'U',
+  //      sameParents(a, b) → bool, probable(child) → bool (link to own parents not proven) }
+  var Kinship = (function () {
+    function ancestors(g, id) {   // id → {ancestor: [generations up, child on the way down]}
+      var out = {}, todo = [[id, 0, null]];
+      out[id] = [0, null];
+      while (todo.length) {
+        var cur = todo.shift();
+        g.parents(cur[0]).forEach(function (p) { if (!(p in out)) { out[p] = [cur[1] + 1, cur[0]]; todo.push([p, cur[1] + 1, cur[0]]); } });
+      }
+      return out;
+    }
+    function chainUp(anc, from, to) {   // from … to, following the stored child links back down
+      var ids = [to];
+      while (to !== from) { to = anc[to][1]; ids.unshift(to); }
+      return ids;
+    }
+    // blood relation: generations from a up to the nearest common ancestor and from it down to b
+    function blood(g, a, b) {
+      if (a === b) return null;
+      var A = ancestors(g, a), B = ancestors(g, b), best = null;
+      Object.keys(A).forEach(function (x) {
+        if (!(x in B)) return;
+        var d = A[x][0] + B[x][0];
+        if (!best || d < best.d) best = { d: d, ca: x, up: A[x][0], down: B[x][0] };
+      });
+      if (!best) return null;
+      var path = chainUp(A, a, best.ca).concat(chainUp(B, b, best.ca).reverse().slice(1));
+      var probable = path.some(function (x, i) { var n = path[i + 1]; return n != null && (g.parents(x).indexOf(n) >= 0 ? g.probable(x) : g.probable(n)); });
+      var half = best.up === 1 && best.down === 1 && !g.sameParents(a, b);
+      return { type: 'blood', up: best.up, down: best.down, ca: best.ca, path: path, probable: probable, half: half };
+    }
+    function relation(g, a, b) {
+      if (a === b) return { type: 'self', path: [a] };
+      var r = blood(g, a, b);
+      if (r) return r;
+      if (g.spouses(a).indexOf(b) >= 0) return { type: 'spouse', path: [a, b] };
+      var best = null;
+      g.spouses(b).forEach(function (s) { var k = blood(g, a, s); if (k && (!best || k.up + k.down < best.rel.up + best.rel.down)) best = { type: 'spouse_of', via: s, rel: k, path: k.path.concat([b]) }; });
+      g.spouses(a).forEach(function (s) { var k = blood(g, s, b); if (k && (!best || k.up + k.down < best.rel.up + best.rel.down)) best = { type: 'of_spouse', via: s, rel: k, path: [a].concat(k.path) }; });
+      if (best) return best;
+      // anything else: the shortest chain through parents, children and spouses
+      var prev = {}, todo = [a];
+      prev[a] = null;
+      while (todo.length) {
+        var x = todo.shift();
+        if (x === b) break;
+        g.parents(x).concat(g.children(x), g.spouses(x)).forEach(function (y) { if (!(y in prev)) { prev[y] = x; todo.push(y); } });
+      }
+      if (!(b in prev)) return { type: 'none', path: [] };
+      var path = [b];
+      while (prev[path[0]] != null) path.unshift(prev[path[0]]);
+      return { type: 'chain', path: path };
+    }
+    // what y is to x, one step: 'parent' | 'child' | 'spouse'
+    function step(g, x, y) { return g.parents(x).indexOf(y) >= 0 ? 'parent' : g.children(x).indexOf(y) >= 0 ? 'child' : 'spouse'; }
+
+    // ----- names of relations: what b is to a; sex of b
+    function rep(s, n) { return n > 0 ? new Array(n + 1).join(s) : ''; }
+    var RU_ADJ = ['', 'двоюродн', 'троюродн', 'четвероюродн', 'пятиюродн', 'шестиюродн', 'семиюродн', 'восьмиюродн'];
+    function ruAdj(i, sex) {
+      var stem = RU_ADJ[i] || ((i + 1) + '-юродн');
+      return stem + (sex === 'F' ? 'ая ' : sex === 'M' ? 'ый ' : 'ый(ая) ');
+    }
+    function ru(up, down, sex, half, parentSex) {
+      var w = function (m, f) { return sex === 'M' ? m : sex === 'F' ? f : m + ' / ' + f; };
+      if (down === 0) {
+        if (up === 1) return w('отец', 'мать');
+        if (up === 2) return w('дед', 'бабушка');
+        return rep('пра', up - 2) + w('дед', 'бабушка').replace(/(^|\/ )/g, '$1' + rep('пра', up - 2)).slice((up - 2) * 3);
+      }
+      if (up === 0) {
+        if (down === 1) return w('сын', 'дочь');
+        return rep('пра', down - 2) + w('внук', 'внучка').replace(/\/ /, '/ ' + rep('пра', down - 2));
+      }
+      var k = Math.min(up, down) - 1, r = Math.abs(up - down);
+      if (r === 0) {
+        if (k === 0) return half ? (parentSex === 'M' ? w('единокровный брат', 'единокровная сестра') : parentSex === 'F' ? w('единоутробный брат', 'единоутробная сестра') : w('брат по одному из родителей', 'сестра по одному из родителей')) : w('брат', 'сестра');
+        return ruAdj(k, sex) + w('брат', 'сестра');
+      }
+      if (up > down) {   // b is of an older generation: uncle, great-uncle…
+        var noun = r === 1 ? w('дядя', 'тётя') : r === 2 ? w('дед', 'бабушка') : w(rep('пра', r - 2) + 'дед', rep('пра', r - 2) + 'бабушка');
+        var i = k + (r >= 2 ? 1 : 0);   // брат деда — двоюродный дед, двоюродный брат деда — троюродный
+        return i ? ruAdj(i, sex) + noun : noun;
+      }
+      var pre = r === 1 ? '' : r === 2 ? 'внучат' : rep('пра', r - 3) + 'правнучат';
+      var nephew = pre ? w(pre + 'ый племянник', pre + 'ая племянница') : w('племянник', 'племянница');
+      return k ? ruAdj(k, sex) + nephew : nephew;
+    }
+    var EN_ORD = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth'];
+    function en(up, down, sex, half) {
+      var w = function (m, f, u) { return sex === 'M' ? m : sex === 'F' ? f : u; };
+      var great = function (n) { return rep('great-', n); };
+      if (down === 0) return up === 1 ? w('father', 'mother', 'parent') : great(up - 2) + w('grandfather', 'grandmother', 'grandparent');
+      if (up === 0) return down === 1 ? w('son', 'daughter', 'child') : great(down - 2) + w('grandson', 'granddaughter', 'grandchild');
+      var k = Math.min(up, down) - 1, r = Math.abs(up - down);
+      if (k === 0) {
+        if (r === 0) return (half ? 'half-' : '') + w('brother', 'sister', 'sibling');
+        if (up > down) return w(great(r - 1) + 'uncle', great(r - 1) + 'aunt', great(r - 1) + 'uncle or ' + great(r - 1) + 'aunt');
+        return w(great(r - 1) + 'nephew', great(r - 1) + 'niece', great(r - 1) + 'nephew or ' + great(r - 1) + 'niece');
+      }
+      var times = ['', 'once', 'twice', 'three times', 'four times', 'five times'][r] || r + ' times';
+      return (EN_ORD[k] || k + 'th') + ' cousin' + (r ? ' ' + times + ' removed' : '');
+    }
+    function ro(up, down, sex, half) {
+      var w = function (m, f) { return sex === 'M' ? m : sex === 'F' ? f : m + ' / ' + f; };
+      var stra = function (n) { return rep('stră', n); };
+      if (down === 0) return up === 1 ? w('tată', 'mamă') : stra(up - 2) + w('bunic', 'bunică').replace('/ ', '/ ' + stra(up - 2));
+      if (up === 0) return down === 1 ? w('fiu', 'fiică') : stra(down - 2) + w('nepot', 'nepoată').replace('/ ', '/ ' + stra(down - 2));
+      var k = Math.min(up, down) - 1, r = Math.abs(up - down);
+      if (k === 0) {
+        if (r === 0) return w('frate', 'soră') + (half ? ' (după un singur părinte)' : '');
+        if (up > down) return r === 1 ? w('unchi', 'mătușă') : w('fratele', 'sora') + ' ' + stra(r - 2) + 'bunicului';
+        return r === 1 ? w('nepot de frate', 'nepoată de frate') : stra(r - 1) + w('nepot de frate', 'nepoată de frate').replace('/ ', '/ ' + stra(r - 1));
+      }
+      var cousin = k === 1 ? w('văr primar', 'vară primară') : w('văr de gradul ', 'vară de gradul ').replace(/ \//, ' ' + (k) + ' /') + (sex === 'M' || sex === 'F' ? k : '');
+      if (sex !== 'M' && sex !== 'F' && k > 1) cousin = 'văr / vară de gradul ' + k;
+      return cousin + (r ? ', cu ' + r + (r === 1 ? ' generație' : ' generații') + (up > down ? ' mai sus' : ' mai jos') : '');
+    }
+    function name(lang, up, down, sex, half, parentSex) {
+      return (lang === 'en' ? en : lang === 'ro' ? ro : ru)(up, down, sex, half, parentSex);
+    }
+    return { relation: relation, step: step, name: name };
+  })();
+  // ---------- kinship (end)
+
+  var kinGraph = {
+    parents: parentsOf, spouses: spousesOf, children: childrenOf,
+    sex: function (x) { return P[x].sex; },
+    sameParents: function (a, b) { return !!parentFam[a] && parentFam[a] === parentFam[b]; },
+    probable: function (x) { return parentsProbable(x); }
+  };
+  function stepWord(kind, sex) {
+    var w = { parent: [T('отец'), T('мать'), T('родитель')], child: [T('сын'), T('дочь'), T('ребёнок')], spouse: [T('муж'), T('жена'), T('супруг(а)')] }[kind];
+    return sex === 'M' ? w[0] : sex === 'F' ? w[1] : w[2];
+  }
+  // what b is to a, in the site language
+  function kinText(a, b) {
+    var r = Kinship.relation(kinGraph, a, b), lang = LOCALE.lang;
+    var name = function (k, sex, x) { return Kinship.name(lang, k.up, k.down, sex, k.half, k.half ? P[k.ca].sex : null) + (x || ''); };
+    var text = r.type === 'self' ? T('это тот же человек')
+      : r.type === 'blood' ? name(r, P[b].sex)
+      : r.type === 'spouse' ? stepWord('spouse', P[b].sex)
+      : r.type === 'spouse_of' ? stepWord('spouse', P[b].sex) + ' · ' + P[r.via].display_name + ' — ' + name(r.rel, P[r.via].sex)
+      : r.type === 'of_spouse' ? name(r.rel, P[b].sex) + ' · ' + T('по линии супруга: ') + P[r.via].display_name
+      : r.type === 'chain' ? T('свойственник (родство через браки)') : T('связь в древе не найдена');
+    var probable = r.probable || (r.rel && r.rel.probable);
+    return { text: text + (probable ? T(' — вероятно: одно из звеньев не доказано') : ''), path: r.path };
+  }
+  function kinBlock(id) {
+    var box = el('div', { class: 'kin' });
+    var labels = {}, opts = el('datalist', { id: 'kin-people' });
+    D.people.forEach(function (p) {
+      var l = p.display_name + (lifespan(p) ? ' (' + lifespan(p) + ')' : '');
+      if (labels[l]) l += ' · ' + p.id;
+      labels[l] = p.id;
+      opts.appendChild(el('option', { value: l }));
+    });
+    var other = id !== D.root_person_id ? D.root_person_id : (focusId && focusId !== id ? focusId : null);
+    var input = el('input', { type: 'text', list: 'kin-people', 'aria-label': T('С кем сравнить'), placeholder: T('Выберите человека…') });
+    var out = el('div', { class: 'kin-out' });
+    function show(a) {
+      clear(out);
+      if (!a || !P[a]) return;
+      input.value = Object.keys(labels).filter(function (l) { return labels[l] === a; })[0] || '';
+      var k = kinText(a, id);
+      out.appendChild(el('p', { class: 'kin-res' }, el('b', { text: P[id].display_name }), ' — ', el('b', { class: 'kin-term', text: k.text }), ' ', T('для'), ' ', personChip(a)));
+      if (k.path.length > 2) {
+        var steps = el('p', { class: 'kin-path' }, el('span', { class: 'kin-lbl', text: T('Цепочка: ') }));
+        k.path.forEach(function (x, i) {
+          if (i) steps.appendChild(el('span', { class: 'kin-arrow', text: ' → ' + stepWord(Kinship.step(kinGraph, k.path[i - 1], x), P[x].sex) + ': ' }));
+          steps.appendChild(el('a', { href: '#/tree/' + x + '?person=' + x, text: P[x].display_name, onclick: function (e) { e.preventDefault(); openPerson(x); } }));
+        });
+        out.appendChild(steps);
+      }
+    }
+    input.addEventListener('change', function () { show(labels[input.value]); });
+    box.appendChild(el('label', { class: 'kin-q' }, T('Кем приходится для:'), ' ', input));
+    box.appendChild(opts);
+    box.appendChild(out);
+    show(other);
+    return box;
   }
 
   // ---------- comments

@@ -1047,6 +1047,13 @@ ol.bio-srcs a:hover { color: var(--accent); }
 .no-comments .cm, .no-comments #qa-talk, .no-comments [data-go="qa-talk"], .no-comments #c-count, .no-comments #c-count2 { display: none !important; }
 /* Ссылка на сайт движка в подвале меню «Ещё» */
 .more-list .more-engine { font-size: 12px; opacity: .7; }
+.kin { font: 14px var(--sans); }
+.kin-q { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--muted); }
+.kin-q input { flex: 1; min-width: 180px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 14px var(--sans); }
+.kin-res { margin: 10px 0 4px; line-height: 1.7; }
+.kin-term { color: var(--accent); }
+.kin-path { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.kin-arrow { white-space: nowrap; }
 .propose { margin-top: 14px; font: 14px var(--sans); }
 .propose summary { cursor: pointer; color: var(--accent); }
 .propose select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 15px var(--sans); }

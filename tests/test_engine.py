@@ -6,6 +6,7 @@ import copy
 import json
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -313,3 +314,63 @@ class Init(unittest.TestCase):
             Path(tmp, "notes.txt").write_text("x")
             with self.assertRaises(SystemExit):
                 cli.main(["init", tmp])
+
+
+class Hints(unittest.TestCase):
+    def test_hints(self):
+        from gene_archive.hints import hints, text
+        data = {
+            "root_person_id": "I1",
+            "people": [
+                {"id": "I1", "display_name": "Child", "sex": "F", "birth": {"date": "1900", "source_ids": ["S1"]}, "notes": []},
+                {"id": "I2", "display_name": "Mother", "sex": "F", "birth": {"date": "1890"}, "death": {"date": "1899"}, "notes": ["S1"]},
+                {"id": "I3", "display_name": "Stranger", "sex": "U", "notes": []},
+            ],
+            "families": [{"id": "F1", "partners": ["I2"], "children": ["I1"]}],
+            "sources": [{"id": "S1", "title": "Register", "kind": "church_record"}, {"id": "S2", "title": "Lost", "kind": "letter"}],
+            "places": [{"slug": "x", "name": "X"}],
+        }
+        got = {(h["code"], h["id"]) for h in hints(data)}
+        for want in [("born_after_mother_death", "I1"), ("parent_young", "I2"), ("unconnected", "I3"), ("no_documents", "I3"),
+                     ("no_dates", "I3"), ("no_sex", "I3"), ("event_no_source", "I2"), ("family_no_source", "F1"),
+                     ("unused_source", "S2"), ("place_no_coords", "x")]:
+            self.assertIn(want, got)
+        self.assertNotIn(("unused_source", "S1"), got)
+        self.assertEqual(hints(data)[0]["code"], "born_after_mother_death")   # impossible facts first
+        self.assertIn("Mother", text(hints(data)[0], "ru"))
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class Kinship(unittest.TestCase):
+    """The «How we are related» block of app.js, run in node on a small family."""
+
+    def test_names_and_paths(self):
+        app = (ROOT / "gene_archive/engine/web/app.js").read_text(encoding="utf-8")
+        block = app[app.index("// ---------- kinship"):app.index("// ---------- kinship (end)")]
+        # G1+G2 → P1 (+W), P2; P1+W → A, Asis; P2 → C; C → D; A → K;  H: Asis's half-brother (G1 + other)
+        script = block + r"""
+var fam = { P1: ['G1', 'G2'], P2: ['G1', 'G2'], A: ['P1', 'W'], Asis: ['P1', 'W'], C: ['P2'], D: ['C'], K: ['A'], H: ['P1', 'X'] };
+var sex = { G1: 'M', G2: 'F', P1: 'M', P2: 'F', W: 'F', A: 'F', Asis: 'F', C: 'M', D: 'F', K: 'M', H: 'M', X: 'F', S: 'M' };
+var spouses = { A: ['S'], S: ['A'], P1: ['W', 'X'], W: ['P1'], X: ['P1'], G1: ['G2'], G2: ['G1'] };
+var g = {
+  parents: function (x) { return fam[x] || []; },
+  children: function (x) { return Object.keys(fam).filter(function (c) { return fam[c].indexOf(x) >= 0; }); },
+  spouses: function (x) { return spouses[x] || []; },
+  sex: function (x) { return sex[x]; },
+  sameParents: function (a, b) { return String(fam[a]) === String(fam[b]); },
+  probable: function (x) { return x === 'D'; }
+};
+function say(a, b, lang) {
+  var r = Kinship.relation(g, a, b);
+  if (r.type !== 'blood') return r.type + (r.rel ? ':' + Kinship.name(lang, r.rel.up, r.rel.down, sex[r.via], false) : '');
+  return Kinship.name(lang || 'ru', r.up, r.down, sex[b], r.half, r.half ? sex[r.ca] : null) + (r.probable ? '?' : '');
+}
+console.log(JSON.stringify([say('A', 'G1'), say('A', 'C'), say('A', 'D'), say('D', 'A'), say('A', 'Asis'), say('Asis', 'H'),
+  say('K', 'G2'), say('A', 'S'), say('C', 'S', 'ru'), say('S', 'C', 'en'), say('A', 'C', 'en'), say('K', 'D', 'en'),
+  Kinship.relation(g, 'A', 'D').path.join('>')]));
+"""
+        out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout
+        self.assertEqual(json.loads(out), [
+            "дед", "двоюродный брат", "двоюродная племянница?", "двоюродная тётя?", "сестра", "единокровный брат",
+            "прабабушка", "spouse", "spouse_of:двоюродная сестра", "of_spouse:first cousin", "first cousin",
+            "second cousin?", "A>P1>G1>P2>C>D"])
