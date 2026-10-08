@@ -10,6 +10,8 @@ services:
     environment:
       GENE_MODERATE: "0"      # "1": new comments wait for `gene comments approve`
       # GENE_PIN: "1234"      # uncomment for a private archive
+      # GENE_EDITOR: /site    # online editor at /edit/: also remove ":ro" above and set user: below (docs/editor.md)
+    # user: "1000:1000"       # owner of ./my-family, so that the editor can write to it
     restart: unless-stopped
 volumes:
   gene-state:

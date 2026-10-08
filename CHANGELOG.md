@@ -1,5 +1,18 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- Online editor at `/edit/` (`gene serve --editor`, `GENE_EDITOR` in Docker): people, families, documents with uploads,
+  places; checks before saving, conflict detection, automatic `corrections` and `research_log`, history in git with restore,
+  background rebuild. Accounts with roles (`gene users`), invitation links, CSRF protection. See docs/editor.md.
+  Онлайн-редактор на `/edit/` (`gene serve --editor`, `GENE_EDITOR` в Docker): люди, семьи, документы с загрузкой файлов,
+  места; проверка перед сохранением, защита от одновременных правок, журналы `corrections` и `research_log`, история в git
+  с возвратом версий, пересборка сайта. Пользователи с ролями (`gene users`), ссылки-приглашения. См. docs/editor.ru.md.
+- "Suggest a correction" on person cards (with the editor); administrators apply proposals in one click.
+  «Предложить исправление» в карточке человека (с редактором); администратор применяет предложение одной кнопкой.
+- Docker image: git included; the editor needs the site folder mounted writable.
+  Docker-образ: добавлен git; для редактора папка сайта монтируется с правом записи.
+
 ## 0.1.0 — 2026-10-07
 
 First public release, extracted from the family archive at igoruan.ru/gene.

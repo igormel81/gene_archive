@@ -969,6 +969,7 @@
     body.appendChild(list);
     renderCommentList(list, byPerson[id] || [], T('Пока никто ничего не добавил. Помните что-то о ') + (p.sex === 'F' ? T('ней') : p.sex === 'M' ? T('нём') : T('этом человеке')) + T('? Даты, места, истории, фотографии — всё пригодится.'));
     body.appendChild(commentForm(id, opts.placeholder));
+    body.appendChild(proposalForm(id));
 
     var panel = $('panel');
     panel.classList.add('open');
@@ -1038,6 +1039,30 @@
     } }, name, text, trap, el('div', { class: 'row' }, status, btn));
     return form;
   }
+  // «Предложить исправление»: структурированная правка уходит администратору в редактор (gene serve --editor)
+  var canPropose = false;
+  function proposalForm(personId) {
+    var fieldSel = el('select', { 'aria-label': T('Что исправить') }, [['birth.date', T('Дата рождения')], ['birth.place', T('Место рождения')], ['death.date', T('Дата смерти')],
+      ['death.place', T('Место смерти')], ['display_name', T('Имя')], ['other', T('Другое')]].map(function (o) { return el('option', { value: o[0], text: o[1] }); }));
+    var value = el('input', { type: 'text', maxlength: '500', placeholder: T('Как правильно (например, 12.03.1899)') });
+    var note = el('textarea', { maxlength: '4000', placeholder: T('Откуда это известно? Документ, рассказ, фотография…') });
+    var name = el('input', { type: 'text', maxlength: '80', placeholder: T('Ваше имя (например, тётя Анна)'), required: true, value: store('gene-author') || '' });
+    var trap = el('input', { type: 'text', name: 'website', class: 'hp', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+    var status = el('span', { class: 'status' });
+    var btn = el('button', { type: 'submit', text: T('Отправить') });
+    var form = el('form', { class: 'cform', onsubmit: function (e) {
+      e.preventDefault();
+      if (!name.value.trim() || !(value.value.trim() || note.value.trim())) { status.className = 'status err'; status.textContent = T('Укажите имя и исправление.'); return; }
+      btn.disabled = true; status.className = 'status'; status.textContent = T('Отправляю…');
+      fetch(ROOT + 'api/proposals', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Gene-Client': '1' },
+        body: JSON.stringify({ target: personId, field: fieldSel.value, value: value.value, note: note.value, author: name.value, website: trap.value }) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || T('Ошибка ') + r.status); return j; }); })
+        .then(function () { store('gene-author', name.value.trim()); value.value = ''; note.value = ''; status.textContent = T('Спасибо! Исправление ушло составителю архива.'); })
+        .catch(function (err) { status.className = 'status err'; status.textContent = err.message || T('Не удалось отправить. Проверьте интернет и попробуйте ещё раз.'); })
+        .then(function () { btn.disabled = false; });
+    } }, fieldSel, value, note, name, trap, el('div', { class: 'row' }, status, btn));
+    return el('details', { class: 'propose', hidden: !canPropose }, el('summary', { text: T('Предложить исправление') }), form);
+  }
   function groupComments() {
     byPerson = {};
     comments.forEach(function (c) { (byPerson[c.person_id] = byPerson[c.person_id] || []).push(c); });
@@ -1061,6 +1086,10 @@
     var early = window.genePrefetch && window.genePrefetch.comments;
     if (early) window.genePrefetch.comments = null;
     if (!SITE.comments) return Promise.resolve().then(function () { comments = []; groupComments(); });
+    fetch(ROOT + 'api/features', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (f) {
+      canPropose = !!(f && f.proposals);
+      document.querySelectorAll('.propose').forEach(function (d) { d.hidden = !canPropose; });
+    }).catch(function () {});
     return (early || fetch(ROOT + 'api/comments', { credentials: 'same-origin' }))
       .then(function (r) { if (r.status === 401) { location.reload(); return []; } return r.ok ? r.json() : []; })
       .catch(function () { return []; })

@@ -26,6 +26,14 @@ SLUG_RE = re.compile(r"[a-z0-9][a-z0-9-]*")
 SRC_IN_TEXT = re.compile(r"\bS\d+\b")
 
 
+def bad_path(rel):
+    """A file reference must stay inside the site folder and avoid hidden folders (.git, .gene-state…):
+    whatever it names is copied to the published site."""
+    rel = str(rel)
+    parts = rel.replace("\\", "/").split("/")
+    return rel.startswith(("/", "~")) or ":" in parts[0] or any(p.startswith(".") or p == "" for p in parts)
+
+
 def _valid_ymd(y, mo, d):
     try:
         datetime.date(int(y), int(mo or 1), int(d or 1))
@@ -182,7 +190,7 @@ def validate(data, root=Path("."), cfg=None):
         for k in ("file", "back"):
             if s.get(k):
                 rel = str(s[k])
-                if rel.startswith(("/", "..")) or "/../" in rel:
+                if bad_path(rel):
                     err(m(f"{sid}: {k} must be a path inside the site folder", f"{sid}: {k} — путь внутри папки сайта"))
                 elif not (root / rel).is_file():
                     err(m(f"{sid}: file {rel} not found", f"{sid}: нет файла {rel}"))
@@ -212,7 +220,9 @@ def validate(data, root=Path("."), cfg=None):
         if ("lat" in pl) != ("lon" in pl):
             err(m(f"{where}: only one coordinate", f"{where}: координата только одна"))
         for n, md in enumerate(pl.get("media", [])):
-            if md.get("file") and not (root / md["file"]).is_file():
+            if md.get("file") and bad_path(md["file"]):
+                err(m(f"{where} media[{n}]: file must be a path inside the site folder", f"{where} media[{n}]: файл — путь внутри папки сайта"))
+            elif md.get("file") and not (root / md["file"]).is_file():
                 err(m(f"{where} media[{n}]: file {md['file']} not found", f"{where} media[{n}]: нет файла {md['file']}"))
     for n, r in enumerate(data.get("place_routes", [])):
         where = f"place_routes[{n}]"

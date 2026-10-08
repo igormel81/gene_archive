@@ -10,6 +10,7 @@ Settings (command-line flags of `gene serve` or environment variables):
   GENE_PIN         PIN for a private archive (or GENE_PIN_HASH = sha256 hex of it); empty = open site
   GENE_PREFIX      public URL prefix when the site lives in a sub-folder behind a proxy (e.g. /family)
   GENE_MODERATE    1 = new comments stay hidden until approved with `gene comments approve`
+  GENE_EDITOR      folder with family_tree.json: turns on the online editor at /edit/ (see docs/editor.md)
   GENE_HOST, GENE_PORT, GENE_INSECURE_COOKIE (1 for http://localhost tests), GENE_TRUST_PROXY
 """
 import hashlib
@@ -37,17 +38,23 @@ PIN_FAILS, PIN_WINDOW = 6, 15 * 60
 POSTS, POST_WINDOW = 30, 10 * 60
 TARGET_RE = re.compile(r"general|[ISF]\d{1,7}")   # a person, a document, a family or the general thread
 COOKIE_NAME = "gene_session"
+EDITOR_COOKIE = "gene_editor"
+EDITOR_BODY = 4 * 1024 * 1024             # a whole record with long notes
+LOGIN_FAILS, LOGIN_WINDOW = 10, 15 * 60
+PROPOSALS, PROPOSAL_WINDOW = 10, 60 * 60
+EDITOR_WEB = Path(__file__).resolve().parent / "editor_web"
 
 
 class Settings:
     def __init__(self, site, state_dir, pin_hash="", prefix="", host="127.0.0.1", port=8111,
-                 moderate=False, secure_cookie=True, trust_proxy=False):
+                 moderate=False, secure_cookie=True, trust_proxy=False, editor=None):
         self.site = Path(site).resolve()
         self.state_dir = Path(state_dir)
         self.pin_hash = (pin_hash or "").strip().lower()
         self.prefix = (prefix or "").rstrip("/")
         self.host, self.port = host, int(port)
         self.moderate, self.secure_cookie, self.trust_proxy = moderate, secure_cookie, trust_proxy
+        self.editor = Path(editor).resolve() if editor else None   # site folder with family_tree.json
 
     @classmethod
     def from_env(cls, **override):
@@ -58,7 +65,8 @@ class Settings:
         values = dict(site=env.get("GENE_SITE", "_site"), state_dir=env.get("GENE_STATE_DIR", ".gene-state"),
                       pin_hash=pin_hash, prefix=env.get("GENE_PREFIX", ""), host=env.get("GENE_HOST", "127.0.0.1"),
                       port=env.get("GENE_PORT", "8111"), moderate=env.get("GENE_MODERATE") == "1",
-                      secure_cookie=env.get("GENE_INSECURE_COOKIE") != "1", trust_proxy=env.get("GENE_TRUST_PROXY") == "1")
+                      secure_cookie=env.get("GENE_INSECURE_COOKIE") != "1", trust_proxy=env.get("GENE_TRUST_PROXY") == "1",
+                      editor=env.get("GENE_EDITOR") or None)
         values.update({k: v for k, v in override.items() if v is not None})
         return cls(**values)
 
@@ -102,6 +110,12 @@ def make_handler(cfg):
     token = hmac.new(secret_path.read_bytes(), b"gene-session:" + cfg.pin_hash.encode(), hashlib.sha256).hexdigest()
     db_path = cfg.state_dir / "comments.db"
     db_lock, hits_lock, hits = threading.Lock(), threading.Lock(), {}
+    accounts = store = rebuilder = None
+    if cfg.editor:
+        from . import editor as ed
+        accounts = ed.Accounts(cfg.state_dir)
+        rebuilder = ed.Rebuilder(cfg.editor, cfg.site)
+        store = ed.Store(cfg.editor, on_change=rebuilder.request)
     script_hash = "sha256-" + __import__("base64").b64encode(hashlib.sha256(LOGIN_SCRIPT.encode()).digest()).decode()
 
     def db():
@@ -219,14 +233,202 @@ def make_handler(cfg):
                     while chunk := f.read(64 * 1024):
                         self.wfile.write(chunk)
 
-        def _read_body(self):
+        def _read_body(self, limit=MAX_BODY):
             try:
                 length = int(self.headers.get("Content-Length") or 0)
             except ValueError:
                 raise ValueError("bad length") from None
-            if length < 0 or length > MAX_BODY:
+            if length < 0 or length > limit:
                 raise ValueError("too large")
             return self.rfile.read(length)
+
+        # ---------- online editor (/edit/): its own accounts, independent of the PIN
+        def _cookie(self, name):
+            jar = cookies.SimpleCookie()
+            try:
+                jar.load(self.headers.get("Cookie", ""))
+                return jar[name].value
+            except (cookies.CookieError, KeyError):
+                return None
+
+        def _editor_cookie(self, token, max_age):
+            return (f"{EDITOR_COOKIE}={token}; Path={cfg.prefix}/edit; HttpOnly; SameSite=Strict; Max-Age={max_age}"
+                    + ("; Secure" if cfg.secure_cookie else ""))
+
+        def _editor_user(self):
+            return accounts.session(self._cookie(EDITOR_COOKIE))
+
+        def _editor_static(self, rel, head):
+            name = {"": "index.html", "index.html": "index.html", "editor.js": "editor.js", "editor.css": "editor.css"}.get(rel)
+            if not name:
+                self._send(404, b"Not found", "text/plain; charset=utf-8", head)
+                return
+            body = (EDITOR_WEB / name).read_bytes()
+            ctype = {"html": "text/html", "js": "application/javascript", "css": "text/css"}[name.rsplit(".", 1)[1]] + "; charset=utf-8"
+            csp = ("default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self'; connect-src 'self'; "
+                   "object-src 'none'; frame-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'")
+            self._send(200, body, ctype, head, {"Content-Security-Policy": csp, "X-Robots-Tag": "noindex, nofollow"})
+
+        def _editor_get(self, path, head):
+            rel = path[len("/edit/"):] if path.startswith("/edit/") else ""
+            if not rel.startswith("api/"):
+                if path == "/edit":
+                    self._redirect(f"{cfg.prefix}/edit/")
+                    return
+                self._editor_static(rel, head)
+                return
+            api = rel[4:]
+            if api == "invite":
+                u = accounts.invite_user(parse_qs(urlsplit(self.path).query).get("token", [""])[0])
+                self._json(200 if u else 404, {"name": u["name"], "display": u["display"]} if u else {"error": "expired"})
+                return
+            user = self._editor_user()
+            if not user:
+                self._json(401, {"error": "unauthorized"})
+                return
+            if api == "me":
+                self._json(200, {"name": user["name"], "display": user["display"], "role": user["role"], "csrf": user["csrf"],
+                                 "git": store.has_git, "build": rebuilder.state, "lang": store.lang})
+            elif api == "data":
+                raw = store.raw()
+                self._send(200, raw, "application/json; charset=utf-8", head,
+                           {"X-Gene-Version": hashlib.sha256(raw).hexdigest()[:16]})
+            elif api == "status":
+                self._json(200, {"build": rebuilder.state, "version": store.version()})
+            elif api == "history":
+                self._json(200, store.history())
+            elif api == "file":
+                # a scan before the next build has copied it to the site
+                rel_file = parse_qs(urlsplit(self.path).query).get("path", [""])[0]
+                target = (cfg.editor / rel_file).resolve()
+                if not rel_file.startswith("sources/") or (cfg.editor / "sources") not in target.parents or not target.is_file():
+                    self._json(404, {"error": "not found"})
+                    return
+                ctype = mimetypes.guess_type(str(target))[0] or "application/octet-stream"
+                self._send(200, target.read_bytes(), ctype, head)
+            elif api == "proposals" and user["role"] == "admin":
+                self._json(200, accounts.proposals())
+            elif api == "users" and user["role"] == "admin":
+                self._json(200, accounts.users())
+            else:
+                self._json(404, {"error": "not found"})
+
+        def _editor_post(self, path, ip):
+            from .editor import AccountError, SaveError
+            api = path[len("/edit/api/"):]
+            limit = 32 * 1024 * 1024 if api == "upload" else EDITOR_BODY
+            try:
+                body = self._read_body(limit)
+            except ValueError:
+                self._json(413, {"error": "too large"})
+                return
+            # CSRF: a form on another site can neither send this header nor read the token
+            if self.headers.get("X-Gene-Client") != "1":
+                self._json(403, {"error": "forbidden"})
+                return
+            if api in ("login", "invite"):
+                try:
+                    data = json.loads(body or b"{}")
+                except ValueError:
+                    self._json(400, {"error": "bad json"})
+                    return
+                name = str(data.get("name", ""))[:40].strip().lower()
+                if too_many("login", ip, LOGIN_FAILS, LOGIN_WINDOW, record=False) or too_many("login-user", name, LOGIN_FAILS, LOGIN_WINDOW, record=False):
+                    self._json(429, {"error": "too many attempts, try again in 15 minutes"})
+                    return
+                if api == "login":
+                    user = accounts.login(name, str(data.get("password", "")))
+                    if not user:
+                        too_many("login", ip, LOGIN_FAILS, LOGIN_WINDOW, record=True)
+                        too_many("login-user", name, LOGIN_FAILS, LOGIN_WINDOW, record=True)
+                        accounts.log(name, "login_failed")
+                        self._json(401, {"error": "wrong login or password"})
+                        return
+                else:
+                    try:
+                        user = accounts.accept_invite(str(data.get("token", "")), str(data.get("password", "")))
+                    except AccountError as e:
+                        too_many("login", ip, LOGIN_FAILS, LOGIN_WINDOW, record=True)
+                        self._json(400, {"error": str(e)})
+                        return
+                token = accounts.new_session(user)
+                self._send(200, b'{"ok": true}', "application/json", extra={"Set-Cookie": self._editor_cookie(token, 30 * 86400)})
+                return
+            user = self._editor_user()
+            if not user:
+                self._json(401, {"error": "unauthorized"})
+                return
+            if not hmac.compare_digest(self.headers.get("X-CSRF-Token", ""), user["csrf"]):
+                self._json(403, {"error": "forbidden"})
+                return
+            if api == "logout":
+                accounts.end_session(self._cookie(EDITOR_COOKIE))
+                self._send(200, b'{"ok": true}', "application/json", extra={"Set-Cookie": self._editor_cookie("", 0)})
+                return
+            try:
+                if api == "upload":
+                    name = unquote(self.headers.get("X-File-Name", ""))
+                    self._json(201, {"path": store.upload(user, name, body)})
+                    accounts.log(user["name"], "upload", name)
+                    return
+                data = json.loads(body or b"{}")
+                if api == "save":
+                    r = store.save(user, str(data.get("kind")), data.get("record"), data.get("base"),
+                                   str(data.get("reason", ""))[:1000], data.get("source_ids"))
+                    pid = data.get("proposal")
+                    if pid and user["role"] == "admin" and r["changed"]:
+                        accounts.close_proposal(int(pid), "applied", user["display"], ", ".join(r["changed"]))
+                    accounts.log(user["name"], "save", f"{r['id']}: {', '.join(r['changed'])}")
+                    self._json(200, r)
+                elif api == "delete":
+                    r = store.delete(user, str(data.get("kind")), data.get("base"), str(data.get("reason", ""))[:1000])
+                    accounts.log(user["name"], "delete", r["id"])
+                    self._json(200, r)
+                elif api == "password":
+                    if not accounts.login(user["name"], str(data.get("old", ""))):
+                        self._json(400, {"error": "wrong password"})
+                        return
+                    accounts.set_password(user["name"], str(data.get("new", "")))
+                    self._send(200, b'{"ok": true}', "application/json", extra={"Set-Cookie": self._editor_cookie("", 0)})
+                elif user["role"] != "admin":
+                    self._json(403, {"error": "admins only"})
+                elif api == "restore":
+                    r = store.restore(user, str(data.get("commit", "")))
+                    accounts.log(user["name"], "restore", str(data.get("commit", "")))
+                    self._json(200, r)
+                elif api == "proposal":
+                    status = data.get("status")
+                    if status not in ("rejected", "applied", "new"):
+                        self._json(400, {"error": "bad status"})
+                        return
+                    accounts.close_proposal(int(data.get("id")), status, user["display"], str(data.get("note", "")))
+                    self._json(200, {"ok": True})
+                elif api == "users":
+                    action, name = data.get("action"), str(data.get("name", ""))
+                    if name == user["name"] and action in ("disable", "role"):
+                        self._json(400, {"error": "you cannot change your own account this way"})
+                        return
+                    if action == "add":
+                        token = accounts.add_user(name, data.get("role", "editor"), data.get("display"))
+                        self._json(201, {"invite": token})
+                    elif action == "invite":
+                        self._json(200, {"invite": accounts.invite(name)})
+                    elif action == "role":
+                        accounts.set_role(name, data.get("role"))
+                        self._json(200, {"ok": True})
+                    elif action in ("disable", "enable"):
+                        accounts.set_disabled(name, action == "disable")
+                        self._json(200, {"ok": True})
+                    else:
+                        self._json(400, {"error": "bad action"})
+                else:
+                    self._json(404, {"error": "not found"})
+            except SaveError as e:
+                self._json(e.status, {"error": str(e), **e.extra})
+            except AccountError as e:
+                self._json(400, {"error": str(e)})
+            except (ValueError, TypeError, AttributeError):
+                self._json(400, {"error": "bad request"})
 
         def do_GET(self):
             self._get(False)
@@ -243,11 +445,20 @@ def make_handler(cfg):
             if path == "/healthz":
                 self._send(200, b"ok", "text/plain", head)
                 return
+            if path == "/edit" or path.startswith("/edit/"):
+                if not accounts:
+                    self._send(404, b"Not found", "text/plain; charset=utf-8", head)
+                else:
+                    self._editor_get(path, head)
+                return
             if not self._authorized():
                 if path.startswith("/api/"):
                     self._json(401, {"error": "unauthorized"})
                 else:
                     self._login(head=head)
+                return
+            if path == "/api/features":
+                self._json(200, {"proposals": bool(accounts)})
                 return
             if path == "/api/comments":
                 with db_lock, db() as conn:
@@ -260,6 +471,12 @@ def make_handler(cfg):
         def do_POST(self):
             path = urlsplit(self.path).path
             ip = self._ip()
+            if path.startswith("/edit/api/"):
+                if not accounts:
+                    self._json(404, {"error": "not found"})
+                else:
+                    self._editor_post(path, ip)
+                return
             try:
                 body = self._read_body()
             except ValueError:
@@ -318,6 +535,41 @@ def make_handler(cfg):
                 self._json(201, {"id": new_id, "person_id": person_id, "author": author, "text": text,
                                  "created_at": created, "pending": bool(hidden)})
                 return
+            if path == "/api/proposals" and accounts:
+                if not self._authorized():
+                    self._json(401, {"error": "unauthorized"})
+                    return
+                if self.headers.get("X-Gene-Client") != "1":
+                    self._json(403, {"error": "forbidden"})
+                    return
+                if too_many("proposal", ip, PROPOSALS, PROPOSAL_WINDOW, record=True):
+                    self._json(429, {"error": "too many proposals, try again later"})
+                    return
+                from .editor import PROPOSAL_FIELDS, AccountError
+                try:
+                    data = json.loads(body)
+                    target = str(data.get("target", "")).strip()
+                    field = str(data.get("field", "")).strip()
+                    value = str(data.get("value", "")).strip()[:500]
+                    note = str(data.get("note", "")).strip()[:MAX_TEXT]
+                    author = " ".join(str(data.get("author", "")).split())[:MAX_AUTHOR]
+                    trap = str(data.get("website", ""))
+                except (ValueError, AttributeError):
+                    self._json(400, {"error": "bad json"})
+                    return
+                if not re.fullmatch(r"[ISF]\d{1,7}", target) or field not in PROPOSAL_FIELDS or not author or not (value or note):
+                    self._json(400, {"error": "name and the correction are required"})
+                    return
+                if trap:   # a bot: pretend it worked
+                    self._json(201, {"ok": True})
+                    return
+                try:
+                    accounts.add_proposal(target, field, value, note, author)
+                except AccountError as e:
+                    self._json(507, {"error": str(e)})
+                    return
+                self._json(201, {"ok": True})
+                return
             self._json(404, {"error": "not found"})
 
         def log_message(self, fmt, *args):
@@ -332,7 +584,8 @@ def serve(cfg):
     server = ThreadingHTTPServer((cfg.host, cfg.port), handler)
     server.daemon_threads = True
     print(f"gene-archive: serving {cfg.site} on http://{cfg.host}:{cfg.port}{cfg.prefix}/"
-          + (" (PIN required)" if cfg.pin_hash else ""), flush=True)
+          + (" (PIN required)" if cfg.pin_hash else "")
+          + (f"; editor: http://{cfg.host}:{cfg.port}{cfg.prefix}/edit/" if cfg.editor else ""), flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

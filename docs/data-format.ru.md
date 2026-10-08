@@ -170,7 +170,8 @@ ISO (`1899`, `1899-10`, `1899-10-09`) или формы GEDCOM:
   "person_id", "source_ids", "limitations", "url", "resolution"}`.
   `status`: `open`, `to_verify`, `accepted`, `closed`, `superseded`, `candidate_unlinked`…
 - `corrections[]` — каждое изменение факта: `{"person_id" | "family_id" | "record", "field",
-  "previous", "current", "reason", "source_ids"}`. На сайте — «Журнал исправлений».
+  "previous", "current", "reason", "source_ids", "date", "author"}`. На сайте — «Журнал исправлений»;
+  [онлайн-редактор](editor.ru.md) пишет эти строки сам (`date` и `author` необязательны).
 - `research_log[]` — что, где и с каким результатом искали: `{"date": "2026-10-06",
   "action", "result", "scope"}`.
 - `surnames{}` — `{"Иванов": {"history": ["абзац", …]}}`: история рода на странице фамилии.

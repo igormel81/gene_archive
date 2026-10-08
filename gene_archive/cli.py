@@ -5,6 +5,8 @@
   gene validate <folder>           check family_tree.json and site.json
   gene build <folder> [-o out]     build the static site into <folder>/_site
   gene serve <folder>              build, then serve the site with comments on http://127.0.0.1:8111
+  gene serve <folder> --editor     … and the online editor at /edit/ (accounts: gene users)
+  gene users <folder> add NAME [--role admin|editor] | invite NAME | list | role NAME ROLE | disable NAME | enable NAME | passwd NAME
   gene comments <folder> list|approve ID|hide ID|done ID "note"   moderate relatives' comments
   gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
@@ -145,7 +147,52 @@ def cmd_serve(args):
         cfg.secure_cookie = False
     if args.moderate:
         cfg.moderate = True
+    if args.editor or cfg.editor:   # --editor or GENE_EDITOR=<site folder> (Docker)
+        from .editor import Accounts
+        cfg.editor = cfg.editor or Path(args.folder).resolve()
+        if not Accounts(cfg.state_dir).admins():
+            print(m(f"Editor: no administrator yet. Create one: gene users {args.folder} add NAME --role admin",
+                    f"Редактор: администратора ещё нет. Создайте: gene users {args.folder} add ИМЯ --role admin"))
     serve(cfg)
+
+
+def invite_link(folder, token):
+    from .config import load
+    base = load(folder)["base_url"] or "http://127.0.0.1:8111/"
+    return f"{base}edit/#invite={token}"
+
+
+def cmd_users(args):
+    import getpass
+    from .editor import Accounts, AccountError
+    import os
+    acc = Accounts(Path(args.state or os.environ.get("GENE_STATE_DIR") or Path(args.folder) / ".gene-state"))
+    try:
+        if args.action == "list":
+            for u in acc.users():
+                state = m("disabled", "отключён") if u["disabled"] else ("" if u["active"] else m("invited", "приглашён"))
+                print(f"{u['name']:<20} {u['role']:<7} {u['display']} {state}")
+            return
+        if not args.name:
+            sys.exit(m("a login name is required", "нужно имя пользователя (логин)"))
+        if args.action in ("add", "invite"):
+            token = acc.add_user(args.name, args.role or "editor", args.display) if args.action == "add" else acc.invite(args.name)
+            print(m("Send this one-time link (valid 7 days); the person sets the password there:",
+                    "Отправьте эту одноразовую ссылку (действует 7 дней) — по ней человек сам задаст пароль:"))
+            print(invite_link(args.folder, token))
+            return
+        elif args.action == "role":
+            acc.set_role(args.name, args.role)
+        elif args.action in ("disable", "enable"):
+            acc.set_disabled(args.name, args.action == "disable")
+        elif args.action == "passwd":
+            pw = getpass.getpass(m("New password: ", "Новый пароль: "))
+            if pw != getpass.getpass(m("Repeat: ", "Ещё раз: ")):
+                sys.exit(m("passwords differ", "пароли не совпадают"))
+            acc.set_password(args.name, pw)
+        print("ok")
+    except AccountError as e:
+        sys.exit(str(e))
 
 
 def cmd_comments(args):
@@ -244,7 +291,17 @@ def main(argv=None):
     s.add_argument("--moderate", action="store_true", help=m("new comments wait for approval", "новые комментарии ждут одобрения"))
     s.add_argument("--insecure-cookie", action="store_true")
     s.add_argument("--no-build", action="store_true")
+    s.add_argument("--editor", action="store_true", help=m("online editor at /edit/ (see docs/editor.md)", "онлайн-редактор на /edit/ (см. docs/editor.ru.md)"))
     s.set_defaults(fn=cmd_serve)
+    s = sub.add_parser("users", help=m("editor accounts", "пользователи редактора"))
+    s.add_argument("folder")
+    s.add_argument("action", choices=["list", "add", "invite", "role", "disable", "enable", "passwd"])
+    s.add_argument("name", nargs="?")
+    s.add_argument("role_arg", nargs="?", metavar="ROLE")
+    s.add_argument("--role", choices=["admin", "editor"])
+    s.add_argument("--display", help=m("name shown in the history, e.g. \"Aunt Anna\"", "имя в истории правок, например «Тётя Анна»"))
+    s.add_argument("--state")
+    s.set_defaults(fn=cmd_users)
     s = sub.add_parser("comments", help=m("moderate comments", "модерация комментариев"))
     s.add_argument("folder")
     s.add_argument("action", choices=["list", "approve", "hide", "done"])
@@ -265,6 +322,8 @@ def main(argv=None):
     s.add_argument("-o", "--out")
     s.set_defaults(fn=cmd_translations)
     args = p.parse_args(argv)
+    if getattr(args, "cmd", None) == "users" and args.role_arg:
+        args.role = args.role_arg
     return args.fn(args) or 0
 
 

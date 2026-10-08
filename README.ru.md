@@ -33,6 +33,8 @@
 - **Люди** — список с поиском, календарь дней рождения и памяти, страницы фамилий.
 - **История** — ваш рассказ с лентой времени и фильтром «по местам».
 - **Вопросы** — что семья пока не знает; родные отвечают прямо на сайте (с сервером комментариев).
+- **Онлайн-редактор** (с сервером) — люди, семьи, документы и места в браузере, учётные записи
+  с ролями, проверка перед сохранением, история в git, «Предложить исправление» для читателей.
 - **Поисковики** — отдельная страница на каждого человека и фамилию, sitemap, Schema.org;
   живые — `noindex`.
 - **Приватность** — о живых людях публикуется только имя: без дат, мест, заметок и документов,
@@ -106,6 +108,7 @@ gene build my-family              # сайт — в папке my-family/_site
 | История, биографии, новости | [content.ru.md](docs/content.ru.md) | [content.md](docs/content.md) |
 | Языки и переводы | [translations.ru.md](docs/translations.ru.md) | [translations.md](docs/translations.md) |
 | Публикация: GitHub Pages, сервер, Docker, комментарии | [deploy.ru.md](docs/deploy.ru.md) | [deploy.md](docs/deploy.md) |
+| Онлайн-редактор: пользователи, история, предложения читателей | [editor.ru.md](docs/editor.ru.md) | [editor.md](docs/editor.md) |
 | Как участвовать в разработке | [CONTRIBUTING.ru.md](CONTRIBUTING.ru.md) | [CONTRIBUTING.md](CONTRIBUTING.md) |
 
 ## Команды
@@ -117,6 +120,8 @@ gene build my-family              # сайт — в папке my-family/_site
 | `gene validate [папка]` | ошибки и предупреждения в данных |
 | `gene build [папка] [-o куда] [--base-url адрес]` | собрать сайт |
 | `gene serve [папка] [--pin 1234] [--moderate]` | собрать и запустить с комментариями |
+| `gene serve <папка> --editor` | … и онлайн-редактор на `/edit/` |
+| `gene users <папка> add ИМЯ [--role admin] \| invite \| list \| role \| disable \| passwd` | пользователи редактора |
 | `gene comments <папка> list\|approve N\|hide N\|done N "что сделано"` | модерация комментариев |
 | `gene gedcom [папка] [-o файл.ged] [--version 5.5.1\|7.0]` | GEDCOM для MyHeritage, Ancestry, Gramps… (`--full` — с живыми, для своей резервной копии) |
 | `gene translations <папка> <язык>` | ваши тексты, у которых ещё нет перевода |

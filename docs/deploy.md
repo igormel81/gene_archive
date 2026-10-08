@@ -122,6 +122,11 @@ gene comments my-family done 12 "added to the tree"  # "✓ Taken into account" 
 Comments are limited to 4000 characters, 30 per 10 minutes from one address; a hidden form
 field catches simple bots. Back up `comments.db` together with your data.
 
+## Online editor
+
+With `gene serve <folder> --editor` (or `GENE_EDITOR=/site` in Docker) relatives with an account edit
+the data in a browser at `/edit/`: see [editor.md](editor.md).
+
 ## Releases (for maintainers)
 
 ```sh

@@ -18,6 +18,7 @@ living people to an issue.
 | `gene_archive/localize.py` | language editions |
 | `gene_archive/ged_import.py`, `ged_export.py` | GEDCOM |
 | `gene_archive/server.py` | the comments server (standard library only) |
+| `gene_archive/editor.py`, `gene_archive/editor_web/` | the online editor: accounts, saving with checks, git history; its page (tests: `tests/test_editor.py`) |
 | `gene_archive/engine/web/` | the browser app: `index.html` template, `app.js`, `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | interface dictionaries |
 | `schemas/` | JSON Schemas of `family_tree.json` and `site.json` — update them with every new field |

@@ -35,4 +35,4 @@ Documentation = "https://github.com/igormel81/gene_archive/tree/main/docs"
 packages = ["gene_archive"]
 
 [tool.setuptools.package-data]
-gene_archive = ["templates/*.md", "engine/*.html", "engine/web/*", "engine/web/vendor/leaflet/*", "engine/i18n/*.json"]
+gene_archive = ["templates/*.md", "editor_web/*", "engine/*.html", "engine/web/*", "engine/web/vendor/leaflet/*", "engine/i18n/*.json"]

@@ -166,7 +166,8 @@ A person is the biological child (`children`) of at most one family with partner
   "person_id", "source_ids", "limitations", "url", "resolution"}`.
   `status`: `open`, `to_verify`, `accepted`, `closed`, `superseded`, `candidate_unlinked`…
 - `corrections[]` — every change of a fact: `{"person_id" | "family_id" | "record", "field",
-  "previous", "current", "reason", "source_ids"}`. Shown on the site as the corrections log.
+  "previous", "current", "reason", "source_ids", "date", "author"}`. Shown on the site as the corrections log;
+  the [online editor](editor.md) writes these lines itself (`date` and `author` are optional).
 - `research_log[]` — what was searched, where, with what result: `{"date": "2026-10-06",
   "action", "result", "scope"}`.
 - `surnames{}` — `{"Ivanov": {"history": ["paragraph", …]}}`: stories shown on surname pages.

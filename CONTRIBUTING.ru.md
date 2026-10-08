@@ -18,6 +18,7 @@
 | `gene_archive/localize.py` | языковые версии |
 | `gene_archive/ged_import.py`, `ged_export.py` | GEDCOM |
 | `gene_archive/server.py` | сервер комментариев (только стандартная библиотека) |
+| `gene_archive/editor.py`, `gene_archive/editor_web/` | онлайн-редактор: пользователи, сохранение с проверкой, история в git; его страница (тесты — `tests/test_editor.py`) |
 | `gene_archive/engine/web/` | приложение в браузере: шаблон `index.html`, `app.js`, `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | словари интерфейса |
 | `schemas/` | JSON Schema для `family_tree.json` и `site.json` — дополняйте при каждом новом поле |

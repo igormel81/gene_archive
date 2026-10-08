@@ -35,6 +35,8 @@ fictional family made to show every feature.
 - **Story** — your narrative with a timeline and a "by place" filter.
 - **Questions** — what the family does not know yet; relatives answer on the site
   (with the comments server).
+- **Online editor** (with the server) — people, families, documents and places in a browser,
+  accounts with roles, checks before saving, history in git, readers' "Suggest a correction".
 - **Search engines** — a static page for every person and surname, sitemap, Schema.org;
   living people are `noindex`.
 - **Privacy** — living people show only their names: no dates, places, notes or documents,
@@ -108,6 +110,7 @@ More ready-made requests and the rules for reviewing the agent's work:
 | Story, biographies, news | [content.md](docs/content.md) | [content.ru.md](docs/content.ru.md) |
 | Languages and translations | [translations.md](docs/translations.md) | [translations.ru.md](docs/translations.ru.md) |
 | Publishing: GitHub Pages, server, Docker, comments | [deploy.md](docs/deploy.md) | [deploy.ru.md](docs/deploy.ru.md) |
+| Online editor: accounts, history, readers' proposals | [editor.md](docs/editor.md) | [editor.ru.md](docs/editor.ru.md) |
 | Contributing to the engine | [CONTRIBUTING.md](CONTRIBUTING.md) | [CONTRIBUTING.ru.md](CONTRIBUTING.ru.md) |
 
 ## Commands
@@ -119,6 +122,8 @@ More ready-made requests and the rules for reviewing the agent's work:
 | `gene validate [folder]` | errors and warnings in the data |
 | `gene build [folder] [-o out] [--base-url URL]` | build the static site |
 | `gene serve [folder] [--pin 1234] [--moderate]` | build and serve with comments |
+| `gene serve <folder> --editor` | … and the online editor at `/edit/` |
+| `gene users <folder> add NAME [--role admin] \| invite \| list \| role \| disable \| passwd` | editor accounts |
 | `gene comments <folder> list\|approve ID\|hide ID\|done ID "note"` | moderate comments |
 | `gene gedcom [folder] [-o file.ged] [--version 5.5.1\|7.0]` | GEDCOM for MyHeritage, Ancestry, Gramps… (`--full`: with living people, for your own backup) |
 | `gene translations <folder> <lang>` | your texts that have no translation yet |

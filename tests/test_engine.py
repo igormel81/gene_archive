@@ -49,6 +49,8 @@ class Validate(unittest.TestCase):
             "YYYY-MM-DD": lambda d: d["research_log"].append({"date": "6.10.2026", "action": "a", "result": "r"}),
             "previous": lambda d: d["corrections"].append({"person_id": "I1", "field": "x", "old": 1, "new": 2}),
             "inside the site": lambda d: d["sources"][0].update(file="../etc/passwd"),
+            "inside the site folder": lambda d: d["sources"][0].update(file=".gene-state/editor.db"),
+            "media[0]: file must": lambda d: d["places"][0].setdefault("media", []).append({"file": "../x.jpg"}),
         }
         for needle, change in cases.items():
             with self.subTest(needle):
