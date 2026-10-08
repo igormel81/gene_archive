@@ -1,6 +1,6 @@
 # Changelog / История изменений
 
-## Unreleased
+## 0.2.0 — 2026-10-08
 
 - Online editor at `/edit/` (`gene serve --editor`, `GENE_EDITOR` in Docker): people, families, documents with uploads,
   places; checks before saving, conflict detection, automatic `corrections` and `research_log`, history in git with restore,

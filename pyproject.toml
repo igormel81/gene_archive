@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gene-archive"
-version = "0.1.0"
+version = "0.2.0"
 description = "Static site generator for a family history archive: tree, people, places, documents, story — in Russian, English and Romanian"
 readme = "README.md"
 license = {text = "MIT"}
