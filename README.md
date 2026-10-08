@@ -1,54 +1,127 @@
+<div align="center">
+
 # gene-archive
 
+### Your family's history as a website — every fact backed by its document.
+
+[![Release](https://img.shields.io/github/v/release/igormel81/gene_archive?color=8a4b2a)](https://github.com/igormel81/gene_archive/releases)
+[![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-2e7d32)](LICENSE)
+![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)
+![Languages](https://img.shields.io/badge/UI-English%20·%20Русский%20·%20Română-6b5b95)
+
+**[▶ Live demo](https://igormel81.github.io/gene_archive/)** ·
+**[Quick start](#quick-start)** ·
+**[Documentation](#documentation)** ·
 **[Русская версия](README.ru.md)**
 
-A static site generator for a family history archive. It turns one JSON file with
-people, families, documents and places into a website that relatives can actually use:
-an interactive tree, a card for every person, an archive of scans and photographs with
-transcriptions, a map of family places, a narrative story, questions to relatives, and
-pages that search engines can find.
+</div>
 
-The interface is in **English, Russian and Romanian**; your own texts can be translated
-too. Living people are hidden automatically. The result is plain HTML that can be hosted
-for free on GitHub Pages, Netlify or any web server; an optional small server adds
-comments from relatives.
+Scans in shoeboxes, dates in a grandmother's notebook, a tree in MyHeritage, stories that
+only one aunt still remembers. **gene-archive** gathers all of it into one beautiful website
+your whole family can open on a phone: an interactive tree, a card for every person with the
+documents behind each date, an archive of scans with transcriptions, a map of family places
+and the story of the family — in English, Russian and Romanian.
 
-**Live demo:** https://igormel81.github.io/gene_archive/ — a fictional family; Russian interface: [/ru/](https://igormel81.github.io/gene_archive/ru/), Romanian: [/ro/](https://igormel81.github.io/gene_archive/ro/).
+Relatives don't just read it. They leave comments, suggest corrections and, with an account,
+edit the archive right in the browser. You keep everything: one JSON file, your own domain,
+free hosting, full history in git, GEDCOM in and out.
 
 ![The tree and a person's card](docs/img/tree-en.png)
 
-The engine grew out of a real family archive with ~550 people, ~500 documents and
-relatives commenting in three languages. The demo in [`example/`](example/) is a
-fictional family made to show every feature.
+> Grew out of a real family archive: ~550 people, ~500 documents, three countries, relatives
+> commenting in three languages. The [demo](https://igormel81.github.io/gene_archive/) is a
+> fictional family made to show every feature.
 
-## What you get
+## Why gene-archive
 
-- **Tree** — an hourglass around any person, with dashed lines for probable links,
-  a whole-tree chart, export to PNG, surname lines.
-- **Person cards** — dates and places with the documents behind them, alternative versions
-  of a date, relatives, a connected life story where `S12` becomes a link to the document,
-  and "How we are related": the exact relation to anyone in the tree ("second cousin once
-  removed") with the chain of people between you.
-- **Archive** — every scan and photo with a transcription, the back side of a photo, PDF
-  previews, filters by type and line, a research log and a log of corrections.
-- **Places** — a map (Leaflet + OpenStreetMap) with family branches, moves between places,
-  "then and now" names, timelines.
-- **People** — a searchable list, a calendar of birthdays and anniversaries, surname pages.
-- **Story** — your narrative with a timeline and a "by place" filter.
-- **Questions** — what the family does not know yet; relatives answer on the site
-  (with the comments server).
-- **Online editor** (with the server) — people, families, documents and places in a browser,
-  accounts with roles, checks before saving, history in git, readers' "Suggest a correction".
-- **Search engines** — a static page for every person and surname, sitemap, Schema.org;
-  living people are `noindex`.
-- **Privacy** — living people show only their names: no dates, places, notes or documents,
-  not even in the data file or the GEDCOM export. Documents the family asked to remove
-  (`"hidden": true`) never leave your computer.
-- **GEDCOM** — import from MyHeritage, Gramps, Ancestry, Geni…; export for the same programs.
+|   |   |
+|---|---|
+| 📜 **Proof for every fact** | Each date and place shows where it comes from — a document, a family story, a calculation from an age — and `S12` in any text opens the scan. Doubtful links are drawn dashed, not hidden. |
+| 👨‍👩‍👧 **Made for the whole family** | Relatives read it like a book, find themselves in the tree, ask "how are we related?", comment and suggest corrections — no registration on a platform. |
+| ✏️ **Edit in the browser** | Accounts for editors and administrators, checks before every save, nobody overwrites anybody, every change is a git commit you can undo. |
+| 🔒 **Private by default** | Living people show only their names — no dates, places or documents, not even in the data file or the GEDCOM export. |
+| 🏠 **Your data, your site** | One JSON file, plain HTML, free hosting on GitHub Pages or Netlify, or your own server. No subscription, no lock-in: GEDCOM import and export. |
+| 🌍 **Three languages** | English, Russian and Romanian interface out of the box; your own texts can be translated too. |
+| 🤖 **AI-ready** | Every new site gets `AGENTS.md` for Claude Code and Codex, plus guides and ready prompts for research in archives and open sources. |
+
+## Features
+
+### 🌳 Tree, people and "How we are related"
+
+- **Hourglass tree** around any person, a whole-tree chart, export to PNG, branches by surname.
+- **Person card**: dates and places with their documents, alternative versions of a date,
+  relatives, a connected life story.
+- **How we are related**: the exact relation between any two people — *second cousin once
+  removed*, *great-uncle*, *half-brother*, in-laws — with the chain of people in between.
+  In Russian and Romanian too, with their own kinship terms.
+- **People**: search, a calendar of birthdays and anniversaries, surname pages, the zodiac.
+
+![How we are related](docs/img/kinship-en.png)
+
+### 🗂 Archive of documents
+
+- Every scan and photograph with a transcription, the back of a photo, PDF previews.
+- Filters by type of document and by family line; restored photos next to originals.
+- A research log ("where we searched and what we found") and a log of corrections.
 
 | | |
 |---|---|
 | ![Archive, Russian edition](docs/img/archive-ru.png) | ![Calendar](docs/img/calendar-en.png) |
+
+### 🗺 Places and the family story
+
+- A map (Leaflet + OpenStreetMap) with family branches, moves between places,
+  "then and now" names and timelines.
+- The **Story** page: your narrative with a timeline and a "by place" filter.
+- **Questions to relatives**: what the family does not know yet — answered right on the site.
+
+### ✏️ Online editor
+
+- People, families, documents (with scan uploads) and places in a browser — on a phone too.
+- Dates the way people write them: "about 1899", "between 1900 and 1905", "9.10.1899".
+- A change that would break the data is not saved; the editor says what is wrong.
+- Two people editing the same record? The second one is warned instead of overwriting.
+- Every change goes to the corrections log and becomes a git commit by its author;
+  an administrator can restore any version.
+- **Suggest a correction**: readers send a fix from a person's card; an administrator
+  applies it in one click.
+
+![The online editor](docs/img/editor-en.png)
+
+### 🔎 Research assistant
+
+- **Data checks** (`gene hints` and the editor's "Checks" tab): impossible facts first — born
+  after the mother's death, a parent aged 11 — then gaps: no dates, a date without a document,
+  people not connected to the tree, documents nobody refers to.
+- A step-by-step **research guide** and ready **AI prompts** for archives and open sources.
+
+| | |
+|---|---|
+| ![Data checks](docs/img/hints-en.png) | ![Readers' proposals](docs/img/proposals-en.png) |
+
+### 🚀 Publish anywhere
+
+- `gene build` → plain HTML for GitHub Pages, Netlify, Cloudflare Pages or any web server.
+- `gene serve` or the Docker image adds comments, a PIN for a private archive and the editor.
+- Search engines find every person and surname: static pages, sitemap, Schema.org;
+  living people are `noindex`.
+
+## How it compares
+
+| | gene-archive | Platforms (MyHeritage, Ancestry…) | Self-hosted apps (webtrees, Gramps Web) |
+|---|:-:|:-:|:-:|
+| Your own site and domain | ✓ | — | ✓ |
+| Free static hosting, no database | ✓ | — | — |
+| Free, open source | ✓ (MIT) | subscription | ✓ |
+| A document behind every fact, on the page | ✓ | partly | partly |
+| Story, map and archive in one site | ✓ | partly | partly |
+| Relatives comment and suggest corrections | ✓ | ✓ | partly |
+| Editing in a browser with roles and history | ✓ | ✓ | ✓ |
+| DNA matches, hints from billions of records | — | ✓ | — |
+
+gene-archive does not try to be a database of the world's records. It is the place where
+**your** family's evidence and stories live — and where your relatives actually look.
 
 ## Quick start
 
