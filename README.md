@@ -55,7 +55,9 @@ free hosting, full history in git, GEDCOM in and out.
 - **How we are related**: the exact relation between any two people — *second cousin once
   removed*, *great-uncle*, *half-brother*, in-laws — with the chain of people in between.
   In Russian and Romanian too, with their own kinship terms.
-- **People**: search, a calendar of birthdays and anniversaries, surname pages, the zodiac.
+- **Search everything** from the magnifier: names, villages, any word of a document transcription, places, the story,
+  leads — word endings, the pre-1918 spelling and Latin/Cyrillic letters do not get in the way (“Kolodin” finds Колодин).
+- **People**: a calendar of birthdays and anniversaries, surname pages, the zodiac.
 
 ![How we are related](docs/img/kinship-en.png)
 

@@ -41,12 +41,16 @@ h3 { font-size: 20px; margin: 32px 0 6px; font-weight: 600; }
 .mail-addr { display: none; color: var(--ink); }
 @media (min-width: 1500px) { .mail-addr { display: inline; } }
 .more-mail small { display: block; color: var(--muted); font-size: 12px; }
-.search-panel { position: absolute; top: calc(100% + 4px); right: 0; width: min(320px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: var(--shadow); z-index: 30; }
+.search-panel { position: absolute; top: calc(100% + 4px); right: 0; width: min(420px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: var(--shadow); z-index: 30; }
 .search input, .filter { width: 100%; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font: 15px var(--sans); }
 .search-results { margin: 6px 0 0; padding: 0; list-style: none; max-height: 60vh; overflow: auto; }
 .search-results li button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
 .search-results li button:hover, .search-results li button:focus { background: var(--chip); outline: none; }
 .search-results small { display: block; color: var(--muted); font: 12px var(--sans); }
+.search-results .sr-group { padding: 10px 10px 4px; color: var(--accent); font: 600 11px var(--sans); letter-spacing: .04em; text-transform: uppercase; }
+.search-results .sr-group:first-child { padding-top: 2px; }
+.search-results .sr-snip { margin-top: 2px; color: var(--ink); opacity: .78; line-height: 1.35; }
+.search-results mark { background: var(--chip); color: inherit; font-weight: 600; padding: 0 1px; border-radius: 2px; }
 .tabs { grid-area: tabs; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; align-self: end; }
 .tabs::-webkit-scrollbar { display: none; }
 /* затухание у края ленты, когда за ним есть ещё вкладки */

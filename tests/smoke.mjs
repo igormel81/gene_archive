@@ -75,6 +75,40 @@ for (const engine of engines) {
         ok(await page.locator('#arch-research').isVisible(), P('Archive → Sources does not open'));
         ok(await page.locator('#research-resources .res-card').count() === data.research_resources.length, P('Archive → Sources: not every resource is shown'));
       }
+      // full-text search: a word from a document's transcription, a surname typed in Cyrillic, a word from the story
+      {
+        const search = async (q) => {
+          await page.goto(base + lang + '#/tree');
+          await page.waitForTimeout(300);
+          if (await page.locator('#search-panel').isHidden()) await page.locator('#search-toggle').click();
+          await page.fill('#search', q);
+          await page.waitForTimeout(450);
+          return page.locator('#search-results li button:not([disabled])');
+        };
+        const withScope = data.sources.find((x) => (x.scope || '').split(/\s+/).some((w) => /^[A-Za-z]{8,}$/.test(w)));
+        if (withScope) {
+          const word = withScope.scope.split(/\s+/).find((w) => /^[A-Za-z]{8,}$/.test(w));
+          const hits = await search(word);
+          ok(await hits.count() > 0, P(`search "${word}" finds nothing`));
+          ok(await page.locator('#search-results .sr-snip mark').count() > 0, P(`search "${word}": no marked passage`));
+        }
+        if (data.people.some((x) => x.surname === 'Harper')) {
+          const hits = await search('Харпер');
+          ok((await hits.allTextContents()).some((t) => t.includes('Harper')), P('search in Cyrillic does not find Harper'));
+          await hits.first().click();
+          await page.waitForTimeout(500);
+          ok(await page.locator('#panel.open').count() === 1, P('a search result does not open the card'));
+        }
+        const story = await page.evaluate(() => fetch('story.html').then((r) => r.ok ? r.text() : ''));
+        const sw = (story.replace(/<[^>]+>/g, ' ').match(/\b[A-Za-z]{10,}\b/) || [])[0];
+        if (sw) {
+          await search(sw);
+          await page.waitForTimeout(800);   // the story is read on the first search
+          await page.fill('#search', sw + ' ');
+          await page.waitForTimeout(450);
+          ok(await page.locator('#search-results .sr-group').allTextContents().then((g) => g.some((t) => /Story|История|Istorie|Poveste/.test(t))), P(`search "${sw}" does not reach the story`));
+        }
+      }
       // the "Share" link of a person leads to its page and on to the card
       const sharer = data.people.find((x) => !x.placeholder);
       await page.goto(base + lang + `s/${sharer.id}.html`);

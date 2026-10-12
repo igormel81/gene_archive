@@ -2908,8 +2908,100 @@
     });
   }
 
+  // ---------- full-text search: people, documents, places, the story, leads and questions
+  // Words are compared in a Latin "skeleton": Колодин, Колодинъ, Kolodin, Kołodin all become "kolodin";
+  // a query word matches the beginning of a word, with the ending dropped (Сынкове → сынков… → Сынково).
+  var Search = (function () {
+    var LAT = { 'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z', 'и': 'i', 'к': 'k', 'л': 'l',
+      'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
+      'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'i', 'ь': '', 'э': 'e', 'ю': 'iu', 'я': 'ia', 'і': 'i', 'ї': 'i', 'є': 'e',
+      'ѣ': 'e', 'ѳ': 'f', 'ѵ': 'i', 'ґ': 'g', 'ł': 'l', 'ø': 'o', 'ß': 'ss', 'æ': 'e', 'œ': 'e' };
+    function fold(w) {
+      var s = String(w).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      var out = '';
+      for (var i = 0; i < s.length; i++) { var c = s[i]; out += LAT[c] != null ? LAT[c] : c; }
+      return out.replace(/tsch/g, 'ch').replace(/sch/g, 'sh').replace(/sz/g, 'sh').replace(/cz/g, 'ch').replace(/kh/g, 'h')
+        .replace(/w/g, 'v').replace(/[jy]/g, 'i').replace(/ph/g, 'f').replace(/x/g, 'ks').replace(/ii+/g, 'i')
+        .replace(/[^a-z0-9]/g, '');
+    }
+    function words(text) { return String(text || '').split(/[^\p{L}\p{N}]+/u).filter(Boolean); }
+    function stem(w) {
+      var f = fold(w);
+      if (f.length >= 5) f = f.replace(/[aeiou]{1,2}$/, '');
+      return f;
+    }
+    function hay(text) { return ' ' + words(text).map(fold).join(' ') + ' '; }
+    var docs = null, storyLoading = false;
+    function str(x) { return x == null ? '' : (typeof x === 'string' ? x : Array.isArray(x) ? x.map(str).join(' ') : typeof x === 'object' ? Object.keys(x).map(function (k) { return str(x[k]); }).join(' ') : String(x)); }
+    function add(kind, key, title, text, sub) {
+      docs.push({ kind: kind, key: key, title: title, text: text, sub: sub || '', t: hay(title), h: hay(text) });
+    }
+    function build() {
+      docs = [];
+      D.people.forEach(function (p) {   // readable, the way the card says it: «р. ок. 1832, Louisburgh · † 1891»
+        function ev(e, mark) { return e && (e.date || e.place_as_recorded) ? mark + [e.date ? fmtDate(e.date) : '', e.place_as_recorded || ''].filter(Boolean).join(', ') : ''; }
+        var parts = [(p.aliases || []).join(', '), ev(p.birth, T('р. ')), ev(p.death, '† '), ev(p.burial, '⚱ ')]
+          .concat((p.residences || []).map(function (r) { return [r.place, r.date ? '(' + r.date + ')' : ''].filter(Boolean).join(' '); }))
+          .concat([str(p.notes)]);
+        add('person', p.id, p.display_name, parts.filter(Boolean).join(' · '), [p.relation, lifespan(p)].filter(Boolean).join(' · '));
+      });
+      (D.sources || []).forEach(function (x) { add('source', x.id, x.title || x.id, str([x.scope, x.locator]), x.id); });
+      (D.places || []).forEach(function (x) { add('place', x.slug, x.name, str([x.aliases, x.where, x.then, x.now, x.text, x.details, x.period]), x.where || x.period || ''); });
+      (D.questions || []).forEach(function (x, i) { add('question', i, str(x.question || x.title || x.text).slice(0, 140), str(x), ''); });
+      (D.leads || []).forEach(function (x) { add('lead', x.id, str(x.title).slice(0, 140) || x.id, str([x.record, x.resolution, x.limitations]), x.status || ''); });
+      if (SITE.v_story && !storyLoading) {   // the story is a separate page: read it once, paragraph by paragraph
+        storyLoading = true;
+        fetch('story.html?v=' + SITE.v_story, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (html) {
+          var box = document.createElement('div'); box.innerHTML = html;
+          box.querySelectorAll('p, li, blockquote, figcaption').forEach(function (n) {
+            var sec = n.closest('section[id]'), h = sec && sec.querySelector('h2, h3');
+            if (n.textContent.trim().length > 20) add('story', sec ? sec.id : '', h ? h.textContent.trim() : T('История'), n.textContent.trim(), '');
+          });
+          if (Search.onupdate) Search.onupdate();
+        }).catch(function () { /* the rest still works */ });
+      }
+    }
+    function find(q) {
+      if (!docs) build();
+      var stems = words(q).map(stem).filter(function (s) { return s.length >= 2; });
+      if (!stems.length) return [];
+      var out = [];
+      docs.forEach(function (d) {
+        var score = 0;
+        for (var i = 0; i < stems.length; i++) {
+          var inT = d.t.indexOf(' ' + stems[i]) >= 0, inH = !inT && d.h.indexOf(' ' + stems[i]) >= 0;
+          if (!inT && !inH) return;
+          score += inT ? 3 : 1;
+        }
+        out.push({ d: d, score: score + (d.kind === 'person' ? 1 : 0) });
+      });
+      return out.sort(function (a, b) { return b.score - a.score; }).map(function (x) { return x.d; });
+    }
+    // a piece of the text around the first word that matches, with the matching words marked
+    function snippet(d, q) {
+      var stems = words(q).map(stem), ws = d.text.split(/(\s+)/), at = -1;
+      for (var i = 0; i < ws.length && at < 0; i++) {
+        var f = fold(ws[i]);
+        if (f && stems.some(function (s) { return f.indexOf(s) === 0; })) at = i;
+      }
+      if (at < 0) return null;
+      var from = Math.max(0, at - 16), to = Math.min(ws.length, at + 24), frag = el('span', { class: 'snip' });
+      if (from > 0) frag.appendChild(document.createTextNode('… '));
+      for (var j = from; j < to; j++) {
+        var fj = fold(ws[j]);
+        if (fj && stems.some(function (s) { return fj.indexOf(s) === 0; })) frag.appendChild(el('mark', { text: ws[j] }));
+        else frag.appendChild(document.createTextNode(ws[j]));
+      }
+      if (to < ws.length) frag.appendChild(document.createTextNode(' …'));
+      return frag;
+    }
+    return { find: find, snippet: snippet, fold: fold, stem: stem, reset: function () { docs = null; } };
+  })();
+
   function initSearch() {
     var input = $('search'), out = $('search-results'), toggle = $('search-toggle'), panel = $('search-panel');
+    var GROUPS = [['person', T('Люди')], ['source', T('Документы')], ['place', T('Места')], ['story', T('История')],
+      ['lead', T('Наводки')], ['question', T('Вопросы к родственникам')]];
     function close(returnFocus) {
       panel.hidden = true;
       out.hidden = true;
@@ -2923,22 +3015,45 @@
       input.focus();
       run();
     });
+    function go(d) {
+      close(false);
+      if (d.kind === 'person') { showView('tree'); setFocus(d.key); openPerson(d.key); }
+      else if (d.kind === 'source') showSource(d.key);
+      else if (d.kind === 'place') { showView('places'); openPlace(d.key); }
+      else if (d.kind === 'story') { location.hash = '#/story' + (d.key ? '/' + d.key : ''); }
+      else showView('questions');
+    }
     function run() {
-      var q = input.value.trim().toLowerCase();
+      var q = input.value.trim();
       clear(out);
       if (q.length < 2) { out.hidden = true; return; }
-      var hits = D.people.filter(function (p) { return [p.display_name].concat(p.aliases || []).join(' ').toLowerCase().indexOf(q) > -1; }).slice(0, 12);
-      if (!hits.length) out.appendChild(el('li', null, el('button', { disabled: true, text: T('Никого не нашлось') })));
-      hits.forEach(function (p) {
-        out.appendChild(el('li', null, el('button', { onclick: function () { close(false); input.value = ''; showView('tree'); setFocus(p.id); openPerson(p.id); } },
-          p.display_name, el('small', { text: [p.relation, lifespan(p)].filter(Boolean).join(' · ') }))));
+      var hits = Search.find(q);
+      if (!hits.length) out.appendChild(el('li', null, el('button', { disabled: true, text: T('Ничего не нашлось') })));
+      GROUPS.forEach(function (g) {
+        var list = hits.filter(function (d) { return d.kind === g[0]; });
+        if (!list.length) return;
+        out.appendChild(el('li', { class: 'sr-group', text: g[1] + (list.length > 6 ? ' · ' + list.length : '') }));
+        list.slice(0, 6).forEach(function (d) {
+          var snip = d.kind === 'person' && d.t.indexOf(' ' + Search.stem(q.split(/\s+/)[0])) >= 0 ? null : Search.snippet(d, q);
+          out.appendChild(el('li', null, el('button', { onclick: function () { go(d); } },
+            d.title, d.sub ? el('small', { text: d.sub }) : null, snip ? el('small', { class: 'sr-snip' }, snip) : null)));
+        });
       });
       out.hidden = false;
     }
-    input.addEventListener('input', run);
+    var timer = null;
+    Search.onupdate = function () { if (!panel.hidden && input.value.trim().length >= 2) run(); };
+    input.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(run, 120); });
     input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !out.hidden) { var b = out.querySelector('button:not([disabled])'); if (b) b.click(); }
+      if (e.key === 'Enter' && !out.hidden) { clearTimeout(timer); run(); var b = out.querySelector('button:not([disabled])'); if (b) b.click(); }
       if (e.key === 'ArrowDown' && !out.hidden) { var first = out.querySelector('button:not([disabled])'); if (first) { e.preventDefault(); first.focus(); } }
+    });
+    out.addEventListener('keydown', function (e) {   // arrows move between results
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      var bs = Array.prototype.slice.call(out.querySelectorAll('button:not([disabled])')), i = bs.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      if (e.key === 'ArrowUp' && i === 0) input.focus(); else if (bs[i + (e.key === 'ArrowDown' ? 1 : -1)]) bs[i + (e.key === 'ArrowDown' ? 1 : -1)].focus();
     });
     document.querySelector('.search').addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && !panel.hidden) { e.preventDefault(); e.stopPropagation(); close(true); }

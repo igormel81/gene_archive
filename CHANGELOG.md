@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **Search everything** from the magnifier: people, documents (their transcriptions), places, the Story, leads and
+  questions, grouped, with the passage and the words found marked. Word endings, the pre-1918 spelling (ъ, і, ѣ) and
+  Latin/Cyrillic letters match each other. Runs in the browser — static hosting works; living people are not in it
+  because they are not in the published data. Browser checks added.
+
 - `gene apply`: changes from scripts and AI assistants through the same path as the online editor — checks,
   corrections and research logs, a git commit by the author, `--dry-run`, `--build`. The genealogy-mcp server uses it
   to research and write straight into a site folder. New sites' `AGENTS.md` tells assistants to prefer it.

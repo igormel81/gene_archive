@@ -355,6 +355,29 @@ class UrlMapper(unittest.TestCase):
         self.assertEqual(url("app.js"), "app.js")
 
 
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class SiteSearch(unittest.TestCase):
+    """The full-text search of app.js: endings, pre-1918 spelling and Latin letters match, run in node."""
+
+    def test_matching(self):
+        app = (ROOT / "gene_archive/engine/web/app.js").read_text(encoding="utf-8")
+        block = app[app.index("  var Search = (function () {"):app.index("  function initSearch() {")]
+        script = r"""
+var D = { people: [
+    { id: 'I1', display_name: 'Иван Колодинъ', birth: { date: 'ABT 1885', place_as_recorded: 'с. Сынково Тульской губ.' } },
+    { id: 'I2', display_name: 'Józef Kołodziej', notes: ['Moved to Łódź'] }],
+  sources: [{ id: 'S1', title: 'Метрика 1885', scope: 'В селе Сынкове крещён Иоаннъ' }], places: [], leads: [], questions: [] };
+var SITE = {};
+function T(s) { return s; } function el() { return {}; } function fmtDate(x) { return x; } function lifespan() { return ''; }
+""" + block + r"""
+function ids(q) { return Search.find(q).map(function (d) { return d.key; }).join(','); }
+console.log(JSON.stringify([ids('Колодин'), ids('Kolodin'), ids('Сынкове'), ids('Сынково'), ids('kolodziej'), ids('Лодзь'),
+  ids('Иоанн'), ids('Сынково Колодин'), ids('нет такого'), Search.fold('Щукин'), Search.fold('Schtschukin')]));
+"""
+        out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout
+        self.assertEqual(json.loads(out), ["I1", "I1", "I1,S1", "I1,S1", "I2", "I2", "S1", "I1", "", "shchukin", "shchukin"])
+
 if __name__ == "__main__":
     unittest.main()
 
