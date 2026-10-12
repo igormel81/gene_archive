@@ -117,3 +117,26 @@ Fields without a form — residences, profiles on other sites, alternative dates
 timelines and materials — are edited in "Other fields (JSON)" of the same record, in the
 `family_tree.json` format. Research leads, `content/` pages and `site.json` stay in files;
 AI assistants can help — [ai-assistants.md](ai-assistants.md).
+
+## From scripts and AI assistants: `gene apply`
+
+The same path as the editor — checks, corrections and research logs, a git commit by the author — from the command
+line, for scripts and AI assistants:
+
+```sh
+echo '{"op": "save", "kind": "people", "record": {"given_names": "Peter", "surname": "Kolodin", "sex": "M"},
+       "reason": "baptism record of his son", "source_ids": ["S40"]}' | gene apply my-family --author "Igor" --build
+```
+
+- `{"op": "save", "kind": …, "record": {…}}` — a new record (no id) or an update of the record with this id: the
+  fields given are merged into it (nested objects too; `null` removes a field). Kinds: `people`, `families`,
+  `sources`, `places`, `research_leads`.
+- `{"op": "delete", "kind": …, "id": "I12", "reason": "…"}`.
+- `{"op": "log", "action": "what was searched and where", "result": "what came out"}` — a research-log line without
+  a change.
+- Several requests: a JSON list or one object per line. `--dry-run` checks without writing; `--build` rebuilds the
+  site. The answer is one JSON line per request, `"ok": false` with the reason when a change is refused.
+
+The [genealogy-mcp](https://github.com/igormel81/genealogy-mcp) server uses it: give its project tools the path of
+your site folder and Claude Desktop, Claude Code or Codex research and write into your archive, every change still
+checked and logged.

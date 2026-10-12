@@ -34,6 +34,12 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 7. With the online editor on (`gene serve --editor`) relatives edit the same `family_tree.json` and each of
    their changes is a git commit. Before working — `git pull` / `git log -5`, after — commit; edit other records
    than the ones open in the editor, or agree with the owner.
+8. Prefer `gene apply` to editing the JSON by hand: it checks the change, writes the corrections and research
+   logs and commits it under the owner's name, like the online editor. One JSON request per change:
+   `echo '{"op":"save","kind":"people","record":{"id":"I12","birth":{"date":"9.10.1885"}},"reason":"baptism record","source_ids":["S40"]}' | gene apply . --author "NAME" --build`
+   (`"op":"log"` for a search with no change — "nothing found" counts; `--dry-run` to check first). The
+   genealogy-mcp server does the same for Claude Desktop, Claude Code and Codex: `project_view` with the path of
+   this folder.
 
 ## Rules of evidence
 

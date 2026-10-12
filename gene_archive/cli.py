@@ -11,6 +11,8 @@
   gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0] [--for geni|public]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
   gene hints [folder] [--json]     what is missing or looks wrong: a to-do list for the research
+  gene apply <folder> [--author NAME] [--build] [--dry-run] < changes.json
+                                   changes from scripts and AI assistants, checked and logged like the online editor
 
 Messages are in Russian when the system language is Russian (or GENE_LANG=ru).
 """
@@ -273,6 +275,34 @@ def cmd_hints(args):
     _ = HINTS
 
 
+def cmd_apply(args):
+    import os
+    import subprocess
+    from .apply import apply, parse
+    text = sys.stdin.read() if args.file in (None, "-") else Path(args.file).read_text(encoding="utf-8")
+    try:
+        requests = parse(text)
+    except json.JSONDecodeError as e:
+        print(json.dumps({"ok": False, "error": f"not JSON: {e}"}, ensure_ascii=False))
+        return 2
+    author = args.author or os.environ.get("GENE_AUTHOR")
+    if not author:
+        r = subprocess.run(["git", "config", "user.name"], cwd=args.folder, capture_output=True, text=True)
+        author = r.stdout.strip() or "gene apply"
+    results = apply(args.folder, requests, author=author, login=args.login, dry_run=args.dry_run)
+    for r in results:
+        print(json.dumps(r, ensure_ascii=False))
+    if args.build and not args.dry_run and any(r["ok"] for r in results):
+        from .build import BuildError, build
+        try:
+            b = build(args.folder, args.out)
+            print(json.dumps({"ok": True, "build": str(b["out"])}, ensure_ascii=False))
+        except BuildError as e:
+            print(json.dumps({"ok": False, "build_error": str(e)}, ensure_ascii=False))
+            return 1
+    return 0 if all(r["ok"] for r in results) else 1
+
+
 def cmd_translations(args):
     from . import localize
     from .build import BuildError, build
@@ -361,6 +391,16 @@ def main(argv=None):
     s.add_argument("--code", help=m("only this kind of hint", "только подсказки этого вида"))
     s.add_argument("--limit", type=int, default=15, help=m("lines per kind", "строк на вид"))
     s.set_defaults(fn=cmd_hints)
+    s = sub.add_parser("apply", help=m("apply changes (JSON) like the online editor", "внести правки (JSON) как онлайн-редактор"))
+    s.add_argument("folder")
+    s.add_argument("file", nargs="?", help=m("JSON file; stdin by default", "файл JSON; по умолчанию stdin"))
+    s.add_argument("--author", help=m("name for the history and the logs (default: git user.name)",
+                                      "имя для истории и журналов (по умолчанию git user.name)"))
+    s.add_argument("--login", default="assistant", help=m("login part of the commit e-mail", "логин в адресе коммита"))
+    s.add_argument("--build", action="store_true", help=m("rebuild the site afterwards", "пересобрать сайт после правок"))
+    s.add_argument("--dry-run", action="store_true", help=m("check only, write nothing", "только проверить, ничего не записывать"))
+    s.add_argument("-o", "--out")
+    s.set_defaults(fn=cmd_apply)
     s = sub.add_parser("translations", help=m("texts without a translation", "тексты без перевода"))
     s.add_argument("folder")
     s.add_argument("lang")

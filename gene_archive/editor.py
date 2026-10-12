@@ -583,7 +583,7 @@ class Store:
         self.on_change()
         return commit
 
-    def save(self, user, kind, record, base=None, reason="", source_ids=None):
+    def save(self, user, kind, record, base=None, reason="", source_ids=None, dry_run=False):
         """Creates (base None and no key) or updates a record. `base` is the record as the
         client loaded it: if the stored one differs, someone else changed it — conflict."""
         if kind not in KINDS:
@@ -627,6 +627,9 @@ class Store:
                 return {"id": key, "version": self.version(), "changed": [], "warnings": [], "commit": None}
             changed = self._journal(data, kind, key, before, rec, user, reason, source_ids)
             self._check(original, data)
+            if dry_run:   # checked, not written: what the change would be
+                return {"id": key, "version": self.version(), "changed": changed, "record": rec,
+                        "warnings": self._warnings(kind, rec, data), "commit": None, "dry_run": True}
             self._write(data)
             what = self.t("record created", "запись создана") if before is None else ", ".join(changed)[:200]
             commit = self._commit(user, f"{key} {self._title(kind, rec)}: {what}"
@@ -634,7 +637,7 @@ class Store:
             return {"id": key, "version": self.version(), "changed": changed, "record": rec,
                     "warnings": self._warnings(kind, rec, data), "commit": commit}
 
-    def delete(self, user, kind, base, reason=""):
+    def delete(self, user, kind, base, reason="", dry_run=False):
         if kind not in KINDS or not isinstance(base, dict):
             raise SaveError("bad request", 400)
         key_field, _ = KINDS[kind]
@@ -651,9 +654,27 @@ class Store:
             key = before[key_field]
             self._journal(data, kind, key, before, None, user, reason, [])
             self._check(original, data)   # references to the record left anywhere are errors
+            if dry_run:
+                return {"id": key, "version": self.version(), "commit": None, "dry_run": True}
             self._write(data)
             commit = self._commit(user, self.t(f"{key} deleted", f"{key} удалён(а)") + (f" — {reason}" if reason else ""))
             return {"id": key, "version": self.version(), "commit": commit}
+
+    def log(self, user, action, result, scope="", dry_run=False):
+        """A line in research_log without changing any record: what was searched, where, with what result
+        ("nothing found" counts)."""
+        if not str(action or "").strip() or not str(result or "").strip():
+            raise SaveError(self.t("action and result are required", "нужны action и result"), 422)
+        with self.lock:
+            data = self.load()
+            entry = {"date": datetime.date.today().isoformat(), "action": str(action)[:500], "result": str(result)[:2000],
+                     "scope": (f"{user['display']}: {scope}" if scope else user["display"])[:500]}
+            data.setdefault("research_log", []).append(entry)
+            if dry_run:
+                return {"entry": entry, "commit": None, "dry_run": True}
+            self._write(data)
+            commit = self._commit(user, self.t("Research log: ", "Журнал поиска: ") + entry["action"][:150])
+            return {"entry": entry, "version": self.version(), "commit": commit}
 
     def upload(self, user, filename, body):
         stem, ext = safe_filename(filename or "")

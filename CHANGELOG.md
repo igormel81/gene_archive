@@ -1,5 +1,11 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- `gene apply`: changes from scripts and AI assistants through the same path as the online editor — checks,
+  corrections and research logs, a git commit by the author, `--dry-run`, `--build`. The genealogy-mcp server uses it
+  to research and write straight into a site folder. New sites' `AGENTS.md` tells assistants to prefer it.
+
 ## 0.3.0 — 2026-10-12
 
 - Docs: AGENTS.md for new sites, the AI guide, the research guide and the prompts cover `gene hints`,
