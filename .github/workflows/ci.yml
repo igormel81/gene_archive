@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: sudo apt-get install -y --no-install-recommends poppler-utils
+      - run: sudo apt-get update -q && sudo apt-get install -y --no-install-recommends poppler-utils
       - run: pip install ".[images]"
       - run: python -m unittest discover tests -v
       - name: The CLI works from an installed package
