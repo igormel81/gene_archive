@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- A detailed help page "How to use the site" in English, Russian and Romanian: the tree, a person's card, "How we
+  are related", search, comments and proposals, the archive and its tabs, places and the story, signs, sharing,
+  phones, living people.
+  Подробная справка «Как пользоваться сайтом» на трёх языках: древо, карточка, «Как мы связаны», поиск, комментарии
+  и предложения, архив и его вкладки, места и история, значки, «Поделиться», телефон, ныне живущие.
 - `gene gedcom --for geni` (Geni, MyHeritage, Ancestry: surname at birth and `_MARNM`, deceased marked with `DEAT Y`,
   one clean note with a link to the site) and `--for public` (open forums: living people as "Living /Surname/").
   New optional field `birth_surname`.

@@ -239,6 +239,15 @@ class BuildExample(unittest.TestCase):
             self.assertIn(f"i18n/{lang}.js", html)
         self.assertEqual(self.result["missing_translations"], {"ru": [], "en": [], "ro": []})
 
+    def test_help_page(self):
+        for prefix, words in (("", ("How we are related", "Suggest a correction", "Living people")),
+                              ("ru/", ("Как мы связаны", "Предложить исправление", "Ныне живущие")),
+                              ("ro/", ("Cum suntem înrudiți", "Propune o corectură", "în viață"))):
+            page = (self.out / prefix / "help.html").read_text(encoding="utf-8")
+            self.assertGreaterEqual(page.count('class="help-sec'), 12, prefix)
+            for w in words:
+                self.assertIn(w, page, prefix + w)
+
     def test_research_resources(self):
         data = json.loads((self.out / "data.json").read_text(encoding="utf-8"))
         res = {r["id"]: r for r in data["research_resources"]}
