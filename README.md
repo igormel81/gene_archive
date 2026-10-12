@@ -203,7 +203,7 @@ More ready-made requests and the rules for reviewing the agent's work:
 | `gene serve <folder> --editor` | … and the online editor at `/edit/` |
 | `gene users <folder> add NAME [--role admin] \| invite \| list \| role \| disable \| passwd` | editor accounts |
 | `gene comments <folder> list\|approve ID\|hide ID\|done ID "note"` | moderate comments |
-| `gene gedcom [folder] [-o file.ged] [--version 5.5.1\|7.0]` | GEDCOM for MyHeritage, Ancestry, Gramps… (`--full`: with living people, for your own backup) |
+| `gene gedcom [folder] [-o file.ged] [--version 5.5.1\|7.0] [--for geni\|public]` | GEDCOM for Gramps and others; `--for geni` — for uploading to Geni, MyHeritage, Ancestry; `--for public` — for open forums, living people without names (`--full`: with living people, for your own backup) |
 | `gene translations <folder> <lang>` | your texts that have no translation yet |
 | `gene hints [folder] [--json]` | gaps and doubtful facts — a to-do list for the research |
 

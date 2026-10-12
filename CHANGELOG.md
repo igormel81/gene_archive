@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- `gene gedcom --for geni` (Geni, MyHeritage, Ancestry: surname at birth and `_MARNM`, deceased marked with `DEAT Y`,
+  one clean note with a link to the site) and `--for public` (open forums: living people as "Living /Surname/").
+  New optional field `birth_surname`.
+  `gene gedcom --for geni` (Geni, MyHeritage, Ancestry: фамилия при рождении и `_MARNM`, умершие отмечены `DEAT Y`,
+  одна заметка без кодов и со ссылкой на сайт) и `--for public` (открытые форумы: живые — «Живущий /Фамилия/»).
+  Новое необязательное поле `birth_surname`.
 - The "Share" button works: s/<id>.html pages for people, documents, places, biographies and sections, with
   1200×630 covers for link previews in messengers (Pillow and `base_url` needed for the pictures).
   Кнопка «Поделиться» работает: страницы s/<номер>.html для людей, документов, мест, биографий и разделов

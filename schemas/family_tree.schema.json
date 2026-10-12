@@ -433,6 +433,10 @@
           "type": "string",
           "description": "surname / фамилия"
         },
+        "birth_surname": {
+          "type": "string",
+          "description": "surname at birth when `surname` is the married one; GEDCOM exports put it in NAME and the married one in _MARNM / фамилия при рождении, если в surname — фамилия в браке"
+        },
         "display_name": {
           "type": "string",
           "description": "name as shown: Surname Given names / имя на сайте: Фамилия Имя Отчество"

@@ -359,7 +359,7 @@
     return t.toUpperCase() === t ? t : (/^\d{4}(-\d{2}(-\d{2})?)?$/.test(t) ? t : t.replace(/^(abt|bef|aft|bet|est|cal)\b/i, function (x) { return x.toUpperCase(); }));
   }
   var KNOWN = {
-    people: ['id', 'given_names', 'surname', 'display_name', 'sex', 'relation', 'aliases', 'identity_source_ids', 'birth', 'death', 'burial', 'notes', 'research_status', 'research_note', 'living', 'placeholder'],
+    people: ['id', 'given_names', 'surname', 'birth_surname', 'display_name', 'sex', 'relation', 'aliases', 'identity_source_ids', 'birth', 'death', 'burial', 'notes', 'research_status', 'research_note', 'living', 'placeholder'],
     families: ['id', 'partners', 'relation', 'children', 'probable_children', 'adopted_children', 'probable_note', 'marriage', 'source_ids', 'notes'],
     sources: ['id', 'title', 'kind', 'file', 'back', 'url', 'locator', 'scope', 'preview_page', 'hidden'],
     places: ['slug', 'name', 'where', 'lat', 'lon', 'geo_note', 'period', 'then', 'now', 'aliases', 'text', 'details', 'sort_year']
@@ -449,6 +449,7 @@
     add(body, el('fieldset', {}, el('legend', { text: T('Имя') }), el('div', { class: 'grid' },
       field(rec, 'given_names', T('Имя и отчество')),
       field(rec, 'surname', T('Фамилия')),
+      field(rec, 'birth_surname', T('Фамилия при рождении'), { hint: T('Если выше — фамилия в браке.') }),
       field(rec, 'display_name', T('Как показывать на сайте'), { hint: T('Пусто — «Имя Фамилия».') }),
       field(rec, 'sex', T('Пол'), { type: 'select', options: [['M', T('мужской')], ['F', T('женский')], ['U', T('неизвестно')]] }),
       field(rec, 'relation', T('Кем приходится'), { hint: T('Например: прадед по маме.') }),
@@ -748,7 +749,7 @@
       'Мои изменения (JSON)': 'My changes (JSON)', 'Открыть свежую версию': 'Open the current version', 'В поле «Другие поля (JSON)» ошибка: ': 'Error in “Other fields (JSON)”: ',
       'Сохранено.': 'Saved.', 'Сайт обновится через несколько секунд.': 'The site will update in a few seconds.', 'Изменений нет.': 'No changes.',
       'На каком документе основана правка': 'Document the change is based on', 'Основание правки': 'Basis of the change', 'Имя': 'Name', 'Имя и отчество': 'Given names',
-      'Фамилия': 'Surname', 'Как показывать на сайте': 'Name shown on the site', 'Пусто — «Имя Фамилия».': 'Empty: “Given names Surname”.', 'Пол': 'Sex',
+      'Фамилия': 'Surname', 'Фамилия при рождении': 'Surname at birth', 'Если выше — фамилия в браке.': 'If the one above is a married name.', 'Как показывать на сайте': 'Name shown on the site', 'Пусто — «Имя Фамилия».': 'Empty: “Given names Surname”.', 'Пол': 'Sex',
       'мужской': 'male', 'женский': 'female', 'неизвестно': 'unknown', 'Кем приходится': 'Relation', 'Например: прадед по маме.': 'For example: maternal great-grandfather.',
       'Другие написания, девичья фамилия': 'Other spellings, maiden name', 'Документы, по которым известен человек': 'Documents that identify the person',
       'Рождение': 'Birth', 'Смерть': 'Death', 'Погребение': 'Burial', 'Рассказ': 'Story', 'Рассказ о жизни': 'Life story', 'Статус и приватность': 'Status and privacy',
@@ -816,7 +817,7 @@
     ['Ваши изменения не сохранены. Скопируйте их, если нужно, и откройте свежую версию.', 'Modificările nu au fost salvate. Copiați-le dacă e nevoie și deschideți versiunea actuală.'], ['Мои изменения (JSON)', 'Modificările mele (JSON)'],
     ['Открыть свежую версию', 'Deschide versiunea actuală'], ['В поле «Другие поля (JSON)» ошибка: ', 'Eroare în „Alte câmpuri (JSON)”: '], ['Сохранено.', 'Salvat.'], ['Сайт обновится через несколько секунд.', 'Site-ul se va actualiza în câteva secunde.'],
     ['Изменений нет.', 'Nicio modificare.'], ['На каком документе основана правка', 'Documentul pe care se bazează modificarea'], ['Основание правки', 'Temeiul modificării'], ['Имя', 'Nume'], ['Имя и отчество', 'Prenume'],
-    ['Фамилия', 'Nume de familie'], ['Как показывать на сайте', 'Numele afișat pe site'], ['Пусто — «Имя Фамилия».', 'Gol: „Prenume Nume”.'], ['Пол', 'Sex'], ['мужской', 'masculin'], ['женский', 'feminin'], ['неизвестно', 'necunoscut'],
+    ['Фамилия', 'Nume de familie'], ['Фамилия при рождении', 'Numele la naștere'], ['Если выше — фамилия в браке.', 'Dacă cel de mai sus este numele după căsătorie.'], ['Как показывать на сайте', 'Numele afișat pe site'], ['Пусто — «Имя Фамилия».', 'Gol: „Prenume Nume”.'], ['Пол', 'Sex'], ['мужской', 'masculin'], ['женский', 'feminin'], ['неизвестно', 'necunoscut'],
     ['Кем приходится', 'Rudenia'], ['Например: прадед по маме.', 'De exemplu: străbunic pe linia mamei.'], ['Другие написания, девичья фамилия', 'Alte grafii, numele de fată'], ['Документы, по которым известен человек', 'Documentele care identifică persoana'],
     ['Рождение', 'Naștere'], ['Смерть', 'Deces'], ['Погребение', 'Înmormântare'], ['Рассказ', 'Povestea'], ['Рассказ о жизни', 'Povestea vieții'], ['Статус и приватность', 'Statut și confidențialitate'],
     ['Возможная родня: связь не доказана', 'Posibilă rudă: legătura nu este dovedită'], ['Почему связь под вопросом', 'De ce legătura e nesigură'], ['Живой человек', 'Persoană în viață'], ['определять автоматически', 'automat'],

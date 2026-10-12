@@ -8,7 +8,7 @@
   gene serve <folder> --editor     … and the online editor at /edit/ (accounts: gene users)
   gene users <folder> add NAME [--role admin|editor] | invite NAME | list | role NAME ROLE | disable NAME | enable NAME | passwd NAME
   gene comments <folder> list|approve ID|hide ID|done ID "note"   moderate relatives' comments
-  gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0]   GEDCOM for MyHeritage, Ancestry, Gramps…
+  gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0] [--for geni|public]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
   gene hints [folder] [--json]     what is missing or looks wrong: a to-do list for the research
 
@@ -227,17 +227,26 @@ def cmd_gedcom(args):
     errors, _ = validate(raw, Path(args.folder), cfg)
     if errors:
         sys.exit(m("family_tree.json has errors (see `gene validate`)", "в family_tree.json ошибки (подробно: `gene validate`)"))
+    profile = args.profile or "archive"
+    if args.full and profile == "public":
+        sys.exit(m("--full and --for public exclude each other", "--full и --for public несовместимы"))
     if args.full:   # your own backup: living people included, hidden documents still left out
-        from .privacy import without_hidden
-        data, living = without_hidden(raw), set()
+        from .privacy import living_people, without_hidden
+        data = without_hidden(raw)
+        living = living_people(data, cfg["root_person"] or data["root_person_id"], int(cfg["privacy"].get("living_years", 100)))
     else:
         data, living = public_data(cfg, raw)
-    out = Path(args.out or "family_tree.ged")
-    out.write_text(ged_export.build(data, cfg["title"], version=args.version or cfg["gedcom_version"]), encoding="utf-8")
-    print(m(f"{out}: GEDCOM {args.version or cfg['gedcom_version']}, {len(data['people'])} people"
-            + ("" if args.full else f" ({len(living)} living, details hidden)"),
-            f"{out}: GEDCOM {args.version or cfg['gedcom_version']}, {len(data['people'])} человек"
-            + ("" if args.full else f" (живых — {len(living)}, сведения скрыты)")))
+    out = Path(args.out or {"archive": "family_tree.ged", "geni": "family_tree_geni.ged", "public": "family_tree_public.ged"}[profile])
+    version = args.version or cfg["gedcom_version"]
+    lang = cfg["content_language"] if cfg["content_language"] in ged_export.WORDS else "en"
+    out.write_text(ged_export.build(data, cfg["title"], version=version, profile=profile, living=living,
+                                    base_url=cfg["base_url"], lang=lang), encoding="utf-8")
+    n = sum(1 for p in data["people"] if profile == "archive" or not p.get("placeholder"))
+    how = {"archive": ("", ""), "geni": (" for Geni, MyHeritage, Ancestry", " для Geni, MyHeritage, Ancestry"),
+           "public": (" for open forums", " для открытых форумов")}[profile]
+    hidden = "" if args.full else m(f" ({len(living)} living, " + ("names hidden)" if profile == "public" else "details hidden)"),
+                                    f" (живых — {len(living)}, " + ("имена скрыты)" if profile == "public" else "сведения скрыты)"))
+    print(m(f"{out}: GEDCOM {version}{how[0]}, {n} people{hidden}", f"{out}: GEDCOM {version}{how[1]}, {n} человек{hidden}"))
 
 
 def cmd_hints(args):
@@ -340,6 +349,11 @@ def main(argv=None):
     s.add_argument("--version", choices=["5.5.1", "7.0"])
     s.add_argument("--full", action="store_true", help=m("include living people's details (for your own backup, do not publish)",
                                                         "со сведениями о живых (для своей резервной копии, не публиковать)"))
+    s.add_argument("--for", dest="profile", choices=["archive", "geni", "public"],
+                   help=m("geni: for Geni, MyHeritage, Ancestry (married names, deceased marked, clean notes); "
+                          "public: for open forums (living people without names)",
+                          "geni: для Geni, MyHeritage, Ancestry (фамилии в браке, умершие отмечены, заметки без кодов); "
+                          "public: для открытых форумов (живые без имён)"))
     s.set_defaults(fn=cmd_gedcom)
     s = sub.add_parser("hints", help=m("gaps and doubtful facts: a to-do list", "пробелы и сомнительные факты: список задач"))
     s.add_argument("folder", nargs="?", default=".")

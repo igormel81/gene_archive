@@ -82,6 +82,7 @@ Anything else (`"before the war"`) is an error: put such wording in `note`.
 | Field | Required | Meaning |
 |---|---|---|
 | `id`, `given_names`, `surname`, `display_name`, `sex`, `notes` | yes | `sex`: `M`, `F` or `U` |
+| `birth_surname` | no | the surname at birth when `surname` is the married one; GEDCOM exports use it |
 | `relation` | no | relation to the root person, shown on the card (`relation_to_igor` is accepted as an old name) |
 | `placeholder` | no | `true` for "unknown child" style placeholders |
 | `aliases` | no | other spellings, maiden names — used by search |
@@ -185,6 +186,19 @@ A person is the biological child (`children`) of at most one family with partner
   (e.g. `family_photo` for "Family papers"). `log_match` is a regular expression: the research-log
   entries it matches are listed under the resource. Records with the same `section` are grouped.
 - `surnames{}` — `{"Ivanov": {"history": ["paragraph", …]}}`: stories shown on surname pages.
+
+## GEDCOM for other programs and sites
+
+`gene gedcom` writes the data in GEDCOM 5.5.1 (or 7.0 with `--version 7.0`) in three variants:
+
+| Command | For | What is different |
+|---|---|---|
+| `gene gedcom my-family` | Gramps, RootsMagic, Family Tree Maker, your own copy | everything the site publishes, with the archive's notes and `S12` codes; `family_tree.ged` on the site is this file |
+| `gene gedcom my-family --for geni` | uploading to Geni, MyHeritage, Ancestry, FamilySearch | the surname at birth in `NAME`, the married one in `_MARNM`; everyone who is not living gets "deceased" (`DEAT Y`) even without a date — otherwise these sites hide them as living; one note per person without document codes, with a link to the person on your site; no placeholder cards |
+| `gene gedcom my-family --for public` | open forums and shared trees | like `geni`, but living people stay only as "Living /Surname/" with their sex, so that the generations stay connected; their families have no dates, notes or documents |
+
+Living people follow the same rule as on the site. `--full` adds their details (for your own backup
+or your own private account; never with `--for public`). Links to the site need `base_url` in `site.json`.
 
 ## Privacy
 

@@ -204,7 +204,7 @@ gene build my-family              # сайт — в папке my-family/_site
 | `gene serve <папка> --editor` | … и онлайн-редактор на `/edit/` |
 | `gene users <папка> add ИМЯ [--role admin] \| invite \| list \| role \| disable \| passwd` | пользователи редактора |
 | `gene comments <папка> list\|approve N\|hide N\|done N "что сделано"` | модерация комментариев |
-| `gene gedcom [папка] [-o файл.ged] [--version 5.5.1\|7.0]` | GEDCOM для MyHeritage, Ancestry, Gramps… (`--full` — с живыми, для своей резервной копии) |
+| `gene gedcom [папка] [-o файл.ged] [--version 5.5.1\|7.0] [--for geni\|public]` | GEDCOM для Gramps и других программ; `--for geni` — для загрузки в Geni, MyHeritage, Ancestry; `--for public` — для открытых форумов, живые без имён (`--full` — с живыми, для своей копии) |
 | `gene translations <папка> <язык>` | ваши тексты, у которых ещё нет перевода |
 | `gene hints [папка] [--json]` | пробелы и сомнительные факты — список задач для поиска |
 

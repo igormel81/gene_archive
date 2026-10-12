@@ -139,6 +139,34 @@ class Gedcom(unittest.TestCase):
                 used = set(re.findall(r"^[1-9] \w+ @(\w+)@", ged, re.M))
                 self.assertEqual(used - defined, set())
 
+    def test_profiles_for_other_sites(self):
+        data, living = build.public_data(CFG, copy.deepcopy(DATA))
+        anne = {"id": "I900", "given_names": "Anne", "surname": "Shea", "birth_surname": "Harper", "display_name": "Anne Shea",
+                "sex": "F", "birth": {"date": "1850"}, "notes": ["Born in Louisburgh (S1); see S2."]}
+        data["people"].append(anne)
+        for profile in ("geni", "public"):
+            with self.subTest(profile):
+                ged = ged_export.build(data, "T", profile=profile, living=living, base_url="https://example.org/f/")
+                self.assertRegex(ged, r"0 @I900@ INDI\n1 NAME Anne /Harper/\n2 GIVN Anne\n2 SURN Harper\n2 _MARNM Shea")
+                self.assertIn("1 DEAT Y", ged.split("0 @I900@ INDI")[1].split("\n0 ")[0])   # dead, though no date
+                self.assertIn("Born in Louisburgh; see.", ged)                               # no S## codes
+                self.assertIn("https://example.org/f/#/tree/I900?person=I900", ged)
+                self.assertNotIn("Relation:", ged)
+                for pid in [p["id"] for p in data["people"] if p.get("placeholder")]:
+                    self.assertNotIn(f"@{pid}@", ged)
+                defined = set(re.findall(r"^0 @(\w+)@", ged, re.M))
+                self.assertEqual(set(re.findall(r"^[1-9] \w+ @(\w+)@", ged, re.M)) - defined, set())
+                for pid in living:
+                    block = ged.split(f"0 @{pid}@ INDI")[1].split("\n0 ")[0]
+                    self.assertNotIn("DEAT", block)
+                    given = next(p["given_names"] for p in data["people"] if p["id"] == pid)
+                    if profile == "public":
+                        self.assertRegex(block, r"^\n1 NAME Living /")
+                        self.assertNotIn(given, block)
+        archive = ged_export.build(data, "T")
+        self.assertIn("1 NAME Anne /Shea/\n2 TYPE married", archive)
+        self.assertIn("(S1)", archive)
+
     def test_551_line_limits_and_escaping(self):
         long_note = "Ж" * 300 + " @home " + "word " * 80
         data = {"people": [{"id": "I1", "given_names": "Anna", "surname": "Nováková", "display_name": "Nováková Anna",
