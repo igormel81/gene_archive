@@ -184,6 +184,32 @@ def public_data(cfg, raw):
     return data, living
 
 
+def resource_matches(res, source):
+    """Was this document found in this archive or database: listed by number, its url on the
+    resource's site, or of a kind the resource stands for (the family's own papers)."""
+    if source["id"] in res.get("source_ids", []) or source.get("kind") in res.get("kinds", []):
+        return True
+    url = re.sub(r"^https?://(www\.)?", "", source.get("url") or "")
+    host = url.split("/")[0]
+    return any(url.startswith(d) or ("/" not in d and host.endswith("." + d)) for d in res.get("domains", []))
+
+
+def research_resources(data, sources):
+    """Archive → Sources: the archives and databases searched, with the documents found there and the
+    research-log entries about them. The matching rules (domains, kinds, log_match) stay in the build."""
+    log = data.get("research_log", [])
+    out = []
+    for r in data.get("research_resources", []):
+        pat = re.compile(r["log_match"], re.I) if r.get("log_match") else None
+        out.append({
+            "id": r["id"], "section": r.get("section", ""), "name": r["name"], "url": r.get("url", ""),
+            "about": r.get("about", ""), "found": r.get("found", ""),
+            "source_ids": sorted({s["id"] for s in sources if resource_matches(r, s)}, key=lambda x: int(x[1:])),
+            "log": [n for n, e in enumerate(log) if pat and pat.search(" ".join(str(e.get(k) or "") for k in ("action", "result", "scope")))],
+        })
+    return out
+
+
 def build(site_dir, out=None, base_url=None):
     site_dir = Path(site_dir).resolve()
     out = Path(out).resolve() if out else site_dir / "_site"
@@ -306,6 +332,7 @@ def build(site_dir, out=None, base_url=None):
         "questions": [q for q in cfg["questions"] if q.get("person") not in living],
         "unmatched_profiles": data.get("unmatched_profiles"),
         "research_log": data.get("research_log", []),
+        "research_resources": research_resources(data, sources),
         "surnames": data.get("surnames", {}),
         "restored": restored,
         "bios": re.findall(r'<article class="bio" id="bio-(I\d+)"', bios),
@@ -315,6 +342,7 @@ def build(site_dir, out=None, base_url=None):
 
     pages = discovery.Pages(tmp, data, cfg, living, bool(story), bool(news))
     pages.build(story, news, help_page.read_text(encoding="utf-8") if help_page.exists() else "")
+    pages.share_pages(site_dir, restored, bios)
     indexed = pages.finish()
 
     versions = {"i18n": sha("".join(sorted(p.read_text(encoding="utf-8") for p in (ENGINE / "i18n").glob("*.json"))))}

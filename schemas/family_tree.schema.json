@@ -228,6 +228,65 @@
       },
       "description": "research log / журнал поиска"
     },
+    "research_resources": {
+      "type": "array",
+      "description": "Archives, databases, libraries and websites searched — shown in Archive → Sources. Documents found there are picked up by source_ids, domains (the url of a document) and kinds; research_log entries by log_match. / Архивы, базы, библиотеки и сайты, где искали, — «Архив → Источники»; найденные документы подбираются по source_ids, domains и kinds, записи журнала — по log_match.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^R\\d+$",
+            "description": "R1, R2… / R1, R2…"
+          },
+          "section": {
+            "type": "string",
+            "description": "Group heading: Family, Parish registers, State archives… / заголовок группы: Семья, Метрики, Госархивы…"
+          },
+          "name": {
+            "type": "string",
+            "description": "название"
+          },
+          "url": {
+            "type": "string",
+            "description": "The resource's website / сайт"
+          },
+          "about": {
+            "type": "string",
+            "description": "What it is and how to work with it / что это и как с ним работать"
+          },
+          "found": {
+            "type": "string",
+            "description": "What was found there (S12 becomes a link) / что нашли (S12 станет ссылкой)"
+          },
+          "source_ids": {
+            "$ref": "#/$defs/sourceIds"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Documents whose url starts with one of these (familysearch.org, archive.org/details) count as found here / документы с адресом на этих сайтах считаются найденными здесь"
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Documents of these kinds count as found here (family_photo…) / документы этих видов считаются найденными здесь"
+          },
+          "log_match": {
+            "type": "string",
+            "description": "Regular expression: research_log entries about this resource / регулярное выражение: записи журнала поиска об этом источнике"
+          }
+        }
+      }
+    },
     "surnames": {
       "type": "object",
       "additionalProperties": {

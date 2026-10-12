@@ -170,6 +170,20 @@ A person is the biological child (`children`) of at most one family with partner
   the [online editor](editor.md) writes these lines itself (`date` and `author` are optional).
 - `research_log[]` — what was searched, where, with what result: `{"date": "2026-10-06",
   "action", "result", "scope"}`.
+- `research_resources[]` — the archives, databases and sites you search, shown in **Archive → Sources**
+  with what was found in each:
+
+  ```json
+  {"id": "R2", "section": "Parish registers", "name": "Catholic parish registers of Ireland",
+   "url": "https://registers.nli.ie", "about": "What it is and how to use it.",
+   "found": "Michael's baptism, 1858 (S1).", "source_ids": ["S1", "S2"],
+   "domains": ["registers.nli.ie"], "kinds": [], "log_match": "Louisburgh parish"}
+  ```
+
+  The build picks the documents found there by itself: listed in `source_ids`, with a `url` on one of
+  the `domains` (`familysearch.org`, or a path such as `archive.org/details`), or of one of the `kinds`
+  (e.g. `family_photo` for "Family papers"). `log_match` is a regular expression: the research-log
+  entries it matches are listed under the resource. Records with the same `section` are grouped.
 - `surnames{}` — `{"Ivanov": {"history": ["paragraph", …]}}`: stories shown on surname pages.
 
 ## Privacy

@@ -523,8 +523,15 @@
   }
   // whole=true (кнопка «Вписать») — всё древо целиком, как бы мелко ни вышло;
   // иначе большое древо показывается в читаемом масштабе вокруг центрального человека.
+  // the visible part of the tree: on a computer an open person card covers the right edge of the canvas
+  function visibleBox(r) {
+    var w = r.width, pnl = $('panel');
+    if (pnl && pnl.classList.contains('open') && !window.matchMedia('(max-width: 720px)').matches)
+      w = Math.max(240, r.width - Math.max(0, r.right - (window.innerWidth - pnl.offsetWidth)));
+    return { width: w, height: r.height };
+  }
   function fit(animate, whole) {
-    var r = canvas.getBoundingClientRect();
+    var r = visibleBox(canvas.getBoundingClientRect());
     var w = stageEl.offsetWidth, h = stageEl.offsetHeight;
     var k = Math.min(1, (r.width - 16) / w, (r.height - 16) / h);
     treeMinK = Math.min(0.25, k);
@@ -562,11 +569,23 @@
   function centerOn(id, k, animate) {
     var pos = cardPos[id];
     if (!pos) return;
-    var r = canvas.getBoundingClientRect();
+    var r = visibleBox(canvas.getBoundingClientRect());
     view.k = k || view.k;
     view.x = r.width / 2 - (pos.x + cardW() / 2) * view.k;
     view.y = r.height / 2 - (pos.y + cardH() / 2) * view.k;
     apply(animate);
+  }
+  // a person's card is open and the person in the tree is under it or off the edge: move the tree, keep the scale
+  function revealCard(id) {
+    var pos = cardPos[id];
+    if (!pos || currentView !== 'tree') return;
+    var r = visibleBox(canvas.getBoundingClientRect());
+    var x = view.x + pos.x * view.k, y = view.y + pos.y * view.k, w = cardW() * view.k, h = cardH() * view.k;
+    var dx = x < 16 || x + w > r.width - 16 ? r.width / 2 - (x + w / 2) : 0;
+    var dy = y < 16 || y + h > r.height - 16 ? r.height / 2 - (y + h / 2) : 0;
+    if (!dx && !dy) return;
+    view.x += dx; view.y += dy;
+    apply(true);
   }
   function guard(fn) { return function (e) { if (treeDrag.moved) { e.preventDefault(); return; } fn(e); }; }
 
@@ -978,6 +997,7 @@
     panel.setAttribute('aria-hidden', 'false');
     panel.scrollTop = 0;
     if (window.matchMedia('(max-width: 720px)').matches) $('scrim').hidden = false;
+    else requestAnimationFrame(function () { revealCard(id); });
     syncUrl();
     if (opts.compose) setTimeout(function () { var t = body.querySelector('textarea'); if (t) { t.scrollIntoView({ block: 'center' }); t.focus({ preventScroll: true }); } }, 260);
   }
@@ -1400,7 +1420,7 @@
       }
       if (view === 'places' && r.place && D.places.some(function (p) { return p.slug === r.place; })) openPlace(r.place);
       else if (view === 'places' && selectedPlace) closePanel();
-      if (view === 'sources') setArchMode(r.mode === 'restored' || r.mode === 'corrections' ? r.mode : 'docs');
+      if (view === 'sources') setArchMode(['restored', 'corrections', 'research'].indexOf(r.mode) >= 0 ? r.mode : 'docs');
       if (r.doc && (S[r.doc] || (D.merged_sources || {})[r.doc])) { if (docOpen !== r.doc) openDoc(r.doc); } else if (docOpen) closeDoc();
       if (r.person && P[r.person]) { if (selectedId !== r.person) openPerson(r.person); }
       else if (selectedId) closePanel();
@@ -2548,11 +2568,12 @@
   // «Архив»: вкладки «Документы и фотографии» и «Отреставрированные фото»
   var archMode = 'docs';
   function setArchMode(m) {
-    if (m === 'restored' && $('arch-tab-restored').hidden) m = 'docs';
+    if ((m === 'restored' && $('arch-tab-restored').hidden) || (m === 'research' && $('arch-tab-research').hidden)) m = 'docs';
     archMode = m;
     $('arch-docs').hidden = m !== 'docs';
     $('arch-restored').classList.toggle('off', m !== 'restored');
     $('arch-corrections').hidden = m !== 'corrections';
+    $('arch-research').hidden = m !== 'research';
     document.querySelectorAll('.arch-tabs [data-mode]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.mode === m)); });
   }
   var restSetters = [], restSort = 'year', restMode = 'color';
@@ -2667,10 +2688,52 @@
     });
     if (!list.length) host.appendChild(el('p', { class: 'sub', text: T('Ничего не нашлось. Попробуйте другое слово или сбросьте фильтры.') }));
     renderCorrections();
+    renderResearch();
     var rl = clear($('research-log'));
     (D.research_log || []).slice().reverse().forEach(function (r) {
       rl.appendChild(el('details', { class: 'rlog-item' }, el('summary', null, el('span', { class: 'rlog-date', text: fmtDate(r.date) }), ' ', r.action),
         el('p', { text: r.result }), r.scope ? el('p', { class: 'where', text: r.scope }) : null));
+    });
+  }
+  // «Источники» — вкладка архива: архивы и базы, где искали; найденные там документы и записи журнала поиска
+  function renderResearch() {
+    var list = D.research_resources || [];
+    $('arch-tab-research').hidden = !list.length;
+    if (!list.length) return;
+    $('arch-tab-research').textContent = T('Источники · ') + list.length;
+    document.querySelectorAll('.arch-tabs [data-mode]').forEach(function (b) { b.onclick = function () { setArchMode(b.dataset.mode); syncUrl(); }; });
+    var host = clear($('research-resources')), toc = clear($('res-toc'));
+    var section = null, n = 0;
+    list.forEach(function (r) {
+      if (r.section && r.section !== section) {
+        section = r.section; n++;
+        var hid = 'res-sec-' + n;
+        host.appendChild(el('h4', { class: 'res-sec', id: hid, text: section }));
+        toc.appendChild(el('button', { type: 'button', class: 'btn', text: section, onclick: function () { document.getElementById(hid).scrollIntoView({ block: 'start', behavior: 'smooth' }); } }));
+      }
+      var ids = (r.source_ids || []).filter(function (sid) { return S[sid]; });
+      var chip = function (sid) { return el('button', { class: 'src-chip', type: 'button', text: sid, title: S[sid].title, onclick: function () { openDoc(sid); } }); };
+      var docs = null;
+      if (ids.length) {
+        var shown = el('span', { class: 'res-chips' }, ids.slice(0, 16).map(chip));
+        docs = el('p', { class: 'res-docs' }, el('b', { text: T('Документы в архиве') + ' (' + ids.length + '): ' }), shown);
+        if (ids.length > 16) {
+          var more = el('button', { type: 'button', class: 'linkish', text: T('показать все'), onclick: function () {
+            ids.slice(16).forEach(function (sid) { shown.appendChild(chip(sid)); });
+            more.remove();
+          } });
+          docs.appendChild(more);
+        }
+      }
+      var log = (r.log || []).map(function (i) { return (D.research_log || [])[i]; }).filter(Boolean).reverse();
+      var logBox = log.length ? el('details', { class: 'res-log' }, el('summary', { text: T('Журнал поиска · ') + log.length + ' ' + plural(log.length, T('запись'), T('записи'), T('записей')) }),
+        log.map(function (e) { return el('p', null, el('span', { class: 'rlog-date', text: fmtDate(e.date) }), ' ', el('b', { text: e.action }), ' — ', e.result); })) : null;
+      toc.hidden = n < 2;
+      host.appendChild(el('article', { class: 'res-card', id: 'res-' + r.id },
+        el('h5', null, r.url ? el('a', { href: r.url, target: '_blank', rel: 'noopener', text: r.name + ' ↗' }) : r.name),
+        r.about ? el('p', { class: 'res-about', text: r.about }) : null,
+        r.found ? el('p', { class: 'res-found' }, el('b', { text: T('Что нашли: ') }), r.found) : null,
+        docs, logBox));
     });
   }
   // «Журнал исправлений» — отдельная вкладка архива: новые правки сверху, имя открывает карточку, номер — документ

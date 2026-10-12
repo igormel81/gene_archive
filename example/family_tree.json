@@ -3463,6 +3463,136 @@
       "scope": "S15, I43"
     }
   ],
+  "research_resources": [
+    {
+      "id": "R1",
+      "section": "Family",
+      "name": "Family papers and memories",
+      "about": "Photographs, letters, notebooks and the stories of relatives — where every search starts: a name, a year and a place to look for in the archives.",
+      "found": "Kate Harper's recorded recollections (S16), Dorothy Harper's notebook (S25), wedding photographs and letters: the first names and dates for three generations.",
+      "kinds": [
+        "family_photo",
+        "family_report",
+        "family_manuscript",
+        "family_archive_document"
+      ],
+      "log_match": "recollections|notebook"
+    },
+    {
+      "id": "R2",
+      "section": "Parish registers",
+      "name": "Catholic parish registers of Ireland",
+      "url": "https://registers.nli.ie",
+      "about": "Microfilmed Catholic registers of baptisms and marriages, most of them up to 1880, browsed by parish (National Library of Ireland).",
+      "found": "Michael Harper's baptism in 1858 (S1) and his parents' marriage in 1856 (S2).",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "log_match": "Louisburgh parish"
+    },
+    {
+      "id": "R3",
+      "section": "Parish registers",
+      "name": "Slovak church books",
+      "url": "https://www.familysearch.org",
+      "about": "Scanned church registers of Slovakia, 1592–1910, browsed by parish on FamilySearch; free with an account.",
+      "found": "Josef Novák's baptism in Kapušany, 1866 (S6). Nothing yet for his parents' marriage.",
+      "source_ids": [
+        "S6"
+      ],
+      "log_match": "Kapu[sš]any"
+    },
+    {
+      "id": "R4",
+      "section": "Censuses and migration",
+      "name": "Census of Ireland, 1901 and 1911",
+      "url": "https://www.census.nationalarchives.ie",
+      "about": "Every household of Ireland in 1901 and 1911, searchable by name and townland (National Archives of Ireland).",
+      "found": "The Harpers who stayed in Louisburgh in 1901, among them a possible Martin Harper (S15).",
+      "source_ids": [
+        "S15"
+      ],
+      "log_match": "census of Ireland"
+    },
+    {
+      "id": "R5",
+      "section": "Censuses and migration",
+      "name": "United States federal census",
+      "url": "https://www.archives.gov/research/census",
+      "about": "Census returns every ten years from 1790; name indexes on FamilySearch and other sites.",
+      "found": "Michael Harper as a boarder in Pittsburgh's Sixth Ward in 1880, with Honora Harper two doors away (S14).",
+      "source_ids": [
+        "S14"
+      ],
+      "log_match": "US census"
+    },
+    {
+      "id": "R6",
+      "section": "Censuses and migration",
+      "name": "Passenger lists: Ellis Island and Hamburg",
+      "url": "https://heritage.statueofliberty.org",
+      "about": "Ship manifests of arrivals in New York and the emigrant lists of the port of Hamburg.",
+      "found": "Michael Harper's crossing from Queenstown in 1880 (S4) and the Novak family's journey in 1892 (S5, S9).",
+      "source_ids": [
+        "S4",
+        "S5",
+        "S9"
+      ],
+      "log_match": "Hamburg|passenger|Ellis"
+    },
+    {
+      "id": "R7",
+      "section": "Military records, newspapers and courts",
+      "name": "Military records",
+      "url": "https://www.archives.gov/research/military",
+      "about": "Draft registration cards of the First World War, burial case files and service records.",
+      "found": "John Joseph Harper's draft card (S24) and Daniel Harper's burial card, 1918 (S12).",
+      "source_ids": [
+        "S12",
+        "S24"
+      ],
+      "log_match": "War Department|draft"
+    },
+    {
+      "id": "R8",
+      "section": "Military records, newspapers and courts",
+      "name": "Newspapers and parish histories",
+      "about": "Local newspapers on microfilm and jubilee books of parishes: obituaries, reports from the front, names of founders.",
+      "found": "Michael Harper's obituary (S10), the 1918 report of Daniel's death (S11) and the jubilee book of St. Mary's in Windber (S20).",
+      "source_ids": [
+        "S10",
+        "S11",
+        "S20"
+      ],
+      "log_match": "newspaper"
+    },
+    {
+      "id": "R9",
+      "section": "Military records, newspapers and courts",
+      "name": "County courts and offices",
+      "about": "Orphans' courts, naturalization and vital records of the county where the family lived.",
+      "found": "Rose's adoption file (S13), Joseph Novak's naturalization (S26) and death certificate (S22).",
+      "source_ids": [
+        "S7",
+        "S13",
+        "S22",
+        "S26"
+      ],
+      "log_match": "Orphans' Court|adoption"
+    },
+    {
+      "id": "R10",
+      "section": "Military records, newspapers and courts",
+      "name": "Cemeteries",
+      "about": "Gravestones photographed on the spot: years of life, family plots, sometimes the place of birth.",
+      "found": "The stone of Michael and Catherine Harper at Calvary Cemetery (S19).",
+      "kinds": [
+        "gravestone"
+      ],
+      "log_match": "gravestone|cemetery"
+    }
+  ],
   "surnames": {
     "Harper": {
       "history": [

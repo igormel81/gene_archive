@@ -1,6 +1,7 @@
 """Static pages for search engines, sharing and readers without JavaScript.
 
-people/<id>.html, people/index.html, surnames/<slug>.html, history.html, news.html,
+people/<id>.html, people/index.html, surnames/<slug>.html, history.html, news.html, s/<key>.html
+(pages the "Share" button links to, with covers for messengers),
 sitemap.xml and robots.txt (the last two only when site.json has base_url).
 Texts here are written in the interface source language (Russian) and translated
 by localize.py like every other page.
@@ -9,6 +10,7 @@ import html
 import json
 import re
 import unicodedata
+from pathlib import Path
 from xml.etree import ElementTree as ET
 
 STYLE = """body{display:block}main.archive-page{max-width:820px;margin:auto;padding:28px 20px 64px}
@@ -233,6 +235,94 @@ class Pages:
         if help_html:
             self.document("help.html", "Как пользоваться сайтом", help_html, "Как устроен семейный архив и как дописать в него то, что вы знаете.")
         self.meta["index.html"] = ("WebSite", None, True)
+
+    # --- pages for sharing: s/I12.html, s/S5.html, s/place-x.html, s/tree.html…
+    SECTIONS = (
+        ("tree", "Семейное древо", "Все поколения семьи в одном древе. Нажмите на человека — откроется его карточка с документами и снимками.", "#/tree"),
+        ("people", "Люди семейного архива", "Все люди архива: имена, годы, места, родство и документы.", "#/people"),
+        ("bios", "Биографии", "Подробные рассказы о жизни людей семьи.", "#/people?mode=bios"),
+        ("story", "История семьи", "История семьи по документам и воспоминаниям.", "#/story"),
+        ("archive", "Архив: документы и фотографии", "Метрики, свидетельства, письма и семейные снимки — с расшифровками и комментариями родных.", "#/sources"),
+        ("restored", "Отреставрированные фотографии", "Старые семейные снимки после реставрации — рядом с оригиналом. Узнали кого-то? Напишите под снимком.", "#/sources?mode=restored"),
+        ("places", "Места семьи", "Карта мест, где жила семья: сёла, города, приходы и кладбища.", "#/places"),
+        ("questions", "Вопросы к семье", "Что мы пока не знаем и что могут подсказать родные. Можно ответить прямо на сайте.", "#/questions"),
+        ("news", "Что нового", "Новые находки семейного архива.", "news.html"),
+    )
+
+    def share_pages(self, site_dir, restored, bios_html=""):
+        """Short pages the "Share" button links to: a title, a description and a cover for link previews
+        in messengers; a visitor is sent on to the right place of the site (in the same language).
+        Not indexed. Covers need Pillow and an absolute address of the site (base_url in site.json)."""
+        from . import share_cards
+        site_dir = Path(site_dir)
+        out = self.out / "s"
+        out.mkdir(exist_ok=True)
+        base = self.cfg["base_url"]
+        label = re.sub(r"^https?://(www\.)?", "", base).rstrip("/") if base else self.cfg["short_title"]
+        restored = {r["source_id"]: r for r in restored}
+        made = 0
+
+        def pic(sid):
+            """The best picture of a document for a cover: the colour restoration, otherwise the original."""
+            s = self.sources.get(sid) or {}
+            f = (restored.get(sid) or {}).get("color") or s.get("file")
+            return site_dir / f if f and re.search(r"\.(jpe?g|png|webp)$", f, re.I) and (site_dir / f).is_file() else None
+
+        def portrait(p):
+            ids = [i for i in p.get("identity_source_ids", []) if (self.sources.get(i) or {}).get("kind") == "family_photo"]
+            ids.sort(key=lambda i: (i not in restored, int(i[1:])))
+            return next((x for x in map(pic, ids) if x), None)
+
+        def page(key, title, desc, target, photos=(), kind="website"):
+            nonlocal made
+            image = ""
+            img = share_cards.make(self.out, site_dir / ".cache" / "cards", key, [x for x in photos if x], label) if base else None
+            if img:
+                image = (f'<meta property="og:image" content="{esc(base + img)}"><meta property="og:image:width" content="1200">'
+                         f'<meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">')
+            desc = " ".join(str(desc or title).split())
+            text = ('<!doctype html><html lang="ru"><head><meta charset="utf-8">\n'
+                    '<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex, follow">\n'
+                    f'<title>{esc(title)}</title><meta name="description" content="{esc(desc)}">\n'
+                    f'<meta property="og:type" content="{kind}"><meta property="og:site_name" content="{esc(self.cfg["title"])}">'
+                    f'<meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}">{image}\n'
+                    f"<script>location.replace(location.pathname.replace(/s\\/[^/]*$/, '') + {json.dumps(target)});</script>\n"
+                    f'</head><body><p><a href="../{esc(target)}">{esc(title)}</a></p></body></html>')
+            (out / f"{key}.html").write_text(text, encoding="utf-8")
+            made += 1
+
+        for p in self.data["people"]:
+            if p.get("placeholder"):
+                continue
+            pid = p["id"]
+            page(pid, p["display_name"], p.get("relation") or self.cfg["title"], f"#/tree/{pid}?person={pid}",
+                 [] if pid in self.living else [portrait(p)], "profile")
+        for sid, s in self.sources.items():
+            page(sid, s["title"], s.get("scope") or s.get("locator") or s["title"], f"#/sources?doc={sid}", [pic(sid)])
+        bio_ids = re.findall(r'<article class="bio" id="bio-(I\d+)"', bios_html)
+        for pid in bio_ids:
+            if pid in self.byid:
+                p = self.byid[pid]
+                page("bio-" + pid, p["display_name"], p.get("relation") or self.cfg["title"], f"#/people?mode=bios&bio={pid}",
+                     [] if pid in self.living else [portrait(p)], "article")
+        for pl in self.data.get("places", []):
+            photos = [pic(i) for i in pl.get("sources", []) if (self.sources.get(i) or {}).get("kind") in ("family_photo", "gravestone_image")]
+            photos += [site_dir / md["file"] for md in pl.get("media", []) if md.get("file") and (site_dir / md["file"]).is_file()]
+            page("place-" + pl["slug"], pl["name"], pl.get("text") or pl.get("where") or pl["name"], f"#/places?place={pl['slug']}", photos[:4])
+        faces = []   # portraits for section covers: people with biographies first, never the living, each photo once
+        for p in [self.byid[i] for i in bio_ids if i in self.byid] + self.data["people"]:
+            x = portrait(p) if p["id"] not in self.living else None
+            if x and x not in faces:
+                faces.append(x)
+        rest = [x for x in (pic(sid) for sid in restored) if x]
+        photos = {"tree": faces, "people": faces[2:] + faces[:2], "bios": faces, "story": faces[::-1], "archive": rest[-6:] or faces,
+                  "restored": rest, "places": rest[6:12] or faces, "questions": rest[12:18] or faces[::-1], "news": rest[-6:][::-1] or faces}
+        for key, title, desc, target in self.SECTIONS:
+            if (key == "story" and not self.has_story) or (key == "news" and not self.has_news) \
+                    or (key == "bios" and not bio_ids) or (key == "restored" and not restored):
+                continue
+            page(key, title, desc, target, photos[key][:6])
+        return made
 
     def finish(self):
         """Robots meta, canonical links, Open Graph, JSON-LD and the sitemap for every page."""

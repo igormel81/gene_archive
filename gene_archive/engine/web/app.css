@@ -1058,3 +1058,21 @@ ol.bio-srcs a:hover { color: var(--accent); }
 .propose summary { cursor: pointer; color: var(--accent); }
 .propose select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); font: 15px var(--sans); }
 .cform .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* Archive → Sources: where we searched and what we found */
+.arch-research { margin: 18px 0 26px; }
+.arch-research h3 { margin: 0 0 4px; }
+.res-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.res-toc .btn { font-size: 13px; padding: 5px 10px; }
+.res-sec { margin: 26px 0 10px; font: 600 13px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); scroll-margin-top: 80px; }
+.res-card { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
+.res-card h5 { margin: 0 0 6px; font: 600 16px var(--sans); }
+.res-card h5 a { color: var(--ink); text-decoration-color: var(--line); }
+.res-card p { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+.res-about { color: var(--muted); }
+.res-docs { font: 13px var(--sans); }
+.res-docs .src-chip { margin: 2px 4px 0 0; padding: 1px 6px; border: 1px solid var(--line); border-radius: 10px; background: none; color: var(--accent); font: 12px var(--sans); cursor: pointer; }
+.res-docs .linkish { padding: 0; border: 0; background: none; color: var(--accent); font: 12px var(--sans); cursor: pointer; text-decoration: underline; }
+.res-log { margin-top: 8px; font: 13px/1.45 var(--sans); }
+.res-log summary { cursor: pointer; color: var(--accent); }
+.res-log p { font-size: 13px; }

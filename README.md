@@ -63,7 +63,8 @@ free hosting, full history in git, GEDCOM in and out.
 
 - Every scan and photograph with a transcription, the back of a photo, PDF previews.
 - Filters by type of document and by family line; restored photos next to originals.
-- A research log ("where we searched and what we found") and a log of corrections.
+- **Sources**: every archive and database you searched — what it is, what was found there,
+  the documents and the research-log entries for each; plus a log of corrections.
 
 | | |
 |---|---|
@@ -104,6 +105,8 @@ free hosting, full history in git, GEDCOM in and out.
 
 - `gene build` → plain HTML for GitHub Pages, Netlify, Cloudflare Pages or any web server.
 - `gene serve` or the Docker image adds comments, a PIN for a private archive and the editor.
+- **Share** any person, document or place: the link shows a photo, a name and a description in
+  Telegram, WhatsApp and Facebook.
 - Search engines find every person and surname: static pages, sitemap, Schema.org;
   living people are `noindex`.
 

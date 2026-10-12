@@ -1,5 +1,18 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- The "Share" button works: s/<id>.html pages for people, documents, places, biographies and sections, with
+  1200×630 covers for link previews in messengers (Pillow and `base_url` needed for the pictures).
+  Кнопка «Поделиться» работает: страницы s/<номер>.html для людей, документов, мест, биографий и разделов
+  с обложками 1200×630 для превью в мессенджерах (для картинок нужны Pillow и `base_url`).
+- Archive → Sources: `research_resources` in family_tree.json — the archives and databases searched, what was found
+  in each, with their documents and research-log entries picked up by the build.
+  «Архив → Источники»: `research_resources` в family_tree.json — архивы и базы, где искали, что в каждом нашлось;
+  документы и записи журнала поиска к ним подбирает сборка.
+- A person's card no longer covers the person in the tree: the tree moves into the visible part.
+  Карточка человека больше не закрывает его в древе: древо сдвигается в видимую часть.
+
 ## 0.2.0 — 2026-10-08
 
 - Online editor at `/edit/` (`gene serve --editor`, `GENE_EDITOR` in Docker): people, families, documents with uploads,

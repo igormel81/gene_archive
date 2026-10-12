@@ -56,6 +56,30 @@ for (const engine of engines) {
         ok(await page.locator('#view-' + v + '.active').count() === 1, P(`section ${v} does not open`));
         if (v === 'story') ok(await page.locator('#story section').count() > 0 && await page.locator('#story-nav .tl-item').count() > 0, P('the story did not load'));
       }
+      // a card opened next to the right edge stays visible to the left of the panel (laptop)
+      if (profile.name === 'laptop') {
+        await page.goto(base + lang + '#/tree');
+        await page.waitForTimeout(500);
+        const right = await page.evaluate(() => { let best = null; document.querySelectorAll('#cards .card').forEach((c) => { const r = c.getBoundingClientRect(); if (r.width && (!best || r.right > best.r)) best = { id: c.dataset.id, r: r.right }; }); return best && best.id; });
+        if (right) {
+          await page.locator(`#cards .card[data-id="${right}"]`).click();
+          await page.waitForTimeout(900);
+          const seen = await page.evaluate((id) => { const c = document.querySelector(`#cards .card[data-id="${id}"]`).getBoundingClientRect(), p = document.querySelector('#panel').getBoundingClientRect(); return c.right <= p.left + 2; }, right);
+          ok(seen, P(`card ${right} is hidden under the open panel`));
+        }
+      }
+      // Archive → Sources
+      if ((data.research_resources || []).length) {
+        await page.goto(base + lang + '#/sources?mode=research');
+        await page.waitForTimeout(500);
+        ok(await page.locator('#arch-research').isVisible(), P('Archive → Sources does not open'));
+        ok(await page.locator('#research-resources .res-card').count() === data.research_resources.length, P('Archive → Sources: not every resource is shown'));
+      }
+      // the "Share" link of a person leads to its page and on to the card
+      const sharer = data.people.find((x) => !x.placeholder);
+      await page.goto(base + lang + `s/${sharer.id}.html`);
+      await page.waitForTimeout(800);
+      ok(page.url().includes(`#/tree/${sharer.id}`), P(`s/${sharer.id}.html does not lead to the card (${page.url()})`));
       // a living person: the card opens, and the published data holds nothing but the name
       if (living.length) {
         await page.goto(base + lang + `#/tree/${living[0]}?person=${living[0]}`);

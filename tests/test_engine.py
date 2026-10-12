@@ -51,6 +51,8 @@ class Validate(unittest.TestCase):
             "previous": lambda d: d["corrections"].append({"person_id": "I1", "field": "x", "old": 1, "new": 2}),
             "inside the site": lambda d: d["sources"][0].update(file="../etc/passwd"),
             "inside the site folder": lambda d: d["sources"][0].update(file=".gene-state/editor.db"),
+            "research_resources[0]": lambda d: d["research_resources"][0].update(source_ids=["S999"]),
+            "regular expression": lambda d: d["research_resources"][0].update(log_match="(("),
             "media[0]: file must": lambda d: d["places"][0].setdefault("media", []).append({"file": "../x.jpg"}),
         }
         for needle, change in cases.items():
@@ -208,6 +210,38 @@ class BuildExample(unittest.TestCase):
             self.assertTrue((self.out / prefix / "people" / "index.html").exists())
             self.assertIn(f"i18n/{lang}.js", html)
         self.assertEqual(self.result["missing_translations"], {"ru": [], "en": [], "ro": []})
+
+    def test_research_resources(self):
+        data = json.loads((self.out / "data.json").read_text(encoding="utf-8"))
+        res = {r["id"]: r for r in data["research_resources"]}
+        self.assertEqual(res["R2"]["source_ids"], ["S1", "S2"])
+        self.assertIn("S16", res["R1"]["source_ids"])   # by kind: family papers
+        self.assertTrue(res["R2"]["log"])                 # log_match → research-log entries
+        self.assertNotIn("log_match", res["R2"])          # matching rules stay in the build
+        index = (self.out / "ru" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('id="arch-tab-research"', index)
+        self.assertIn("Где мы ищем", index)
+
+    def test_share_pages(self):
+        """The "Share" button links to s/<key>.html: every key app.js can produce has a page in every edition."""
+        data = json.loads((self.out / "data.json").read_text(encoding="utf-8"))
+        from gene_archive.privacy import living_people
+        living = living_people(json.loads((self.site / "family_tree.json").read_text(encoding="utf-8")))
+        self.assertTrue(living)
+        keys = ["tree", "people", "archive", "places", "questions", "story"] + [s["id"] for s in data["sources"]] \
+            + [p["id"] for p in data["people"] if not p.get("placeholder")] + ["place-" + pl["slug"] for pl in data["places"]]
+        for prefix in ("", "ru/", "ro/"):
+            for key in keys:
+                self.assertTrue((self.out / prefix / "s" / f"{key}.html").exists(), prefix + key)
+        page = (self.out / "ru" / "s" / "tree.html").read_text(encoding="utf-8")
+        self.assertIn("<title>Семейное древо</title>", page)
+        self.assertIn('content="https://example.org/family/s/img/tree.jpg"', page)
+        self.assertIn('content="noindex, follow"', page)
+        self.assertIn("location.replace(", page)
+        self.assertNotIn("language-tools", page)
+        self.assertTrue((self.out / "s" / "img" / "tree.jpg").exists())
+        for pid in living:   # no photos of the living in previews
+            self.assertNotIn("og:image", (self.out / "s" / f"{pid}.html").read_text(encoding="utf-8"), pid)
 
     def test_no_russian_interface_left_in_english(self):
         cyr = re.compile("[А-Яа-яЁё]")

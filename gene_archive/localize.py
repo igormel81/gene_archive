@@ -39,7 +39,7 @@ PATH_KEYS = {"file", "thumb", "back", "bw", "color", "bw_thumb", "color_thumb"}
 SOFT = {"corrections", "research_log"}   # journals: without a translation they stay in the original
 # files and folders shared by all languages (everything else exists per language)
 SHARED = ("app.js", "app.css", "languages.js", "vendor/", "sources/", "img/", "geo/", "i18n/",
-          "family_tree.ged", "api/", "robots.txt", "sitemap.xml", "favicon")
+          "family_tree.ged", "api/", "robots.txt", "sitemap.xml", "favicon", "s/img/")
 FRAGMENTS = ("story.html", "bios.html")   # loaded by app.js, no header of their own
 
 
@@ -385,7 +385,7 @@ def build_locales(out, cfg, site_dir, data_versions):
                                 f'<script src="{"../" * depth}i18n/{lang}.js?v={data_versions.get("i18n", "")}"></script>')
             text = text.replace("<!--gene:root-->", f"window.GENE_ROOT = {json.dumps(root)};")
             text = Page(tr, lang, make_url_mapper(prefix, page, base)).render(text)
-            if page not in FRAGMENTS:
+            if page not in FRAGMENTS and not page.startswith("s/"):   # share pages only redirect
                 text = decorate(text, cfg, lang, page)
             dest = target / page
             dest.parent.mkdir(parents=True, exist_ok=True)

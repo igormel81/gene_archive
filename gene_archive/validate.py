@@ -254,6 +254,21 @@ def validate(data, root=Path("."), cfg=None):
         if c.get("family_id"):
             need(where, c["family_id"], fams, "family", "семьи")
         need_sources(where, c.get("source_ids"))
+    res_ids = set()
+    for n, r in enumerate(data.get("research_resources", [])):
+        where = f"research_resources[{n}]"
+        missing = [k for k in ("id", "name") if not r.get(k)]
+        if missing:
+            err(m(f"{where}: missing {', '.join(missing)}", f"{where}: нет полей {', '.join(missing)}"))
+        if r.get("id") in res_ids:
+            err(m(f"{where}: id {r['id']} repeats", f"{where}: номер {r['id']} повторяется"))
+        res_ids.add(r.get("id"))
+        need_sources(where, r.get("source_ids"))
+        text_sources(where, [r.get("about"), r.get("found")])
+        try:
+            re.compile(r.get("log_match") or "")
+        except re.error as e:
+            err(m(f"{where}: log_match is not a valid regular expression ({e})", f"{where}: log_match — неверное регулярное выражение ({e})"))
     for n, r in enumerate(data.get("research_log", [])):
         where = f"research_log[{n}]"
         missing = [k for k in ("date", "action", "result") if not r.get(k)]

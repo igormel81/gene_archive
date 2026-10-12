@@ -42,7 +42,7 @@ an unknown key is an error, so typos do not go unnoticed. With the `"$schema"` l
 | `title` | "Family archive" | site name: browser tab, search results, the tree image |
 | `short_title` | = `title` | the name in the header |
 | `description` | "" | one sentence for search engines and link previews |
-| `base_url` | "" | the public address, ending with `/`. Enables `sitemap.xml`, `robots.txt`, canonical links and language alternates. `gene build --base-url` overrides it |
+| `base_url` | "" | the public address, ending with `/`. Enables `sitemap.xml`, `robots.txt`, canonical links, language alternates and pictures in link previews (with Pillow). `gene build --base-url` overrides it |
 | `languages` | `["en"]` | interface languages: `en`, `ru`, `ro`. The first is published at the site root, the others in `/ru/`, `/ro/`… |
 | `content_language` | first language | the language your texts are written in |
 | `root_person` | `root_person_id` of the data | the person the archive is "about": relations are counted from them, privacy generations too |
