@@ -154,3 +154,5 @@ Workflow `Release` проверяет, что тег совпадает с ве�
 2. На GitHub → Settings → Environments → создайте `pypi`; Settings → Secrets and variables → Actions →
    *Variables* → `PYPI_PUBLISH` = `true`.
 Со следующим тегом пакет опубликуется и на PyPI, и заработает `pip install gene-archive`.
+Чтобы опубликовать уже вышедшую версию, ещё раз запустите Actions → Release → *Run workflow*: выпуск на GitHub
+сохранит описание, файлы в нём обновятся, а пакет уйдёт на PyPI.

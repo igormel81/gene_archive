@@ -46,7 +46,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then where="--target $GITHUB_SHA"; else where="--verify-tag"; fi
-          gh release create "$TAG" dist/* --title "gene-archive $TAG" --notes-file notes.md $where
+          # run again for a released version (e.g. after PyPI is set up): refresh the files, keep the release
+          if gh release view "$TAG" >/dev/null 2>&1; then gh release upload "$TAG" dist/* --clobber
+          else gh release create "$TAG" dist/* --title "gene-archive $TAG" --notes-file notes.md $where; fi
       - uses: actions/upload-artifact@v4
         with:
           name: dist

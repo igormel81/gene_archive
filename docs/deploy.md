@@ -155,3 +155,5 @@ Publishing to PyPI is off until it is set up once:
 2. On GitHub → Settings → Environments → create `pypi`; Settings → Secrets and variables → Actions →
    *Variables* → `PYPI_PUBLISH` = `true`.
 The next tag then also publishes the package, and `pip install gene-archive` works.
+To publish a version that is already released, run Actions → Release → *Run workflow* again: the existing
+GitHub release keeps its notes, its files are refreshed, and the package goes to PyPI.
