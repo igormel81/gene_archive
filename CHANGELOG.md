@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Docs: AGENTS.md for new sites, the AI guide, the research guide and the prompts cover `gene hints`,
+  `research_resources`, `gene gedcom --for` and working next to the online editor; link previews in deploy.md;
+  your own help page in `content/help.html`.
+  Документация: AGENTS.md новых сайтов, руководство по ИИ, руководство по поиску и сборник запросов — про
+  `gene hints`, `research_resources`, `gene gedcom --for` и работу рядом с онлайн-редактором; превью ссылок в
+  deploy; своя справка в `content/help.html`.
 - A detailed help page "How to use the site" in English, Russian and Romanian: the tree, a person's card, "How we
   are related", search, comments and proposals, the archive and its tabs, places and the story, signs, sharing,
   phones, living people.

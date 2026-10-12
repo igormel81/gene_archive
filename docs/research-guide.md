@@ -445,6 +445,16 @@ gene build        # builds the site; refuses when validation fails
   for the family ("Who is in this photo?", "Where is grandfather buried?"). An answer
   becomes a new `family_report` with a date and the name of the person who told it.
 - **One line at a time.** Ten threads started at once are never finished.
+- **A list of sources.** Record every database and archive you searched in
+  `research_resources`: what it is, how to use it, what was found there. On the site
+  this is Archive → Sources: you and your relatives can see where you have already looked.
+- **Let the site tell you what next.** `gene hints` (or the editor's "Checks" tab)
+  lists impossible facts — born after the mother's death, a parent aged 12 — and gaps:
+  dates without documents, people outside the tree, documents nobody refers to.
+  It is a ready to-do list for your next weekend.
+- **Share findings where others search.** `gene gedcom --for geni` makes a file for
+  Geni and MyHeritage, whose matches find distant cousins; `gene gedcom --for public`
+  is for open forums, with living people left without names.
 
 ### DNA tests, briefly
 
@@ -495,6 +505,8 @@ gene build        # builds the site; refuses when validation fails
 - [ ] Search FamilySearch (index **and** Catalog by place) and the national
       census/registration site for that country.
 - [ ] Log what you searched in `research_log`, including empty results.
+- [ ] Add the databases you searched to `research_resources`.
+- [ ] Look at `gene hints`: no impossible dates?
 - [ ] `gene validate`.
 
 ### Before you publish

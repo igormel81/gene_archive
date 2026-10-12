@@ -122,6 +122,15 @@ gene comments my-family done 12 "added to the tree"  # "✓ Taken into account" 
 Comments are limited to 4000 characters, 30 per 10 minutes from one address; a hidden form
 field catches simple bots. Back up `comments.db` together with your data.
 
+## Link previews in messengers
+
+The "Share" button gives links like `…/s/I12.html`. In Telegram, WhatsApp, Facebook and others
+such a link shows the person's photograph (or a collage for sections), the name and a short
+description, and opens the right place of the site in the visitor's language. The pictures need
+two things: `base_url` in `site.json` (messengers only fetch pictures by a full address) and Pillow
+(`pip install "gene-archive[images]"`). Living people get no photograph. Covers are cached in
+`.cache/cards`, so rebuilding is fast.
+
 ## Online editor
 
 With `gene serve <folder> --editor` (or `GENE_EDITOR=/site` in Docker) relatives with an account edit

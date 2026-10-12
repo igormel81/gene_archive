@@ -131,6 +131,25 @@ The agent shows the transcription — **compare it line by line with the scan** 
 > step-by-step research plan (archives, databases, years and parishes) and record it in
 > `research_leads`. Do not add anything to the tree.
 
+### A to-do list from the data checks
+
+```sh
+gene hints . > hints.txt
+```
+
+> Here is the output of `gene hints`: … Start with impossible facts (born after the mother's death,
+> a parent too young): for each, find the document the date rests on and tell me what is most likely
+> wrong. Change nothing — show a table. Then turn the "date without a document" gaps into a research
+> plan in `research_leads`.
+
+### Where we searched
+
+> Create `research_resources` entries for the databases and archives mentioned in `research_log` and
+> in the `url`s of our documents: `section` (Family, Parish registers, State archives, Military…), `name`,
+> `url`, `about` — what it is and how to use it, `found` — what was found there (with S## links),
+> `domains` and `log_match` so that the build links documents and log entries by itself. Show the list
+> before writing it.
+
 More requests for searching databases and archives — in [a separate collection](research-prompts.md).
 
 It helps to give the agent the [research guide](research-guide.md):
@@ -182,6 +201,17 @@ gene translations . ru > todo-ru.json
 > spelled the same way every time, translate kinship terms exactly, explain archaic words. Do not
 > touch the `<1>…</1>` markers.
 
+### Uploading to MyHeritage, Geni and forums
+
+```sh
+gene gedcom . --for geni      # family_tree_geni.ged — upload to Geni, MyHeritage, Ancestry
+gene gedcom . --for public    # family_tree_public.ged — for forums: living people without names
+```
+
+> Check family_tree_geni.ged before uploading: married women have their surname at birth in `NAME`
+> (if not, fill `birth_surname` in family_tree.json), the deceased without a date have `DEAT Y`, notes
+> carry no S## codes. List what to fix before fixing it.
+
 ### Importing GEDCOM and tidying up
 
 > I imported the tree from MyHeritage (`gene import`). Go through the people: make `display_name`
@@ -210,7 +240,9 @@ scans while Claude writes life stories. To keep them out of each other's way:
 - give them tasks about **different** people or files;
 - `AGENTS.md` already tells them to check `git status` before editing;
 - commit after every task — then you can see who did what;
-- if both edited `family_tree.json`, run `gene validate` after both.
+- if both edited `family_tree.json`, run `gene validate` after both;
+- if relatives edit the site in the online editor, their changes are commits in the same folder too:
+  the agent does `git pull` before a task and commits after it.
 
 Codex is handy for batches without a conversation:
 
@@ -242,4 +274,6 @@ codex exec "Transcribe the scans sources/ballina-baptisms-1902-*.jpg and create 
 | A life story | "Write notes for I…: connected, citing documents, doubts separately." |
 | A research plan | "What is missing on the … line? The plan into research_leads." |
 | Translation | "Translate todo-ru.json into translations/ru.json." |
+| Data checks | "Here is gene hints output — go through the impossible facts, change nothing." |
+| Where we searched | "Create research_resources from research_log and the documents' urls." |
 | End of a task | "gene validate, gene build, git diff --stat." |

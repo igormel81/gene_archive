@@ -248,6 +248,14 @@ class BuildExample(unittest.TestCase):
             for w in words:
                 self.assertIn(w, page, prefix + w)
 
+    def test_own_help_page(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            site = Path(tmp, "site")
+            shutil.copytree(EXAMPLE, site, ignore=shutil.ignore_patterns("_site*", ".cache"))
+            (site / "content" / "help.html").write_text("<p>Write to Daniel.</p>", encoding="utf-8")
+            out = build.build(site)["out"]
+            self.assertIn("Write to Daniel.", (out / "help.html").read_text(encoding="utf-8"))
+
     def test_research_resources(self):
         data = json.loads((self.out / "data.json").read_text(encoding="utf-8"))
         res = {r["id"]: r for r in data["research_resources"]}

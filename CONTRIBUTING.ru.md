@@ -14,12 +14,14 @@
 | `gene_archive/build.py` | сборка: данные → приватность → файлы и превью → `data.json` → страницы → языки |
 | `gene_archive/validate.py` | проверка `family_tree.json` и `site.json` |
 | `gene_archive/privacy.py` | живые люди и скрытые документы |
-| `gene_archive/discovery.py` | статические страницы для поисковиков, sitemap |
+| `gene_archive/discovery.py` | статические страницы для поисковиков, sitemap, страницы `s/` для пересылки |
+| `gene_archive/share_cards.py` | обложки 1200×630 для превью ссылок (Pillow) |
+| `gene_archive/hints.py` | подсказки для поиска: невозможные факты и пробелы (`gene hints`, вкладка «Проверка» в редакторе) |
 | `gene_archive/localize.py` | языковые версии |
 | `gene_archive/ged_import.py`, `ged_export.py` | GEDCOM |
 | `gene_archive/server.py` | сервер комментариев (только стандартная библиотека) |
 | `gene_archive/editor.py`, `gene_archive/editor_web/` | онлайн-редактор: пользователи, сохранение с проверкой, история в git; его страница (тесты — `tests/test_editor.py`) |
-| `gene_archive/engine/web/` | приложение в браузере: шаблон `index.html`, `app.js`, `app.css`, Leaflet |
+| `gene_archive/engine/web/` | приложение в браузере: шаблон `index.html`, `app.js` (блок родства «Как мы связаны» проверяется в node тестом `tests/test_engine.py`), `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | словари интерфейса |
 | `schemas/` | JSON Schema для `family_tree.json` и `site.json` — дополняйте при каждом новом поле |
 | `example/` | вымышленная демонстрационная семья, на ней же работают тесты |

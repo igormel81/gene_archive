@@ -237,7 +237,7 @@ def build(site_dir, out=None, base_url=None):
     story = (content / "story.html").read_text(encoding="utf-8") if (content / "story.html").exists() else ""
     bios = (content / "bios.html").read_text(encoding="utf-8") if (content / "bios.html").exists() else ""
     news = (content / "news.html").read_text(encoding="utf-8") if (content / "news.html").exists() else ""
-    help_page = ENGINE / "help.html"
+    help_page = content / "help.html" if (content / "help.html").exists() else ENGINE / "help.html"   # your own help replaces the engine's
     if story:
         story = tag_story_places(story, (cfg.get("story") or {}).get("places", []))
         (tmp / "story.html").write_text(story, encoding="utf-8")

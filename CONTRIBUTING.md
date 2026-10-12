@@ -14,12 +14,14 @@ living people to an issue.
 | `gene_archive/build.py` | the build: data → privacy → files and previews → `data.json` → pages → languages |
 | `gene_archive/validate.py` | checks of `family_tree.json` and `site.json` |
 | `gene_archive/privacy.py` | living people and hidden documents |
-| `gene_archive/discovery.py` | static pages for search engines, sitemap |
+| `gene_archive/discovery.py` | static pages for search engines, sitemap, `s/` pages for sharing |
+| `gene_archive/share_cards.py` | 1200×630 covers for link previews (Pillow) |
+| `gene_archive/hints.py` | research hints: impossible facts and gaps (`gene hints`, the editor's "Checks" tab) |
 | `gene_archive/localize.py` | language editions |
 | `gene_archive/ged_import.py`, `ged_export.py` | GEDCOM |
 | `gene_archive/server.py` | the comments server (standard library only) |
 | `gene_archive/editor.py`, `gene_archive/editor_web/` | the online editor: accounts, saving with checks, git history; its page (tests: `tests/test_editor.py`) |
-| `gene_archive/engine/web/` | the browser app: `index.html` template, `app.js`, `app.css`, Leaflet |
+| `gene_archive/engine/web/` | the browser app: `index.html` template, `app.js` (the kinship block "How we are related" is tested in node by `tests/test_engine.py`), `app.css`, Leaflet |
 | `gene_archive/engine/i18n/` | interface dictionaries |
 | `schemas/` | JSON Schemas of `family_tree.json` and `site.json` — update them with every new field |
 | `example/` | the fictional demo family, also used by the tests |

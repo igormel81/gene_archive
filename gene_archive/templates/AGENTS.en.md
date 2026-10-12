@@ -28,6 +28,12 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 4. Show what changed (`git diff --stat` and a few words) and commit one topic per commit if the owner
    asked you to commit.
 5. Write JSON with indent 2 and `ensure_ascii=False`, without reordering existing records.
+6. What to look for next and what looks wrong: `gene hints` (born after the mother's death, dates without
+   documents, people outside the tree, unused documents). Deal with impossible facts first; do not "fix"
+   anything without a document — propose it to the owner.
+7. With the online editor on (`gene serve --editor`) relatives edit the same `family_tree.json` and each of
+   their changes is a git commit. Before working — `git pull` / `git log -5`, after — commit; edit other records
+   than the ones open in the editor, or agree with the owner.
 
 ## Rules of evidence
 
@@ -43,6 +49,9 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 - Every change of a fact → an entry in `corrections` (`person_id`, `field`, `previous`, `current`,
   `reason`, `source_ids`) and a line in `research_log` (`date`, `action`, `result`, `scope`).
   Record empty searches in `research_log` too: it saves time next time.
+- A new database, archive or website searched → an entry in `research_resources` (`id R#`, `section`, `name`,
+  `url`, `about`, `found`, `log_match`); a notable find → extend its `found`. On the site: Archive → Sources.
+- The surname at birth, when `surname` holds the married one, goes to `birth_surname`.
 
 ## Documents and photos
 

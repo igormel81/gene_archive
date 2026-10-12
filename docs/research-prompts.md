@@ -200,6 +200,19 @@ parish and district, not by village.
 > source_ids; dates computed from an age but written as exact; children born when the mother was under 15
 > or after her death; namesakes linked only by surname. List them with ids, do not fix anything.
 
+### Impossible facts and gaps
+
+> Here is the output of `gene hints`: … For every impossible fact (born after the mother's death, a parent
+> under 14, a marriage before 15) find the documents both dates rest on and tell me which one is more likely
+> wrong and where to check it. As a table, change nothing.
+
+### Where we have already searched
+
+> Collect the databases and archives from research_log and from the urls of our documents. For each,
+> suggest a research_resources entry: section, name, url, about (what it is and how to use it), found (what
+> was found there, with S## links), domains, log_match. Separately — which databases from step 3 of the
+> guide we have not checked yet.
+
 ### What is new since last time
 
 > Look at research_log for the last month and research_leads with status open. Which leads are stale,
@@ -220,4 +233,6 @@ parish and district, not by village.
 | Check | "Compare feature by feature: matches / does not / unknown…" |
 | Record | "Create the source, confirm the fact, corrections, research_log" |
 | Nothing found | "Record in research_log: searched …, nothing found" |
+| Hints | "Here is gene hints output — what is wrong, where to check; change nothing" |
+| Sources | "Collect research_resources from research_log and the documents' urls" |
 | Archive | "Draft a request, do not send it" |

@@ -10,6 +10,7 @@ Optional pages with your own texts. They are HTML **fragments** — no `<html>`,
 | `content/story.html` | the **Story** tab (and a static `history.html` for search engines) |
 | `content/bios.html` | **People → Biographies** and a "Biography" button in the cards |
 | `content/news.html` | the **What's new** tab |
+| `content/help.html` | replaces the built-in **How to use the site** page (More menu) |
 
 Images and documents used in these pages go into `sources/` or `img/` of the site folder;
 the build copies everything they refer to and fails if a file is missing.
@@ -60,3 +61,11 @@ The id must be `bio-` + the person's id; the person gets a "Biography" button.
 ## `news.html`
 
 Any HTML: headings, paragraphs, lists. Newest news on top is a good habit.
+
+## `help.html`
+
+The engine has a detailed help page in three languages: the tree, a person's card, "How we are
+related", search, comments and "Suggest a correction", the archive and its tabs, places, signs,
+sharing, phones, living people. To write your own (with your family's names, your address, your
+rules), copy [`gene_archive/engine/help.html`](../gene_archive/engine/help.html) to `content/help.html`
+and edit it; its texts are translated through `translations/<lang>.json` like other content.
