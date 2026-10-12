@@ -1,6 +1,6 @@
 # Changelog / История изменений
 
-## Unreleased
+## 0.3.0 — 2026-10-12
 
 - Docs: AGENTS.md for new sites, the AI guide, the research guide and the prompts cover `gene hints`,
   `research_resources`, `gene gedcom --for` and working next to the online editor; link previews in deploy.md;
