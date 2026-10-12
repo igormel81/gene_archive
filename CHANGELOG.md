@@ -1,15 +1,21 @@
 # Changelog / История изменений
 
-## Unreleased
+## 0.4.0 — 2026-10-12
 
 - **Search everything** from the magnifier: people, documents (their transcriptions), places, the Story, leads and
   questions, grouped, with the passage and the words found marked. Word endings, the pre-1918 spelling (ъ, і, ѣ) and
   Latin/Cyrillic letters match each other. Runs in the browser — static hosting works; living people are not in it
   because they are not in the published data. Browser checks added.
+  Поиск по всему архиву под лупой: люди, документы (их расшифровки), места, «История», наводки и вопросы — по группам,
+  с отрывком и подсвеченными словами. Окончания, дореформенное письмо (ъ, і, ѣ) и латиница/кириллица совпадают.
+  Работает в браузере — подходит и статический хостинг; живых в поиске нет, потому что их нет в опубликованных данных.
 
 - `gene apply`: changes from scripts and AI assistants through the same path as the online editor — checks,
   corrections and research logs, a git commit by the author, `--dry-run`, `--build`. The genealogy-mcp server uses it
   to research and write straight into a site folder. New sites' `AGENTS.md` tells assistants to prefer it.
+  `gene apply`: правки из скриптов и ИИ-помощников тем же путём, что онлайн-редактор, — проверки, журналы исправлений
+  и поисков, коммит от имени автора, `--dry-run`, `--build`. Через него сервер genealogy-mcp ищет и записывает прямо
+  в папку сайта. `AGENTS.md` новых сайтов советует помощникам пользоваться им.
 
 ## 0.3.0 — 2026-10-12
 
