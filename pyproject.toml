@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gene-archive"
 version = "0.5.0"
-description = "Static site generator for a family history archive: tree, people, places, documents, story — in Russian, English and Romanian"
+description = "Your family's website: the tree, the documents and your ancestors' stories — every fact backed by its document. A static site generator with an online editor, GEDCOM, in English, Russian and Romanian"
 readme = "README.md"
 license = {text = "AGPL-3.0-or-later"}
 authors = [{name = "Igor Melnikov"}]

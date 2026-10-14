@@ -2,7 +2,9 @@
 
 # gene-archive
 
-### Your family's history as a website — every fact backed by its document.
+### Your family's website: the tree, the documents and your ancestors' stories
+
+Every fact backed by its document.
 
 [![Release](https://img.shields.io/github/v/release/igormel81/gene_archive?color=8a4b2a)](https://github.com/igormel81/gene_archive/releases)
 [![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)

@@ -2,7 +2,9 @@
 
 # gene-archive
 
-### История вашей семьи — сайтом, где у каждого факта есть документ.
+### Сайт вашей семьи: древо, документы и истории предков
+
+У каждого факта — свой документ.
 
 [![Release](https://img.shields.io/github/v/release/igormel81/gene_archive?color=8a4b2a&label=выпуск)](https://github.com/igormel81/gene_archive/releases)
 [![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)
