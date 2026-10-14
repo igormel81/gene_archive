@@ -6,7 +6,7 @@
 
 [![Release](https://img.shields.io/github/v/release/igormel81/gene_archive?color=8a4b2a)](https://github.com/igormel81/gene_archive/releases)
 [![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-2e7d32)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-2e7d32)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)
 ![Languages](https://img.shields.io/badge/UI-English%20·%20Русский%20·%20Română-6b5b95)
 
@@ -118,7 +118,7 @@ free hosting, full history in git, GEDCOM in and out.
 |---|:-:|:-:|:-:|
 | Your own site and domain | ✓ | — | ✓ |
 | Free static hosting, no database | ✓ | — | — |
-| Free, open source | ✓ (MIT) | subscription | ✓ |
+| Free, open source | ✓ (AGPL-3.0) | subscription | ✓ |
 | A document behind every fact, on the page | ✓ | partly | partly |
 | Story, map and archive in one site | ✓ | partly | partly |
 | Relatives comment and suggest corrections | ✓ | ✓ | partly |
@@ -213,5 +213,7 @@ Messages are in Russian when the system language is Russian (or `GENE_LANG=ru`).
 
 ## License
 
-[MIT](LICENSE). Leaflet is BSD-licensed, map tiles © OpenStreetMap contributors — see
+[GNU AGPL-3.0-or-later](LICENSE): you may use, change and share the code; if you publish a changed version
+or run it as a service for others, share your changes under the same license. Sites you build with it — your data,
+texts and photos — are yours, the license does not cover them. Leaflet is BSD-licensed, map tiles © OpenStreetMap contributors — see
 [THIRD_PARTY.md](THIRD_PARTY.md).

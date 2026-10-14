@@ -6,7 +6,7 @@
 
 [![Release](https://img.shields.io/github/v/release/igormel81/gene_archive?color=8a4b2a&label=выпуск)](https://github.com/igormel81/gene_archive/releases)
 [![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/лицензия-MIT-2e7d32)](LICENSE)
+[![License: AGPL-3.0](https://img.shields.io/badge/лицензия-AGPL--3.0-2e7d32)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)
 ![Языки](https://img.shields.io/badge/интерфейс-Русский%20·%20English%20·%20Română-6b5b95)
 
@@ -119,7 +119,7 @@
 |---|:-:|:-:|:-:|
 | Свой сайт и свой адрес | ✓ | — | ✓ |
 | Бесплатный статический хостинг, без базы данных | ✓ | — | — |
-| Бесплатно, открытый код | ✓ (MIT) | подписка | ✓ |
+| Бесплатно, открытый код | ✓ (AGPL-3.0) | подписка | ✓ |
 | Документ за каждым фактом прямо на странице | ✓ | отчасти | отчасти |
 | История, карта и архив на одном сайте | ✓ | отчасти | отчасти |
 | Родные комментируют и предлагают исправления | ✓ | ✓ | отчасти |
@@ -214,5 +214,7 @@ gene build my-family              # сайт — в папке my-family/_site
 
 ## Лицензия
 
-[MIT](LICENSE). Leaflet — лицензия BSD, подложка карты © участники OpenStreetMap —
+[GNU AGPL-3.0-or-later](LICENSE): код можно использовать, менять и распространять; если вы публикуете изменённую
+версию или даёте ею пользоваться другим как сервисом, откройте свои изменения по той же лицензии. Сайты, собранные
+движком, — ваши данные, тексты и фото — принадлежат вам, лицензия на них не распространяется. Leaflet — лицензия BSD, подложка карты © участники OpenStreetMap —
 см. [THIRD_PARTY.md](THIRD_PARTY.md).

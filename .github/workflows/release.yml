@@ -76,7 +76,7 @@ jobs:
           v="${TAG#v}"
           docker build -t "$image:$v" -t "$image:latest" \
             --label org.opencontainers.image.source="https://github.com/$GITHUB_REPOSITORY" \
-            --label org.opencontainers.image.licenses=MIT \
+            --label org.opencontainers.image.licenses=AGPL-3.0-or-later \
             --label org.opencontainers.image.description="Family archive site generator with a comments server" .
           docker push "$image:$v"
           docker push "$image:latest"

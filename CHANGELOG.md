@@ -1,5 +1,12 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- License changed from MIT to GNU AGPL-3.0-or-later. Versions up to 0.4.0 stay available under MIT. Sites built
+  with the engine (your data, texts, photos) are not covered by the license.
+  Лицензия сменена с MIT на GNU AGPL-3.0-or-later. Версии до 0.4.0 включительно остаются доступны по MIT. Сайты,
+  собранные движком (ваши данные, тексты, фото), лицензия не затрагивает.
+
 ## 0.4.0 — 2026-10-12
 
 - **Search everything** from the magnifier: people, documents (their transcriptions), places, the Story, leads and

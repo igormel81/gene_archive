@@ -66,4 +66,4 @@ A paragraph with tags is translated whole, tags replaced by markers: `"Подр�
 - Python: standard library, readable code, comments explain *why*.
 - JavaScript: the existing ES5 style of `app.js`, no build step, no frameworks.
 - Commits: one topic each, a clear message.
-- By contributing you agree that your contribution is released under the MIT license.
+- By contributing you agree that your contribution is released under the GNU AGPL-3.0-or-later license.

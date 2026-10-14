@@ -4,7 +4,7 @@ title: "gene-archive: static site generator for a family history archive"
 authors:
   - family-names: Melnikov
     given-names: Igor
-license: MIT
+license: AGPL-3.0-or-later
 repository-code: "https://github.com/igormel81/gene_archive"
 version: 0.3.0
 date-released: 2026-10-12

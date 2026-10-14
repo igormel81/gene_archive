@@ -1,7 +1,7 @@
 /* gene-archive: interactive family tree, person cards, documents, places and relatives' comments.
    Data — data.json (built by `gene build`), comments — api/comments (optional server).
    UI strings are wrapped in T(): the Russian source text is the key, translations come from
-   window.GENE_LOCALE (i18n/<lang>.js, written by the build). MIT License. */
+   window.GENE_LOCALE (i18n/<lang>.js, written by the build). GNU AGPL-3.0-or-later. */
 (function () {
   'use strict';
 
