@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: sudo apt-get update -q && sudo apt-get install -y --no-install-recommends poppler-utils
-      - run: pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@main"
+      - run: pip install "gene-archive[images]"
       - id: pages
         uses: actions/configure-pages@v5
       - run: gene build . -o _site --base-url "${{ steps.pages.outputs.base_url }}/"

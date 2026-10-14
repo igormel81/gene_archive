@@ -40,7 +40,7 @@ jobs:
           v="${TAG#v}"
           awk -v v="$v" '$0 ~ "^## "v" " {on=1; next} on && /^## / {exit} on {print}' CHANGELOG.md > notes.md
           test -s notes.md || echo "See CHANGELOG.md" > notes.md
-          printf '\n**Install:** `pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive@%s"` · **Docker:** `ghcr.io/igormel81/gene_archive:%s` · **Demo:** https://igormel81.github.io/gene_archive/\n' "$TAG" "$v" >> notes.md
+          printf '\n**Install:** `pip install "gene-archive[images]==%s"` · **Docker:** `ghcr.io/igormel81/gene_archive:%s` · **Demo:** https://igormel81.github.io/gene_archive/\n' "$v" "$v" >> notes.md
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

@@ -31,7 +31,7 @@ free hosting, full history in git, GEDCOM in and out.
 
 > Grew out of a real family archive: ~550 people, ~500 documents, three countries, relatives
 > commenting in three languages. The [demo](https://igormel81.github.io/gene_archive/) is a
-> fictional family made to show every feature.
+> fictional family made to show every feature. How it came about: [an article on Habr](https://habr.com/ru/articles/1094212/) (in Russian).
 
 ## Why gene-archive
 
@@ -43,7 +43,7 @@ free hosting, full history in git, GEDCOM in and out.
 | 🔒 **Private by default** | Living people show only their names — no dates, places or documents, not even in the data file or the GEDCOM export. |
 | 🏠 **Your data, your site** | One JSON file, plain HTML, free hosting on GitHub Pages or Netlify, or your own server. No subscription, no lock-in: GEDCOM import and export. |
 | 🌍 **Three languages** | English, Russian and Romanian interface out of the box; your own texts can be translated too. |
-| 🤖 **AI-ready** | Every new site gets `AGENTS.md` for Claude Code and Codex, plus guides and ready prompts for research in archives and open sources. |
+| 🤖 **AI-ready** | Every new site gets `AGENTS.md` for Claude Code and Codex, plus guides and ready prompts for research in archives and open sources. Its companion [genealogy-mcp](https://github.com/igormel81/genealogy-mcp) gives any AI assistant 114 archives and databases, name variants, old calendars and evidence checks — and writes what it finds into your site through its checks and logs. |
 
 ## Features
 
@@ -134,7 +134,7 @@ You need Python 3.10+. [Pillow](https://pypi.org/project/Pillow/) makes thumbnai
 (optional), `pdftoppm` from poppler-utils makes PDF previews (optional).
 
 ```sh
-pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive"
+pip install "gene-archive[images]"
 
 gene init my-family --example     # a copy of the demo family to look around
 gene serve my-family              # → http://127.0.0.1:8111
@@ -164,7 +164,7 @@ Open an empty folder in it and paste:
 
 ```text
 Set up a family archive site with gene-archive (https://github.com/igormel81/gene_archive) in this folder.
-1. Install it: pip install "gene-archive[images] @ git+https://github.com/igormel81/gene_archive"
+1. Install it: pip install "gene-archive[images]"
 2. Create the site: gene init . --lang en (or gene import <my file>.ged . if I give you a GEDCOM file),
    then git init and a first commit.
 3. Read AGENTS.md and follow it in all further work: never invent facts or relationships,
