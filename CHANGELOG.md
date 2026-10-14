@@ -1,6 +1,6 @@
 # Changelog / История изменений
 
-## Unreleased
+## 0.5.0 — 2026-10-14
 
 - License changed from MIT to GNU AGPL-3.0-or-later. Versions up to 0.4.0 stay available under MIT. Sites built
   with the engine (your data, texts, photos) are not covered by the license.

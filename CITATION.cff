@@ -6,8 +6,8 @@ authors:
     given-names: Igor
 license: AGPL-3.0-or-later
 repository-code: "https://github.com/igormel81/gene_archive"
-version: 0.3.0
-date-released: 2026-10-12
+version: 0.5.0
+date-released: 2026-10-14
 keywords:
   - genealogy
   - family history
