@@ -28,6 +28,7 @@ WORDS = {   # fixed texts of the geni/public profiles, in the language of the si
     "en": {"living": "Living", "also": "Also: ", "more": "More: ", "other_birth": "Another version of the birth: "},
     "ru": {"living": "Живущий", "also": "Также: ", "more": "Подробнее: ", "other_birth": "Другая версия рождения: "},
     "ro": {"living": "În viață", "also": "De asemenea: ", "more": "Detalii: ", "other_birth": "Altă versiune a nașterii: "},
+    "uk": {"living": "Живий", "also": "Також: ", "more": "Докладніше: ", "other_birth": "Інша версія народження: "},
 }
 
 

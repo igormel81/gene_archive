@@ -203,14 +203,14 @@ class Translations(unittest.TestCase):
         app = (ROOT / "gene_archive/engine/web/app.js").read_text(encoding="utf-8")
         keys = {m.group(2) for m in re.finditer(r"\bT\((['\"])((?:\\.|(?!\1).)*)\1\)", app)}
         self.assertGreater(len(keys), 250)
-        for lang in ("en", "ro"):
+        for lang in ("en", "ro", "uk"):
             d = json.loads((ROOT / f"gene_archive/engine/i18n/{lang}.json").read_text(encoding="utf-8"))
             missing = [k for k in keys if k.replace("\\'", "'") not in d]
             self.assertEqual(missing, [], lang)
 
     def test_markup_is_kept(self):
         tags = re.compile(r"</?[A-Za-z][^>]*>|</?\d+/?>")
-        for lang in ("en", "ro"):
+        for lang in ("en", "ro", "uk"):
             d = json.loads((ROOT / f"gene_archive/engine/i18n/{lang}.json").read_text(encoding="utf-8"))
             for k, v in d.items():
                 self.assertEqual(sorted(tags.findall(k)), sorted(tags.findall(v)), (lang, k))

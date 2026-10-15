@@ -11,6 +11,7 @@ UI_LANGUAGES = {
     "ru": {"name": "Русский", "locale": "ru-RU", "plural": "ru"},
     "en": {"name": "English", "locale": "en-GB", "plural": "one_other"},
     "ro": {"name": "Română", "locale": "ro-RO", "plural": "ro"},
+    "uk": {"name": "Українська", "locale": "uk-UA", "plural": "ru"},
 }
 
 DEFAULTS = {
