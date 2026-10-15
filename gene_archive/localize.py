@@ -341,7 +341,7 @@ def language_nav(cfg, lang, page):
     depth = page.count("/")
     up = "../" * (depth + (0 if lang == langs[0] else 1))   # path from this page to the site root
     rel = "" if page == "index.html" else page.replace("/index.html", "/")
-    label = {"ru": "Язык сайта", "en": "Site language", "ro": "Limba site-ului"}.get(lang, "Language")
+    label = {"ru": "Язык сайта", "en": "Site language", "ro": "Limba site-ului", "uk": "Мова сайту"}.get(lang, "Language")
     links = "".join(
         f'<a data-site-lang="{x}" lang="{x}" hreflang="{x}"' + (' class="on" aria-current="true"' if x == lang else "")
         + f' href="{up}{"" if x == langs[0] else x + "/"}{rel}">{UI_LANGUAGES[x]["name"]}</a>' for x in langs)
