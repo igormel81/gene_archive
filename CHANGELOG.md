@@ -1,5 +1,14 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- Translations: a paragraph with links is reported for translation only as a whole, never piece by piece, and
+  the text of a link to a person is kept as a name — renaming someone no longer breaks a translated paragraph.
+  Titles of people whose name holds a comma («Иванова Анна, жена Петра (~1918)») keep the whole name.
+  Переводы: абзац со ссылками просится к переводу только целиком, а не кусками, текст ссылки на человека остаётся
+  именем — переименование человека больше не ломает переведённый абзац. В заголовках людей с запятой в имени
+  («Иванова Анна, жена Петра (~1918)») имя остаётся целым.
+
 ## 0.5.0 — 2026-10-14
 
 - License changed from MIT to GNU AGPL-3.0-or-later. Versions up to 0.4.0 stay available under MIT. Sites built

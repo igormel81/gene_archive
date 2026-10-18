@@ -339,6 +339,45 @@ class BuildExample(unittest.TestCase):
             build.build(broken)
 
 
+class PageTranslation(unittest.TestCase):
+    """Paragraphs with links and titles of people's pages in a translated edition."""
+
+    def page(self, html, names, catalog, strict=False):
+        tr = localize.Translator(names, {localize.digest(k.strip()): v for k, v in catalog.items()}, strict=strict)
+        return localize.Page(tr, "en", lambda u: u).render(html), tr
+
+    def test_chunked_paragraph_survives_a_new_name(self):
+        html = '<p>Отец — <a data-p="I1">Пётр</a>, кузнец.</p>'
+        old = {"Отец —": "Father:", ", кузнец.": ", a smith."}
+        # "Пётр" used to be the whole given name; now it has a patronymic, the text of the story stays the same
+        for names in (["Пётр"], ["Пётр Иванович", "Иванов Пётр Иванович"]):
+            out, tr = self.page(html, names, old)
+            self.assertEqual(out, '<p>Father: <a data-p="I1">Пётр</a>, a smith.</p>', names)
+            self.assertEqual(tr.missing, set(), names)
+
+    def test_missing_paragraph_is_reported_whole(self):
+        html = '<p>Отец — <a href="../people/I1.html">Пётр</a>, кузнец <b>в Красном</b>.</p>'
+        out, tr = self.page(html, ["Пётр Иванович"], {"Отец —": "Father:"})
+        self.assertEqual(tr.missing, {"Отец — <1>Пётр</1>, кузнец <2>в Красном</2>."})
+        self.assertIn("Father: ", out)
+        whole = {"Отец — <1>Пётр</1>, кузнец <2>в Красном</2>.": "Father: <1>Pyotr</1>, a smith <2>in Krasnoye</2>."}
+        out, tr = self.page(html, [], whole)
+        self.assertEqual(out, '<p>Father: <a href="../people/I1.html">Pyotr</a>, a smith <b>in Krasnoye</b>.</p>')
+        with self.assertRaises(localize.Missing):
+            self.page(html, [], {}, strict=True)
+
+    def test_title_with_a_comma_in_the_name(self):
+        name = "Иванова Анна, жена Петра"
+        cat = {"Семейный архив": "Family archive", "Красное": "Krasnoye"}
+        for title, want in (("Иванова Анна, жена Петра (~1918) — Семейный архив", "Иванова Анна, жена Петра (~1918) — Family archive"),
+                            ("Иванова Анна, жена Петра (~1918), Красное — Семейный архив", "Иванова Анна, жена Петра (~1918), Krasnoye — Family archive"),
+                            ("Иванова Анна, жена Петра — Семейный архив", "Иванова Анна, жена Петра — Family archive"),
+                            ("Петров Иван (1890–1950) — Семейный архив", "Петров Иван (1890–1950) — Family archive")):
+            out, tr = self.page(f"<html><head><title>{title}</title></head></html>", [name, "Петров Иван"], cat)
+            self.assertIn(f"<title>{want}</title>", out, title)
+            self.assertEqual(tr.missing, set(), title)
+
+
 class UrlMapper(unittest.TestCase):
     def test_language_folder(self):
         url = localize.make_url_mapper("ru/", "people/I1.html", "https://example.org/f/")

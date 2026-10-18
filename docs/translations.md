@@ -44,6 +44,9 @@ gene translations my-family en > todo-en.json
 It prints a JSON object with empty values: fill them in and merge into `translations/en.json`.
 A paragraph with links or bold text is translated whole, with markers instead of tags:
 `"Подробнее в <1>Истории</1>."` → `"More in the <1>Story</1>."` — the markers must stay the same.
+`gene translations` always lists such a paragraph whole (older translations of its pieces between the
+tags keep working while every piece has one). The text of a link to a person (`<a data-p="I12">`) is
+a name and is never asked for, so renaming someone in the data does not break the translated story.
 
 Untranslated texts appear in the original language. To make the build fail instead, set
 `"strict_translations": true` in `site.json`.

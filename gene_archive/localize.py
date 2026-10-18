@@ -64,13 +64,25 @@ class Missing(ValueError):
     pass
 
 
+NAME_WORD = re.compile(r"[^\W\d_]+(?:['’-][^\W\d_]+)*")
+
+
 class Translator:
     def __init__(self, names, catalog=None, strict=False):
         self.names = set(names)
+        # every word of every name: a piece of text made only of them ("Пётр", "Анна Петровна") is a name
+        # even after the person's full name in the data has changed
+        self.name_words = {w for n in self.names for w in NAME_WORD.findall(n or "")}
         self.catalog = catalog          # None = collect mode (gene translations missing)
         self.strict = strict
         self.strings = set()
         self.missing = set()
+
+    def is_name(self, core):
+        if core in self.names:
+            return True
+        words = NAME_WORD.findall(core)
+        return bool(words) and all(w in self.name_words for w in words) and not CYR.search(NAME_WORD.sub("", core))
 
     def soft(self, text):
         try:
@@ -81,9 +93,29 @@ class Translator:
     def paragraph(self, key):
         return None if self.catalog is None else self.catalog.get(digest(key))
 
+    def known(self, text):
+        """Is there nothing to translate in `text`, or a translation for it (nothing is recorded)."""
+        core = text.strip()
+        return not CYR.search(core) or self.is_name(core) or (self.catalog is not None and digest(core) in self.catalog)
+
+    def piece(self, text):
+        """A piece of a paragraph reported as a whole: translated when possible, never recorded."""
+        core = text.strip()
+        if self.known(core) and CYR.search(core) and not self.is_name(core):
+            return text[:len(text) - len(text.lstrip())] + self.catalog[digest(core)] + text[len(text.rstrip()):]
+        return text
+
+    def need(self, core):
+        """A text without a translation, reported as a whole (a paragraph with its markers)."""
+        self.strings.add(core)
+        if self.catalog is not None:
+            self.missing.add(core)
+            if self.strict:
+                raise Missing("Missing translation: " + core[:100])
+
     def __call__(self, text, strict=None):
         core = text.strip()
-        if not CYR.search(core) or core in self.names:
+        if not CYR.search(core) or self.is_name(core):
             return text
         self.strings.add(core)
         if self.catalog is None:
@@ -142,10 +174,18 @@ TEXT_ATTRS = {"title", "alt", "placeholder", "aria-label"}
 VOID = ("area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr")
 
 
+def person_link(tag, attrs):
+    """A link to a person: its text is a name and is never translated."""
+    a = dict(attrs)
+    return tag == "a" and ("data-p" in a or re.search(r"(^|/)people/I\d+\.html$", a.get("href") or "") is not None)
+
+
 class Page(HTMLParser):
     """Translates an HTML page. A block (paragraph, list item, caption…) with inline links and emphasis is
-    translated whole: tags become markers <1>…</1>, <2/> and the key is the whole paragraph. Without a
-    whole-paragraph translation the block is translated piece by piece between tags."""
+    translated whole: tags become markers <1>…</1>, <2/> and the key is the whole paragraph. Older
+    translations piece by piece between tags still work while every piece has one; otherwise the whole
+    paragraph is reported as missing — never its pieces, which change whenever a name in the text does.
+    Text inside links to people is a name and is kept as it is."""
 
     def __init__(self, tr, lang, url):
         super().__init__(convert_charrefs=True)
@@ -174,12 +214,31 @@ class Page(HTMLParser):
         text = "".join(key)
         core = text.strip()
         whole = bool(tags) and bool(CYR.search(core)) and not open_ids
-        if whole:
+        if whole and self.tr.catalog is not None:
             translated = self.tr.paragraph(core)
             if translated is not None and self._replay(text, core, translated, tags):
                 return
+        names, depth, pieces = [], 0, []   # names: is each data event inside a link to a person
         for ev in events:
-            getattr(self, "_ev_" + ev[0])(*ev[1:])
+            if ev[0] == "start" and (depth or person_link(ev[1], ev[2])):
+                depth += 1
+            elif ev[0] == "end" and depth:
+                depth -= 1
+            names.append(ev[0] == "data" and depth > 0)
+            if ev[0] == "data" and not depth:
+                pieces.append(ev[1])
+        if whole and not all(self.tr.known(x) for x in pieces):
+            self.tr.need(core)                 # translated as a whole, or not at all
+            translate = self.tr.piece
+        else:
+            translate = self.tr
+        for ev, name in zip(events, names):
+            if name:
+                self.out.append(html.escape(ev[1], quote=False))
+            elif ev[0] == "data":
+                self.out.append(html.escape(translate(ev[1]), quote=False))
+            else:
+                getattr(self, "_ev_" + ev[0])(*ev[1:])
 
     def _replay(self, text, core, translated, tags):
         if sorted(TOKEN.findall(core)) != sorted(TOKEN.findall(translated)):
@@ -199,7 +258,12 @@ class Page(HTMLParser):
         return True
 
     def title(self, s):
-        """«Имя (1890–1950), Место — Семейный архив»: names stay, every other part is translated by itself."""
+        """«Имя (1890–1950), Место — Семейный архив»: names stay, every other part is translated by itself.
+        A name may hold a comma or brackets («Иванова Анна, жена Петра (~1918)»): the whole text before the
+        bracketed years (or before the dash) is tried as a name first."""
+        head = re.match(r"(.+?)(?= \([^()]*\d{4}[^()]*\)| — )", s)
+        if head and self.tr.is_name(head[1]):
+            return head[1] + self.title(s[len(head[1]):]) if s[len(head[1]):] else s
         parts = re.split(r"( — |, | \(|\))", s)
         return "".join(p if i % 2 else self.tr.soft(p) for i, p in enumerate(parts))
 
