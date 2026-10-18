@@ -81,6 +81,8 @@ free hosting, full history in git, GEDCOM in and out.
 - The roads of the family's branches: places in the order of years, numbered stops on each branch's map
   (Leaflet + OpenStreetMap), and all places on one map.
 - The **Story** page: your narrative with a timeline and a "by place" filter.
+- **Archive in numbers**: people, documents and places, where the documents come from, what confirms
+  each person, the family lines, births by century and the research log — counted at every build.
 - **Questions to relatives**: what the family does not know yet — answered right on the site.
 
 ### ✏️ Online editor

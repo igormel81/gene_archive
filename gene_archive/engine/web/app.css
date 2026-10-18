@@ -1136,3 +1136,36 @@ ol.bio-srcs a:hover { color: var(--accent); }
 .res-log { margin-top: 8px; font: 13px/1.45 var(--sans); }
 .res-log summary { cursor: pointer; color: var(--accent); }
 .res-log p { font-size: 13px; }
+
+/* «Архив в цифрах»: плитки с числами и полосы на цветах темы */
+.page.stats { max-width: 980px; }
+.stat-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 18px 0 8px; }
+.stat-tile { padding: 14px 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+.stat-tile b { display: block; font: 600 32px/1.1 var(--serif); color: var(--accent); font-variant-numeric: tabular-nums; }
+.stat-tile span { color: var(--muted); font: 13px/1.35 var(--sans); }
+.stat-sec { margin-top: 34px; }
+.stat-sec h3 { margin: 0 0 6px; }
+.stat-bars { display: grid; gap: 8px; margin-top: 10px; font: 14px var(--sans); }
+.stat-row { display: grid; grid-template-columns: minmax(150px, 34%) minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.stat-bar { height: 14px; background: var(--chip); border-radius: 7px; overflow: hidden; }
+.stat-bar i { display: block; height: 100%; background: var(--accent); border-radius: 7px; }
+.stat-row.p-family_word .stat-bar i, .stat-row.o-family .stat-bar i { background: color-mix(in srgb, var(--accent) 55%, var(--paper)); }
+.stat-row.p-none .stat-bar i, .stat-row.o-other .stat-bar i { background: var(--muted); }
+.stat-n { color: var(--muted); font: 13px var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stat-table { font: 14px var(--sans); }
+.stat-table td, .stat-table th { padding: 6px 10px; text-align: left; vertical-align: middle; }
+.stat-table td:nth-child(n+2):not(:last-child) { font-variant-numeric: tabular-nums; }
+.stat-cols { display: flex; align-items: flex-end; gap: 14px; height: 200px; margin-top: 12px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.stat-col { flex: 1 1 0; max-width: 90px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; position: relative; }
+.stat-col i { display: block; width: 100%; background: var(--accent); border-radius: 5px 5px 0 0; }
+.stat-col .stat-label { color: var(--muted); font: 12px var(--sans); white-space: nowrap; }
+.stat-log { gap: 2px; height: 120px; }
+.stat-log .stat-col { max-width: 26px; min-width: 2px; }
+.stat-log .stat-col.empty i { background: none; }
+.stat-log .stat-label { position: absolute; bottom: -20px; left: 0; }
+.stat-log { margin-bottom: 26px; }
+@media (max-width: 720px) {
+  .stat-row { grid-template-columns: 1fr auto; }
+  .stat-row .stat-bar { grid-column: 1 / -1; grid-row: 2; }
+  .stat-tile b { font-size: 26px; }
+}

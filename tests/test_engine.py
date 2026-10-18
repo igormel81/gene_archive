@@ -301,7 +301,7 @@ class BuildExample(unittest.TestCase):
         from gene_archive.privacy import living_people
         living = living_people(json.loads((self.site / "family_tree.json").read_text(encoding="utf-8")))
         self.assertTrue(living)
-        keys = ["tree", "people", "archive", "places", "questions", "story"] + [s["id"] for s in data["sources"]] \
+        keys = ["tree", "people", "archive", "places", "questions", "story", "stats"] + [s["id"] for s in data["sources"]] \
             + [p["id"] for p in data["people"] if not p.get("placeholder")] + ["place-" + pl["slug"] for pl in data["places"]]
         for prefix in ("", "ru/", "ro/"):
             for key in keys:
@@ -525,6 +525,25 @@ class Hints(unittest.TestCase):
         self.assertNotIn(("unused_source", "S1"), got)
         self.assertEqual(hints(data)[0]["code"], "born_after_mother_death")   # impossible facts first
         self.assertIn("Mother", text(hints(data)[0], "ru"))
+
+
+class ArchiveStats(unittest.TestCase):
+    def test_numbers(self):
+        from gene_archive.stats import archive_stats
+        data, living = build.public_data(CFG, copy.deepcopy(DATA))
+        st = archive_stats(data, [("Harper", [p["id"] for p in data["people"] if p.get("surname") == "Harper"])], living)
+        self.assertEqual(st["totals"]["documents"], len(data["sources"]))
+        self.assertEqual(st["totals"]["people"], sum(1 for p in data["people"] if not p.get("placeholder")))
+        self.assertEqual(sum(n for _, n in st["origins"]), len(data["sources"]))
+        origins = dict(st["origins"])
+        self.assertEqual(origins["military"], 2)
+        self.assertEqual(st["branches"][0]["earliest"], "I1")       # Patrick Harper, about 1832
+        self.assertIn("family_word", dict(st["proof"]))
+        self.assertEqual(dict(st["centuries"])[19] + dict(st["centuries"]).get(20, 0) + dict(st["centuries"]).get(18, 0),
+                         sum(1 for p in data["people"] if not p.get("placeholder") and p["id"] not in living and re.search(r"\d{4}", str((p.get("birth") or {}).get("date", "")))))
+        self.assertEqual(sum(n for _, n in st["log_by_day"]), len(data["research_log"]))
+        for b in st["branches"]:
+            self.assertNotIn(b["earliest"], living)
 
 
 class EstimateBirth(unittest.TestCase):

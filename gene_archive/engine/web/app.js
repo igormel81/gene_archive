@@ -1334,12 +1334,13 @@
     if (name === 'wide' && !document.documentElement.classList.contains('print-wide')) requestAnimationFrame(function () { renderWide(); wideFit(); });
     if (name !== 'story') storyAnchor = null;
     if (name === 'places') setTimeout(drawPlaceMaps, 0);
+    if (name === 'stats') renderStats();
     window.scrollTo({ top: 0, behavior: 'instant' });
     syncUrl();
   }
 
   // ---------- URL routing: #/вид[/аргумент][?person=ID&place=Место]
-  var VIEWS = ['tree', 'wide', 'story', 'people', 'questions', 'places', 'sources'];
+  var VIEWS = ['tree', 'wide', 'story', 'people', 'questions', 'places', 'sources', 'stats'];
   var routing = false, booted = false, storyAnchor = null, storyPlace = null, storyReady = false, pendingStory = null;
   function buildHash() {
     var h = '#/' + currentView;
@@ -1373,6 +1374,7 @@
     if (selectedId && P[selectedId]) what = P[selectedId].display_name;
     else if (docOpen && S[docOpen]) what = S[docOpen].title;
     else if (currentView === 'places' && selectedPlace) { var pl = placeBySlug(selectedPlace); what = pl && pl.name; }
+    else if (currentView === 'stats') what = T('Архив в цифрах');
     else if (currentView === 'tree' && focusId && P[focusId]) what = P[focusId].display_name;
     else { var tab = document.querySelector('.tabs [aria-selected="true"]'); what = tab && tab.firstChild && tab.firstChild.textContent.trim(); }
     return what ? what + T(' — Семейный архив') : baseTitle;
@@ -3044,7 +3046,7 @@
     if (selectedId && $('panel').classList.contains('open')) return selectedId;
     if (currentView === 'places') return selectedPlace ? 'place-' + selectedPlace : 'places';
     if (currentView === 'sources') return archMode === 'restored' ? 'restored' : 'archive';
-    return { story: 'story', people: 'people', questions: 'questions' }[currentView] || 'tree';
+    return { story: 'story', people: 'people', questions: 'questions', stats: 'stats' }[currentView] || 'tree';
   }
   function shareLink(btn, key) {
     var url = location.href.split('#')[0].replace(/[^\/]*$/, '') + 's/' + (key || shareKey()) + '.html';
@@ -3065,6 +3067,82 @@
     $('lightbox-img').alt = s.title;
     $('lightbox-cap').textContent = s.id + ' · ' + s.title;
     $('lightbox').hidden = false;
+  }
+
+  // ---------- «Архив в цифрах»: статистика, посчитанная при сборке (data.json → stats); полосы — на цветах темы
+  function renderStats() {
+    var st = D.stats, host = $('stats');
+    if (!st || !host) return;
+    clear(host);
+    var fmt = new Intl.NumberFormat(LOCALE.locale || 'ru-RU');
+    var t = st.totals;
+    var tiles = [[t.people, T('людей в древе')], [t.documents, T('документов и снимков')], [t.places, T('мест')],
+      [t.corrections, T('исправленных фактов')], [t.restored, T('отреставрированных снимков')], [t.open_leads, T('открытых вопросов')],
+      [t.log, T('записей в журнале поиска')]];
+    if (SITE.comments) tiles.splice(4, 0, [comments.length, T('комментариев родных')]);
+    host.appendChild(el('div', { class: 'stat-tiles' }, tiles.filter(function (x) { return x[0] || x[1] === T('людей в древе'); }).map(function (x) {
+      return el('div', { class: 'stat-tile' }, el('b', { text: fmt.format(x[0]) }), el('span', { text: x[1] }));
+    })));
+    // горизонтальные полосы: подпись, полоса в долю от наибольшего значения, число
+    function bars(rows, total) {
+      var max = Math.max.apply(null, rows.map(function (r) { return r[1]; }).concat([1]));
+      return el('div', { class: 'stat-bars' }, rows.map(function (r) {
+        return el('div', { class: 'stat-row' + (r[2] ? ' ' + r[2] : '') }, el('span', { class: 'stat-label', text: r[0] }),
+          el('span', { class: 'stat-bar' }, el('i', { style: 'width:' + (100 * r[1] / max).toFixed(1) + '%' })),
+          el('span', { class: 'stat-n', text: fmt.format(r[1]) + (total ? ' · ' + Math.round(100 * r[1] / total) + '%' : '') }));
+      }));
+    }
+    function section(title, note, body) { return el('section', { class: 'stat-sec' }, el('h3', { text: title }), note ? el('p', { class: 'sub', text: note }) : null, body); }
+    var ORIGIN = { family: T('Семья: снимки, письма, рассказы'), archives: T('Архивы и метрические книги'), publications: T('Книги, газеты и сайты'),
+      military: T('Военные базы'), graves: T('Надгробия и памятники'), other: T('Прочее') };
+    var nDocs = st.origins.reduce(function (a, r) { return a + r[1]; }, 0);
+    host.appendChild(section(T('Откуда документы'), null, bars(st.origins.map(function (r) { return [ORIGIN[r[0]] || r[0], r[1], 'o-' + r[0]]; }), nDocs)));
+    var PROOF = { archives: T('Архивными документами'), publications: T('Публикациями и базами'), family_papers: T('Семейными документами и снимками'),
+      family_word: T('Только со слов семьи'), none: T('Пока ничем') };
+    var nProof = st.proof.reduce(function (a, r) { return a + r[1]; }, 0);
+    host.appendChild(section(T('Чем подтверждены люди'), T('По самому сильному документу о человеке. Живые и «возможная родня» не считаются.'),
+      bars(st.proof.map(function (r) { return [PROOF[r[0]] || r[0], r[1], 'p-' + r[0]]; }), nProof)));
+    if (st.branches.length) {
+      host.appendChild(section(T('Роды'), null, el('div', { class: 'tblwrap' }, el('table', { class: 'stat-table' },
+        el('thead', {}, el('tr', {}, [T('Фамилия'), T('Людей'), T('Открытых вопросов'), T('Исправлено фактов'), T('Самый ранний предок')].map(function (h) { return el('th', { text: h }); }))),
+        el('tbody', {}, st.branches.map(function (b) {
+          var g = surnameGroups().filter(function (x) { return x.key === b.surname; })[0];
+          return el('tr', {},
+            el('td', {}, g ? el('a', { href: '#/tree/' + g.focus + '?line=' + encodeURIComponent(b.surname), text: b.surname }) : b.surname),
+            el('td', { text: fmt.format(b.people) }), el('td', { text: fmt.format(b.leads) }), el('td', { text: fmt.format(b.corrections) }),
+            el('td', {}, b.earliest && P[b.earliest] ? [el('a', { href: '#/tree/' + b.earliest + '?person=' + b.earliest, text: P[b.earliest].display_name,
+              onclick: function (e) { e.preventDefault(); openPerson(b.earliest); } }), el('small', { class: 'stat-n', text: ' · ' + evYear(P[b.earliest].birth) })] : '—'));
+        }))))));
+    }
+    if (st.centuries.length) {
+      var maxC = Math.max.apply(null, st.centuries.map(function (c) { return c[1]; }));
+      host.appendChild(section(T('Рождения по векам'), T('Люди с известным годом рождения.'), el('div', { class: 'stat-cols' }, st.centuries.map(function (c) {
+        return el('div', { class: 'stat-col' }, el('span', { class: 'stat-n', text: fmt.format(c[1]) }),
+          el('i', { style: 'height:' + Math.max(4, 100 * c[1] / maxC).toFixed(1) + '%' }), el('span', { class: 'stat-label', text: romanCentury(c[0]) + T(' век') }));
+      }))));
+    }
+    if (st.log_by_day.length) {
+      // по дням, а если журнал длиннее четырёх месяцев — по месяцам
+      var first = new Date(st.log_by_day[0][0]), last = new Date(st.log_by_day[st.log_by_day.length - 1][0]);
+      var byMonth = (last - first) / 864e5 > 120, counts = {}, keys = [];
+      st.log_by_day.forEach(function (d) { var k = byMonth ? d[0].slice(0, 7) : d[0]; counts[k] = (counts[k] || 0) + d[1]; });
+      for (var x = new Date(first); x <= last; byMonth ? x.setMonth(x.getMonth() + 1, 1) : x.setDate(x.getDate() + 1)) {
+        var k = x.toISOString().slice(0, byMonth ? 7 : 10);
+        if (keys.indexOf(k) < 0) keys.push(k);
+      }
+      var maxL = Math.max.apply(null, keys.map(function (k) { return counts[k] || 0; }).concat([1]));
+      host.appendChild(section(T('Журнал поиска'), byMonth ? T('Записей в журнале поиска по месяцам.') : T('Записей в журнале поиска по дням.'),
+        el('div', { class: 'stat-cols stat-log' }, keys.map(function (k) {
+          var n = counts[k] || 0, label = byMonth ? fmtDate(k) : fmtDate(k);
+          return el('div', { class: 'stat-col' + (n ? '' : ' empty'), title: label + ': ' + n }, el('i', { style: 'height:' + (n ? Math.max(4, 100 * n / maxL) : 0).toFixed(1) + '%' }),
+            el('span', { class: 'stat-label', text: byMonth ? k.slice(5) === '01' || k === keys[0] ? k.slice(0, 4) : '' : '' }));
+        }))));
+    }
+  }
+  function romanCentury(n) {
+    var r = '', map = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+    map.forEach(function (m) { while (n >= m[0]) { r += m[1]; n -= m[0]; } });
+    return r;
   }
 
   // ---------- surname navigation

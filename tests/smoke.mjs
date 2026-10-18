@@ -90,6 +90,15 @@ for (const engine of engines) {
         const stat = await page.request.get(base + lang + `places/${pl.slug}.html`);
         ok(stat.ok() && (await stat.text()).includes(pl.name), P(`static page places/${pl.slug}.html is missing`));
       }
+      // Archive in numbers
+      if (data.stats) {
+        await page.goto(base + lang + '#/stats');
+        await page.waitForTimeout(500);
+        ok(await page.locator('#view-stats.active .stat-tile').count() >= 3, P('archive in numbers: no headline numbers'));
+        ok(await page.locator('#stats .stat-bar i').count() > 0, P('archive in numbers: no bars'));
+        const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        ok(wide <= 1, P(`archive in numbers scrolls sideways by ${wide}px`));
+      }
       // Archive → Sources
       if ((data.research_resources || []).length) {
         await page.goto(base + lang + '#/sources?mode=research');

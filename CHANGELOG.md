@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- "Archive in numbers" (`#/stats`, in the More menu and on the Archive page): headline counts, where the documents
+  come from (by `kind`), what confirms the people (`identity_source_ids`), per-surname people, open leads,
+  corrections and the earliest ancestor, births by century, research-log activity — computed at build time
+  (`stats` in data.json), CSS bars on the theme's colours, translatable labels.
+  «Архив в цифрах» (`#/stats`, в меню «Ещё» и на странице архива): главные числа, откуда документы (по `kind`), чем
+  подтверждены люди (`identity_source_ids`), по родам — люди, открытые вопросы, исправления и самый ранний предок,
+  рождения по векам, журнал поиска по времени; считается при сборке (`stats` в data.json), полосы на цветах темы,
+  подписи переводятся.
+
 - Register-reading coverage: a `coverage` section (parish → year → births/marriages/deaths → film, frames, status
   complete / partial up to No. … / not found, documents found), checked by `gene validate` and shown as a year × part
   grid under its resource in Archive → Sources and on the place page.

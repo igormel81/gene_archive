@@ -324,6 +324,7 @@ class Pages:
         ("places", "Места семьи", "Карта мест, где жила семья: сёла, города, приходы и кладбища.", "#/places"),
         ("questions", "Вопросы к семье", "Что мы пока не знаем и что могут подсказать родные. Можно ответить прямо на сайте.", "#/questions"),
         ("news", "Что нового", "Новые находки семейного архива.", "news.html"),
+        ("stats", "Архив в цифрах", "Сколько людей, документов и мест собрано, откуда документы и на чём держится древо.", "#/stats"),
     )
 
     def share_pages(self, site_dir, restored, bios_html=""):
@@ -393,7 +394,7 @@ class Pages:
                 faces.append(x)
         rest = [x for x in (pic(sid) for sid in restored) if x]
         photos = {"tree": faces, "people": faces[2:] + faces[:2], "bios": faces, "story": faces[::-1], "archive": rest[-6:] or faces,
-                  "restored": rest, "places": rest[6:12] or faces, "questions": rest[12:18] or faces[::-1], "news": rest[-6:][::-1] or faces}
+                  "restored": rest, "places": rest[6:12] or faces, "questions": rest[12:18] or faces[::-1], "news": rest[-6:][::-1] or faces, "stats": faces}
         for key, title, desc, target in self.SECTIONS:
             if (key == "story" and not self.has_story) or (key == "news" and not self.has_news) \
                     or (key == "bios" and not bio_ids) or (key == "restored" and not restored):

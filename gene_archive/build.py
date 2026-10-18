@@ -12,7 +12,7 @@ import subprocess
 from html.parser import HTMLParser
 from pathlib import Path
 
-from . import config, discovery, ged_export, localize, privacy
+from . import config, discovery, ged_export, localize, privacy, stats
 from .messages import m
 from .validate import validate
 
@@ -136,6 +136,7 @@ def fill_index(template, cfg, has_story, has_news, has_help, has_places=False):
         more.append('<a href="news.html">Что нового</a>')
     if has_help:
         more.append('<a href="help.html">Как пользоваться</a>')
+    more.append('<a href="#/stats" data-view-link="stats">Архив в цифрах</a>')
     more.append('<a href="people/">Указатель людей</a>')
     if has_places:
         more.append('<a href="places/">Указатель мест</a>')
@@ -336,6 +337,8 @@ def build(site_dir, out=None, base_url=None):
         "research_log": data.get("research_log", []),
         "research_resources": research_resources(data, sources),
         "coverage": data.get("coverage", []),
+        "stats": stats.archive_stats(data, [(k, ids) for k, ids in discovery.Pages(tmp, data, cfg, living, False, False).surname_groups()
+                                           if len(ids) >= cfg["min_surname_page"]], living, restored),
         "surnames": data.get("surnames", {}),
         "restored": restored,
         "bios": re.findall(r'<article class="bio" id="bio-(I\d+)"', bios),

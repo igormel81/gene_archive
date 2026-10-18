@@ -229,10 +229,18 @@
     <article class="page place-page" id="place-page" hidden aria-labelledby="place-title"></article>
   </section>
 
+  <section id="view-stats" class="view">
+    <div class="page stats">
+      <h2>Архив в цифрах</h2>
+      <p class="sub">Сколько всего собрано, откуда документы и на чём держится древо. Цифры пересчитываются при каждой сборке сайта.</p>
+      <div id="stats"></div>
+    </div>
+  </section>
+
   <section id="view-sources" class="view">
     <div class="page archive">
       <h2>Семейный архив</h2>
-      <p class="sub">Все документы, фотографии, рукописи и справки, на которых основано древо. Нажмите на карточку, чтобы открыть документ, прочитать описание и увидеть, к кому он относится. <a href="family_tree.ged" download>Скачать древо в формате GEDCOM</a> — для MyHeritage, Gramps и других программ.</p>
+      <p class="sub">Все документы, фотографии, рукописи и справки, на которых основано древо. Нажмите на карточку, чтобы открыть документ, прочитать описание и увидеть, к кому он относится. <a href="family_tree.ged" download>Скачать древо в формате GEDCOM</a> — для MyHeritage, Gramps и других программ. <a href="#/stats">Архив в цифрах</a> — сколько собрано и откуда.</p>
       <div class="arch-tabs" role="tablist" aria-label="Разделы архива"><button type="button" role="tab" data-mode="docs" aria-selected="true">Документы и фотографии</button><button type="button" role="tab" data-mode="restored" aria-selected="false" id="arch-tab-restored" hidden>Отреставрированные фото</button><button type="button" role="tab" data-mode="corrections" aria-selected="false" id="arch-tab-corrections">Журнал исправлений</button><button type="button" role="tab" data-mode="research" aria-selected="false" id="arch-tab-research" hidden>Источники</button></div>
       <div id="arch-docs">
       <div class="arch-tools">
