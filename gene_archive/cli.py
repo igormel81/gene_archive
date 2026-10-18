@@ -27,6 +27,7 @@ from . import __version__
 from .messages import m
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "example"
+EXAMPLE_URL = "https://codeload.github.com/igormel81/gene_archive/tar.gz/refs/tags/v{version}"
 SCHEMAS = "https://raw.githubusercontent.com/igormel81/gene_archive/main/schemas/"
 
 
@@ -42,15 +43,49 @@ def write_agent_rules(dest, lang):
         (dest / "CLAUDE.md").write_text("@AGENTS.md\n", encoding="utf-8")
 
 
+def fetch_example(url, dest):
+    """The example/ folder of a release tarball → dest (without its built _site)."""
+    import io
+    import tarfile
+    import urllib.request
+    with urllib.request.urlopen(url, timeout=60) as r:
+        blob = r.read()
+    found = False
+    with tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz") as tar:
+        for member in tar.getmembers():
+            parts = Path(member.name).parts
+            if len(parts) < 3 or parts[1] != "example" or parts[2].startswith("_site") or ".." in parts:
+                continue
+            if not (member.isfile() or member.isdir()):   # no links or devices from an archive
+                continue
+            target = dest.joinpath(*parts[2:])
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(tar.extractfile(member).read())
+            found = True
+    if not found:
+        raise ValueError("no example/ folder in the archive")
+
+
 def cmd_init(args):
     dest = Path(args.folder)
     # hidden folders of editors and git (.git, .vscode, .cursor…) do not count
     if dest.exists() and any(not x.name.startswith(".") for x in dest.iterdir()):
         sys.exit(m(f"{dest} is not empty", f"папка {dest} не пустая"))
     if args.example:
-        if not EXAMPLE.is_dir():
-            sys.exit(m("the example is not installed with this copy (clone the repository)", "пример не установлен (склонируйте репозиторий)"))
-        shutil.copytree(EXAMPLE, dest, dirs_exist_ok=True, ignore=shutil.ignore_patterns("_site*", ".cache"))
+        if EXAMPLE.is_dir():   # a clone of the repository
+            shutil.copytree(EXAMPLE, dest, dirs_exist_ok=True, ignore=shutil.ignore_patterns("_site*", ".cache"))
+        else:                  # installed from PyPI: the demo family comes from the release of this version
+            print(m("Downloading the demo family from GitHub…", "Скачиваю пример с GitHub…"))
+            try:
+                fetch_example(EXAMPLE_URL.format(version=__version__), dest)
+            except (OSError, ValueError) as e:
+                sys.exit(m(f"could not download the example ({e}); clone the repository instead: "
+                           "git clone https://github.com/igormel81/gene_archive",
+                           f"не удалось скачать пример ({e}); склонируйте репозиторий: "
+                           "git clone https://github.com/igormel81/gene_archive"))
         write_agent_rules(dest, "en")
         print(m(f"Demo site copied to {dest}. Next: gene serve {dest}", f"Пример скопирован в {dest}. Дальше: gene serve {dest}"))
         return

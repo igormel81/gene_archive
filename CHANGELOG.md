@@ -1,5 +1,11 @@
 # Changelog / История изменений
 
+## 0.6.1 — 2026-10-18
+
+- `gene init <folder> --example` works after `pip install gene-archive`: the demo family is downloaded from the
+  GitHub release of the installed version (it is not inside the PyPI package).
+  `gene init <папка> --example` работает после установки с PyPI: пример скачивается из выпуска на GitHub той же версии.
+
 ## 0.6.0 — 2026-10-18
 
 - **Ukrainian interface** (`--lang uk`) next to Russian, English and Romanian.

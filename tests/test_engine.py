@@ -509,6 +509,38 @@ class Init(unittest.TestCase):
                 cli.main(["init", tmp])
 
 
+    def test_example_from_a_release_archive(self):   # installed from PyPI: the example is downloaded
+        import io
+        import tarfile
+        from unittest import mock
+        from gene_archive import cli
+        with tempfile.TemporaryDirectory() as tmp:
+            arc = Path(tmp, "release.tar.gz")
+            with tarfile.open(arc, "w:gz") as tar:
+                def add(name, data=b"x", kind=tarfile.REGTYPE):
+                    info = tarfile.TarInfo(name)
+                    info.type, info.size = kind, (len(data) if kind == tarfile.REGTYPE else 0)
+                    if kind == tarfile.SYMTYPE:
+                        info.linkname = "/etc/passwd"
+                    tar.addfile(info, io.BytesIO(data) if kind == tarfile.REGTYPE else None)
+                add("gene_archive-9.9/README.md")
+                add("gene_archive-9.9/example/family_tree.json", b'{"people": []}')
+                add("gene_archive-9.9/example/sources/a.jpg")
+                add("gene_archive-9.9/example/_site/index.html")
+                add("gene_archive-9.9/example/../../evil.txt")
+                add("gene_archive-9.9/example/link", kind=tarfile.SYMTYPE)
+            dest = Path(tmp, "site")
+            with mock.patch.object(cli, "EXAMPLE", Path(tmp, "missing")), \
+                    mock.patch.object(cli, "EXAMPLE_URL", arc.as_uri()):
+                cli.main(["init", str(dest), "--example"])
+            self.assertEqual(Path(dest, "family_tree.json").read_text(), '{"people": []}')
+            self.assertTrue(Path(dest, "sources", "a.jpg").exists())
+            self.assertTrue(Path(dest, "AGENTS.md").exists())
+            for absent in ("_site", "link", "README.md"):
+                self.assertFalse(Path(dest, absent).exists(), absent)
+            self.assertFalse(Path(tmp, "evil.txt").exists())
+
+
 class Hints(unittest.TestCase):
     def test_hints(self):
         from gene_archive.hints import hints, text
