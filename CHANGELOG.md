@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Attached villages: a `parish` field on places (which church kept the registers, the years, the sources) shown on the
+  place page and its static page as "Registers are in the books of the church: …".
+  Приписные сёла: поле `parish` у места (в книгах какой церкви метрики, годы, источники) — на странице места и её
+  статической странице: «Метрики — в книгах церкви: …».
+
 - Places: a full page for every place instead of the side panel — a cover, the story with footnotes, the family's
   people by generation, the timeline, documents with previews, a mini-map and the place's stops on the branch roads;
   the Places page shows each branch as a road with numbered stops on its own map; all places on one map behind a

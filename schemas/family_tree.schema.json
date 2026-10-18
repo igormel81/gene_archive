@@ -793,6 +793,40 @@
           },
           "description": "history, paragraphs / история, абзацы"
         },
+        "parish": {
+          "type": "array",
+          "description": "which church kept the registers of this place, by periods: an attached village is often recorded in another parish / в книгах какой церкви метрики места, по периодам: приписное село часто записано в другом приходе",
+          "items": {
+            "type": "object",
+            "required": [
+              "church"
+            ],
+            "properties": {
+              "church": {
+                "type": "string",
+                "description": "the church or parish / церковь или приход"
+              },
+              "place_slugs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/slug"
+                },
+                "description": "the place of that church / место этой церкви"
+              },
+              "years": {
+                "type": "string",
+                "description": "years of the attachment, free text / годы приписки, свободный текст"
+              },
+              "note": {
+                "type": "string",
+                "description": "how it is known, what survives / откуда известно, что сохранилось"
+              },
+              "source_ids": {
+                "$ref": "#/$defs/sourceIds"
+              }
+            }
+          }
+        },
         "people": {
           "type": "array",
           "items": {

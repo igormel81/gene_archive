@@ -54,6 +54,8 @@ class Validate(unittest.TestCase):
             "research_resources[0]": lambda d: d["research_resources"][0].update(source_ids=["S999"]),
             "regular expression": lambda d: d["research_resources"][0].update(log_match="(("),
             "media[0]: file must": lambda d: d["places"][0].setdefault("media", []).append({"file": "../x.jpg"}),
+            "parish[0]: church is missing": lambda d: d["places"][0].update(parish=[{"years": "1850"}]),
+            "parish[0]: no place": lambda d: d["places"][0].update(parish=[{"church": "X", "place_slugs": ["nowhere"]}]),
             "estimated date needs a note": lambda d: d["people"][0].update(birth={"date": "ABT 1830", "status": "estimated"}),
         }
         for needle, change in cases.items():
@@ -313,6 +315,7 @@ class BuildExample(unittest.TestCase):
         self.assertIn('href="../people/I3.html"', page)              # people of the place, linked to their pages
         self.assertIn('href="../#/places?place=louisburgh"', page)   # on to the full page in the app
         self.assertIn('"@type": "Place"', page)
+        self.assertIn("Registers are in the books of the church:</b> St. Stephen", (self.out / "places" / "windber.html").read_text(encoding="utf-8"))
         living = {p["id"] for p in json.loads((self.out / "data.json").read_text())["people"] if p.get("living")}
         for slug in [x.name for x in (self.out / "places").glob("*.html")]:
             text = (self.out / "places" / slug).read_text(encoding="utf-8")

@@ -231,6 +231,13 @@ def validate(data, root=Path("."), cfg=None):
                 err(m(f"{where} sort_years: {g} must be a year", f"{where} sort_years: {g} — год числом"))
         for k in ("text", "details"):
             text_sources(where, pl.get(k))
+        for n, x in enumerate(pl.get("parish") or []):
+            if not str(x.get("church") or "").strip():
+                err(m(f"{where} parish[{n}]: church is missing", f"{where} parish[{n}]: нет church (какая церковь)"))
+            for slug in x.get("place_slugs", []):
+                need(f"{where} parish[{n}]", slug, places, "place", "места")
+            need_sources(f"{where} parish[{n}]", x.get("source_ids"))
+            text_sources(f"{where} parish[{n}]", x.get("note"))
         for n, t in enumerate(pl.get("timeline", [])):
             for x in t.get("people", []):
                 need(f"{where} timeline[{n}]", x, people, "person", "человека")

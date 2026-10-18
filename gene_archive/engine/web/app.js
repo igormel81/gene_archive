@@ -2520,7 +2520,18 @@
     });
     return box;
   }
-  function parishBlock(pl) { return null; }
+  // в книгах какой церкви метрики места: приписное село часто записано в другом приходе
+  function parishBlock(pl) {
+    var list = (pl.parish || []).filter(function (x) { return x.church; });
+    if (!list.length) return null;
+    return el('section', { class: 'place-parish' }, el('h3', { class: 'p-sec', text: T('Где искать метрики') }), list.map(function (x) {
+      var at = (x.place_slugs || []).map(placeBySlug).filter(function (c) { return c && c.slug !== pl.slug; })[0];
+      return el('p', {}, T('Метрики — в книгах церкви: '), el('b', { text: x.church }), x.years ? ' (' + x.years + ')' : '',
+        at ? [', ', el('a', { href: placeHref(at.slug), text: at.name })] : null,
+        readablePlaceText((x.source_ids || []).join(', ')), '.',
+        x.note ? el('span', { class: 'place-parish-note' }, readablePlaceText(x.note)) : null);
+    }));
+  }
 
   // ---------- maps (Leaflet): OpenStreetMap tiles, and the outlines from geo/ when the tiles do not load
   function placeMapColors() {

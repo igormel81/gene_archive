@@ -787,6 +787,8 @@ body.doc-open { overflow: hidden; }
 .place-route-links { display: flex; justify-content: space-between; gap: 12px; margin-top: 4px !important; }
 .place-route-links .next { margin-left: auto; text-align: right; }
 .place-gens-note { margin: 0; color: var(--muted); font: 13px var(--sans); }
+.place-parish p { margin: 0 0 10px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--paper); border-radius: 4px; font: 15px/1.5 var(--sans); }
+.place-parish-note { display: block; margin-top: 4px; color: var(--muted); font-size: 13.5px; }
 .place-gens { display: grid; gap: 14px; margin: 10px 0 0; }
 .place-gen h4 { margin: 0 0 6px; font: 600 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .place-gen h4 small { letter-spacing: 0; text-transform: none; font-weight: 400; }

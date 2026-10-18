@@ -190,6 +190,17 @@ order of `sort_year`, numbered on the branch's map; a move in `place_routes` kee
 the years are equal. A place shared by two branches can come at a different time on each road:
 `"sort_years": {"novak": 1912}` overrides `sort_year` for that branch.
 
+**Which church kept the registers.** The registers of a village are often in the books of another
+village's church. `parish` says where to look, by periods; the place page shows "Registers are in
+the books of the church: …":
+
+```json
+"parish": [{"church": "St. Nicholas church, Leca", "place_slugs": ["leca"], "years": "1830–1870",
+            "note": "Attached village; from the clergy lists", "source_ids": ["S40"]}]
+```
+
+`church` is required; `place_slugs` links the church's place, `source_ids` the inventory or clergy list.
+
 ## Research journal
 
 - `research_leads[]` — open questions and hints: `{"id": "L3", "title", "status", "record",

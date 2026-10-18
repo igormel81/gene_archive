@@ -265,7 +265,17 @@ class Pages:
                       "История места, люди семьи, документы и карта.", heading=False, entity=entity)
 
     def parish_html(self, pl):
-        return ""
+        """Which church kept the registers of the place (an attached village is often recorded elsewhere)."""
+        out = ""
+        for x in pl.get("parish") or []:
+            if not x.get("church"):
+                continue
+            at = next((s for s in x.get("place_slugs", []) if s in self.place_name and s != pl["slug"]), None)
+            out += ("<p><b>Метрики — в книгах церкви:</b> " + esc(x["church"]) + (f' ({esc(x["years"])})' if x.get("years") else "")
+                    + (f', <a href="{at}.html">{esc(self.place_name[at])}</a>' if at else "") + ".</p>")
+            if x.get("note"):
+                out += "<p>" + esc(x["note"]) + "</p>"
+        return out
 
     def places(self):
         places = sorted(self.data.get("places", []), key=lambda pl: pl["name"])

@@ -2715,6 +2715,20 @@
         "The Harper story begins here with Patrick, born about 1832. The famine of 1845–1849 hit the west of Mayo hard, and the family remembers relief work on the coast road.",
         "After Michael emigrated, his mother and sister Mary stayed on; in 1901 they lived next to a Martin Harper who may be another son (S15)."
       ],
+      "parish": [
+        {
+          "church": "Kilgeever Catholic parish, chapel in Louisburgh",
+          "place_slugs": [
+            "louisburgh"
+          ],
+          "years": "registers from 1850",
+          "note": "Earlier registers have not survived; for the 1830s and 1840s only the tithe and valuation lists remain.",
+          "source_ids": [
+            "S1",
+            "S2"
+          ]
+        }
+      ],
       "people": [
         "I1",
         "I2",
@@ -3183,6 +3197,27 @@
       "details": [
         "The town was built by a coal company for miners from Central and Eastern Europe; Slovak, Hungarian and Italian parishes stood within a few streets of each other.",
         "The Novak family photograph of 1906 was taken in front of the company houses (S8)."
+      ],
+      "parish": [
+        {
+          "church": "St. Stephen's Slovak Catholic church, Johnstown",
+          "years": "until 1897",
+          "note": "Before Windber had a church of its own, the miners' children were baptised in Johnstown, about ten miles away; look there for the first Novak baptisms.",
+          "source_ids": [
+            "S20"
+          ]
+        },
+        {
+          "church": "St. Mary's Slovak Catholic church, Windber",
+          "place_slugs": [
+            "windber"
+          ],
+          "years": "from 1897",
+          "note": "Founded with the town; its jubilee book lists the founding families.",
+          "source_ids": [
+            "S20"
+          ]
+        }
       ],
       "people": [
         "I12",
