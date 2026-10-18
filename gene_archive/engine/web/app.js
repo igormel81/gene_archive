@@ -870,8 +870,12 @@
     if (ev.date) parts.push(fmtDate(ev.date));
     // номер документа в тексте места («повторное свидетельство, S232») уже стоит кнопкой рядом — из текста убираем
     if (ev.place_as_recorded) parts.push(ev.place_as_recorded.replace(/,?\s*\bS\d+\b/g, '').replace(/\(\s*\)/g, '').replace(/\s+\)/g, ')').trim());
-    return [parts.join(', ') || T('дата неизвестна'), ' '].concat((ev.source_ids || []).map(srcChip));
+    var out = [parts.join(', ') || T('дата неизвестна'), ' '].concat((ev.source_ids || []).map(srcChip));
+    // пояснение к дате — отдельной строкой: причина смерти, стиль календаря, «рассчитано по возрасту», как найти могилу
+    if (ev.note) out.push(el('span', { class: 'ev-note' }, noteText(ev.note)));
+    return out;
   }
+  function hasEvent(ev) { return !!(ev && (ev.date || ev.place_as_recorded || ev.note)); }
   function personSources(p) {
     var ids = [];
     function collect(value) {
@@ -924,9 +928,12 @@
 
     var facts = el('dl', { class: 'facts' });
     function fact(label, value) { facts.appendChild(el('dt', { text: label })); facts.appendChild(el('dd', null, value)); }
-    if (p.birth && (p.birth.date || p.birth.place_as_recorded)) fact(T('Рождение'), eventText(p.birth));
+    if (hasEvent(p.birth)) fact(T('Рождение'), eventText(p.birth));
     (p.birth_alternatives || []).forEach(function (a) { fact(T('Рождение (по другому документу)'), eventText(a)); });
-    if (p.death && p.death.date) fact(T('Смерть'), eventText(p.death));
+    // смерть без точной даты тоже видна, если известно место или есть пояснение
+    if (hasEvent(p.death)) fact(T('Смерть'), eventText(p.death));
+    (p.death_alternatives || []).forEach(function (a) { fact(T('Смерть (по другому документу)'), eventText(a)); });
+    if (hasEvent(p.burial)) fact(T('Погребение'), eventText(p.burial));
     (spouseFams[id] || []).forEach(function (f) {
       if (f.marriage) {
         var other = f.partners.filter(function (x) { return x !== id; })[0];

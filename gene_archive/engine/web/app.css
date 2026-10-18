@@ -273,6 +273,7 @@ main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .place-suggestion-list { margin: 0 0 8px; padding-left: 20px; font: 13px/1.55 var(--sans); }
 .place-suggestion-list li { margin: 5px 0; }
 .place-unmatched details summary { color: var(--accent); cursor: pointer; font: 13px var(--sans); }
+.facts .ev-note { display: block; margin-top: 2px; color: var(--muted); font: 13px/1.45 var(--sans); }
 .place-period { margin: 0 0 12px; color: var(--accent); font: 600 13px var(--sans); }
 .place-then-now { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
 .place-then-now span { background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; font: 13px/1.4 var(--sans); }

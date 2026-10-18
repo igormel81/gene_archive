@@ -96,6 +96,9 @@ Anything else (`"before the war"`) is an error: put such wording in `note`.
 
 **Event** (`birth`, `death`, `burial`, `marriage`): `date`, `place_as_recorded` (as written in the source),
 `place_slugs` (links to `places`), `status`, `source_ids`, `note`.
+`note` is shown on the person's card on its own line under the date: the cause of death, Old or New
+Style, "calculated from the age", how to find the grave. The card shows a death or a burial even
+without a date when its place or note is known.
 `status` says how we know: `documented`, `family_report`, `uncertain_family_report`,
 `calculated_from_age`, `gravestone`, `publication`, `probable`.
 

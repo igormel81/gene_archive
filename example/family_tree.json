@@ -65,7 +65,8 @@
         "status": "uncertain_family_report",
         "source_ids": [
           "S16"
-        ]
+        ],
+        "note": "Unmarked grave; the family remembers it by the east wall of the old church"
       },
       "residences": [
         {
@@ -338,6 +339,14 @@
         "source_ids": [
           "S16"
         ]
+      },
+      "death": {
+        "place_as_recorded": "Liverpool, England",
+        "status": "uncertain_family_report",
+        "source_ids": [
+          "S16"
+        ],
+        "note": "Kate Harper remembers that he died in Liverpool ‘before the first war’; no record has been found"
       },
       "notes": [
         "A Thomas Harper, son of Patrick, is remembered by Kate Harper as 'the brother who went to Liverpool' (S16). No baptism has been found, so his place in the family is probable rather than proven."

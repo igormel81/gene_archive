@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Person card: the note of a birth, death or burial (`note`: cause of death, Old/New Style, how to find the grave)
+  is shown under the date; a Burial row; a death without a date is shown when its place or note is known;
+  deaths from other documents (`death_alternatives`) are listed like births.
+  Карточка человека: пояснение к рождению, смерти или погребению (`note`: причина смерти, стиль календаря, как найти
+  могилу) — под датой; строка «Погребение»; смерть без даты видна, если известно место или есть пояснение; смерть
+  по другому документу (`death_alternatives`) — как у рождения.
+
 - Translations: a paragraph with links is reported for translation only as a whole, never piece by piece, and
   the text of a link to a person is kept as a name — renaming someone no longer breaks a translated paragraph.
   Titles of people whose name holds a comma («Иванова Анна, жена Петра (~1918)») keep the whole name.

@@ -132,8 +132,10 @@ class Pages:
         for key, label in (("birth", "Рождение"), ("death", "Смерть"), ("burial", "Погребение")):
             ev = p.get(key) or {}
             values = [ev.get("date"), ev.get("place_as_recorded")]
-            if any(values):
-                body += f"<p><b>{label}:</b> " + esc(" · ".join(str(v) for v in values if v)) + "</p>"
+            if any(values) or ev.get("note"):
+                body += f"<p><b>{label}:</b> " + esc(" · ".join(str(v) for v in values if v) or "—") + "</p>"
+            if ev.get("note"):   # its own paragraph: translated like the same note in data.json
+                body += '<p class="ev-note">' + esc(ev["note"]) + "</p>"
         if p.get("aliases"):
             body += "<p><b>Варианты имени:</b> " + esc("; ".join(p["aliases"])) + "</p>"
         notes = p.get("notes", [])
