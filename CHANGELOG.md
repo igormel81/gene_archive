@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Register-reading coverage: a `coverage` section (parish → year → births/marriages/deaths → film, frames, status
+  complete / partial up to No. … / not found, documents found), checked by `gene validate` and shown as a year × part
+  grid under its resource in Archive → Sources and on the place page.
+  Учёт прочитанного в метрических книгах: раздел `coverage` (приход → год → рождения/браки/смерти → плёнка, кадры,
+  статус: полностью / до № … / не найдено, найденные документы), проверка в `gene validate`, сетка «год × часть» под
+  источником в «Архив → Источники» и на странице места.
+
 - Attached villages: a `parish` field on places (which church kept the registers, the years, the sources) shown on the
   place page and its static page as "Registers are in the books of the church: …".
   Приписные сёла: поле `parish` у места (в книгах какой церкви метрики, годы, источники) — на странице места и её

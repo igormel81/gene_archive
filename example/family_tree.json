@@ -3656,6 +3656,172 @@
       "log_match": "gravestone|cemetery"
     }
   ],
+  "coverage": [
+    {
+      "parish": "Louisburgh (Kilgeever), Catholic parish",
+      "resource_id": "R2",
+      "place_slugs": [
+        "louisburgh"
+      ],
+      "entries": [
+        {
+          "year": 1855,
+          "part": "marriages",
+          "film": "NLI microfilm 04220/03",
+          "frames": "88–90",
+          "status": "complete"
+        },
+        {
+          "year": 1856,
+          "part": "marriages",
+          "film": "NLI microfilm 04220/03",
+          "frames": "91–94",
+          "status": "complete",
+          "source_ids": [
+            "S2"
+          ]
+        },
+        {
+          "year": 1857,
+          "part": "marriages",
+          "film": "NLI microfilm 04220/03",
+          "frames": "95–97",
+          "status": "complete"
+        },
+        {
+          "year": 1855,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "12–17",
+          "status": "complete"
+        },
+        {
+          "year": 1856,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "18–24",
+          "status": "complete"
+        },
+        {
+          "year": 1857,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "25–31",
+          "status": "complete"
+        },
+        {
+          "year": 1858,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "32–38",
+          "status": "complete",
+          "source_ids": [
+            "S1"
+          ]
+        },
+        {
+          "year": 1859,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "39–43",
+          "status": "partial",
+          "up_to": "No. 112",
+          "note": "Pages for November and December are water-damaged"
+        },
+        {
+          "year": 1860,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "44–50",
+          "status": "complete"
+        },
+        {
+          "year": 1861,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "frames": "51–53",
+          "status": "partial",
+          "up_to": "No. 40",
+          "note": "Faded; to be read again on the 2nd copy of the film"
+        },
+        {
+          "year": 1863,
+          "part": "births",
+          "film": "NLI microfilm 04220/03",
+          "status": "not_found",
+          "note": "No pages for 1863 on the film"
+        },
+        {
+          "year": 1856,
+          "part": "deaths",
+          "status": "not_found",
+          "note": "The parish kept no burial register before 1870"
+        }
+      ]
+    },
+    {
+      "parish": "Kapušany, Roman Catholic parish",
+      "resource_id": "R3",
+      "place_slugs": [
+        "kapusany"
+      ],
+      "entries": [
+        {
+          "year": 1864,
+          "part": "births",
+          "film": "FamilySearch DGS 8031552",
+          "frames": "201–214",
+          "status": "complete"
+        },
+        {
+          "year": 1865,
+          "part": "births",
+          "film": "FamilySearch DGS 8031552",
+          "frames": "215–228",
+          "status": "complete"
+        },
+        {
+          "year": 1866,
+          "part": "births",
+          "film": "FamilySearch DGS 8031552",
+          "frames": "229–241",
+          "status": "complete",
+          "source_ids": [
+            "S6"
+          ]
+        },
+        {
+          "year": 1867,
+          "part": "births",
+          "film": "FamilySearch DGS 8031552",
+          "frames": "242–250",
+          "status": "partial",
+          "up_to": "No. 31"
+        },
+        {
+          "year": 1860,
+          "part": "marriages",
+          "film": "FamilySearch DGS 8031553",
+          "frames": "40–44",
+          "status": "complete"
+        },
+        {
+          "year": 1861,
+          "part": "marriages",
+          "film": "FamilySearch DGS 8031553",
+          "frames": "45–48",
+          "status": "complete"
+        },
+        {
+          "year": 1862,
+          "part": "marriages",
+          "film": "FamilySearch DGS 8031553",
+          "status": "not_found",
+          "note": "The film jumps from 1861 to 1866"
+        }
+      ]
+    }
+  ],
   "surnames": {
     "Harper": {
       "history": [

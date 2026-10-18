@@ -287,6 +287,87 @@
         }
       }
     },
+    "coverage": {
+      "type": "array",
+      "description": "Register-reading coverage: which years and parts of a parish's registers were read, on which film and frames, with what result — shown as a year × part grid in Archive → Sources and on the place page / Учёт прочитанного в метрических книгах: какие годы и части прочитаны, на какой плёнке и кадрах, с каким итогом — сетка «год × часть» в «Архив → Источники» и на странице места",
+      "items": {
+        "type": "object",
+        "required": [
+          "parish",
+          "entries"
+        ],
+        "properties": {
+          "parish": {
+            "type": "string",
+            "description": "the parish or church whose books were read / приход или церковь, чьи книги читали"
+          },
+          "resource_id": {
+            "type": "string",
+            "pattern": "^R\\d+$",
+            "description": "the research resource it belongs to (R2) / к какому источнику поиска относится"
+          },
+          "place_slugs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/slug"
+            },
+            "description": "places whose page shows the grid / места, на странице которых видна сетка"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "year",
+                "part",
+                "status"
+              ],
+              "properties": {
+                "year": {
+                  "type": "integer",
+                  "minimum": 1000,
+                  "maximum": 2100
+                },
+                "part": {
+                  "enum": [
+                    "births",
+                    "marriages",
+                    "deaths"
+                  ],
+                  "description": "part of the register / часть книги"
+                },
+                "film": {
+                  "type": "string",
+                  "description": "film, DGS or archive file / плёнка, DGS или дело"
+                },
+                "frames": {
+                  "type": "string",
+                  "description": "frames or pages read / кадры или листы"
+                },
+                "status": {
+                  "enum": [
+                    "complete",
+                    "partial",
+                    "not_found"
+                  ],
+                  "description": "complete: read through; partial: read up to `up_to`; not_found: this year/part is not on the film or in the archive / прочитано полностью; до `up_to`; не найдено на плёнке или в архиве"
+                },
+                "up_to": {
+                  "type": "string",
+                  "description": "for partial: the last entry read (No. 112) / для partial: до какой записи прочитано"
+                },
+                "note": {
+                  "type": "string"
+                },
+                "source_ids": {
+                  "$ref": "#/$defs/sourceIds"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "surnames": {
       "type": "object",
       "additionalProperties": {

@@ -225,6 +225,21 @@ the books of the church: …":
   the `domains` (`familysearch.org`, or a path such as `archive.org/details`), or of one of the `kinds`
   (e.g. `family_photo` for "Family papers"). `log_match` is a regular expression: the research-log
   entries it matches are listed under the resource. Records with the same `section` are grouped.
+- `coverage[]` — what has been read in a parish's registers, so that nobody reads the same film twice:
+
+  ```json
+  {"parish": "Krasnoye, St. Nicholas church", "resource_id": "R2", "place_slugs": ["krasnoye"],
+   "entries": [
+     {"year": 1895, "part": "births", "film": "DGS 8031552", "frames": "201–214", "status": "complete", "source_ids": ["S4"]},
+     {"year": 1896, "part": "births", "film": "DGS 8031552", "frames": "215–220", "status": "partial", "up_to": "No. 41"},
+     {"year": 1896, "part": "deaths", "status": "not_found", "note": "Not on the film"}]}
+  ```
+
+  `part`: `births`, `marriages` or `deaths`; `status`: `complete` (read through), `partial` (read up to
+  `up_to`) or `not_found` (this year or part is not on the film or in the archive). The site shows a
+  year × part grid coloured by status under the resource in Archive → Sources and on the pages of the
+  `place_slugs`; documents in `source_ids` are buttons in their cells. `gene validate` checks parts,
+  statuses, references, and warns about a `partial` without `up_to` and a year listed twice.
 - `surnames{}` — `{"Ivanov": {"history": ["paragraph", …]}}`: stories shown on surname pages.
 
 ## GEDCOM for other programs and sites

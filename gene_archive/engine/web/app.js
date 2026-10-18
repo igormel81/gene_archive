@@ -2474,6 +2474,11 @@
 
     if (pl.text) main.appendChild(lead);
     if (parish) main.appendChild(parish);
+    var read = (D.coverage || []).filter(function (c) { return (c.place_slugs || []).indexOf(pl.slug) >= 0; });
+    if (read.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Что уже прочитано в метрических книгах') }));
+      read.forEach(function (c) { main.appendChild(coverageGrid(c)); });
+    }
     if (details.length) { main.appendChild(el('h3', { class: 'p-sec', text: T('История места') })); details.forEach(function (p) { main.appendChild(p); }); }
     if (people.length) {
       main.appendChild(el('h3', { class: 'p-sec', text: T('Люди') + ' · ' + people.length }));
@@ -2871,8 +2876,8 @@
   // «Источники» — вкладка архива: архивы и базы, где искали; найденные там документы и записи журнала поиска
   function renderResearch() {
     var list = D.research_resources || [];
-    $('arch-tab-research').hidden = !list.length;
-    if (!list.length) return;
+    $('arch-tab-research').hidden = !list.length && !(D.coverage || []).length;
+    if (!list.length && !(D.coverage || []).length) return;
     $('arch-tab-research').textContent = T('Источники · ') + list.length;
     document.querySelectorAll('.arch-tabs [data-mode]').forEach(function (b) { b.onclick = function () { setArchMode(b.dataset.mode); syncUrl(); }; });
     var host = clear($('research-resources')), toc = clear($('res-toc'));
@@ -2906,8 +2911,52 @@
         el('h5', null, r.url ? el('a', { href: r.url, target: '_blank', rel: 'noopener', text: r.name + ' ↗' }) : r.name),
         r.about ? el('p', { class: 'res-about', text: r.about }) : null,
         r.found ? el('p', { class: 'res-found' }, el('b', { text: T('Что нашли: ') }), r.found) : null,
+        (D.coverage || []).filter(function (c) { return c.resource_id === r.id; }).map(coverageGrid),
         docs, logBox));
     });
+    // прочитанные книги, не привязанные к источнику поиска, — отдельным блоком в конце
+    var loose = (D.coverage || []).filter(function (c) { return !list.some(function (r) { return r.id === c.resource_id; }); });
+    if (loose.length) host.appendChild(el('article', { class: 'res-card', id: 'res-coverage' }, el('h5', { text: T('Прочитанные метрические книги') }), loose.map(coverageGrid)));
+  }
+  // ---------- register-reading coverage: a year × part grid of what was read in a parish's books
+  var COVER_PARTS = [['births', T('Рождения')], ['marriages', T('Браки')], ['deaths', T('Смерти')]];
+  function coverageGrid(c) {
+    var by = {}, years = [], count = { complete: 0, partial: 0, not_found: 0 };
+    (c.entries || []).forEach(function (e) {
+      by[e.year + ' ' + e.part] = e;
+      if (years.indexOf(e.year) < 0) years.push(e.year);
+      if (count[e.status] != null) count[e.status]++;
+    });
+    years.sort(function (a, b) { return a - b; });
+    // промежуточные годы без записей тоже видны — пробел в чтении заметен сразу (если промежуток не слишком велик)
+    if (years.length && years[years.length - 1] - years[0] < 60) { var all = []; for (var y = years[0]; y <= years[years.length - 1]; y++) all.push(y); years = all; }
+    var parts = COVER_PARTS.filter(function (p) { return (c.entries || []).some(function (e) { return e.part === p[0]; }); });
+    var partName = function (k) { return (COVER_PARTS.filter(function (p) { return p[0] === k; })[0] || ['', k])[1]; };
+    var cell = function (y, part) {
+      var e = by[y + ' ' + part];
+      if (!e) return el('td', { class: 'cov-none', title: T('Не читали') }, '·');
+      var tip = [e.film, e.frames ? T('кадры ') + e.frames : '', e.note].filter(Boolean).join(' · ');
+      var label = e.status === 'complete' ? '✓' : e.status === 'partial' ? T('до записи ') + (e.up_to || '…') : '—';
+      return el('td', { class: 'cov-' + e.status, title: tip },
+        el('span', { class: 'cov-mark', text: label }),
+        (e.source_ids || []).filter(function (sid) { return S[sid]; }).map(function (sid) {
+          return el('button', { class: 'src-chip', type: 'button', text: sid, title: S[sid].title, onclick: function () { openDoc(sid); } });
+        }));
+    };
+    var table = el('table', { class: 'cov-grid' },
+      el('thead', {}, el('tr', {}, el('th', { text: T('Год') }), parts.map(function (p) { return el('th', { text: p[1] }); }))),
+      el('tbody', {}, years.map(function (y) { return el('tr', {}, el('th', { text: String(y) }), parts.map(function (p) { return cell(y, p[0]); })); })));
+    var notes = (c.entries || []).filter(function (e) { return e.note || e.film; }).sort(function (a, b) { return a.year - b.year; });
+    return el('div', { class: 'coverage' },
+      el('p', { class: 'cov-head' }, el('b', { text: c.parish }), ' · ',
+        T('полностью: ') + count.complete + ', ' + T('частично: ') + count.partial + ', ' + T('не найдено: ') + count.not_found),
+      el('div', { class: 'tblwrap' }, table),
+      el('p', { class: 'cov-legend' }, el('span', { class: 'cov-complete', text: '✓ ' + T('прочитано полностью') }), el('span', { class: 'cov-partial', text: T('до № … — прочитано частично') }),
+        el('span', { class: 'cov-not_found', text: '— ' + T('нет на плёнке или в архиве') }), el('span', { class: 'cov-none', text: '· ' + T('не читали') })),
+      notes.length ? el('details', { class: 'cov-notes' }, el('summary', { text: T('Плёнки, кадры и пометки') }), el('ul', {}, notes.map(function (e) {
+        return el('li', {}, el('b', { text: e.year + ', ' + partName(e.part).toLowerCase() + ': ' }),
+          [e.film, e.frames ? T('кадры ') + e.frames : '', e.up_to ? T('до записи ') + e.up_to : '', e.note].filter(Boolean).join(' · '));
+      }))) : null);
   }
   // «Журнал исправлений» — отдельная вкладка архива: новые правки сверху, имя открывает карточку, номер — документ
   function renderCorrections() {

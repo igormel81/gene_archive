@@ -689,6 +689,23 @@ th { font: 600 12px var(--sans); color: var(--muted); }
 .doc-meta h2 { font-size: 21px; margin: 6px 0 10px; }
 .doc-meta h3 { font-size: 15px; font-family: var(--sans); margin: 18px 0 8px; }
 .doc-scope { line-height: 1.55; margin: 0 0 10px; }
+/* учёт прочитанного в метрических книгах: год × часть */
+.coverage { margin: 12px 0 14px; font: 13px/1.45 var(--sans); }
+.cov-head { margin: 0 0 6px; }
+.cov-grid { width: auto; border-collapse: separate; border-spacing: 3px; }
+.cov-grid th { padding: 2px 8px; border: 0; font: 600 12px var(--sans); color: var(--muted); text-align: left; }
+.cov-grid tbody th { font-variant-numeric: tabular-nums; }
+.cov-grid td { min-width: 76px; padding: 4px 8px; border-radius: 4px; text-align: center; white-space: nowrap; }
+.cov-grid .src-chip { margin-left: 4px; }
+.cov-complete { background: color-mix(in srgb, #2f7d4f 22%, var(--paper)); }
+.cov-partial { background: color-mix(in srgb, #c08a2a 26%, var(--paper)); }
+.cov-not_found { background: color-mix(in srgb, var(--muted) 18%, var(--paper)); color: var(--muted); }
+td.cov-none { color: var(--muted); background: var(--bg); border: 1px dashed var(--line); }
+.cov-legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; }
+.cov-legend span { padding: 1px 8px; border-radius: 4px; }
+.cov-legend .cov-none { color: var(--muted); border: 1px dashed var(--line); }
+.cov-notes summary { cursor: pointer; color: var(--accent); margin-top: 6px; }
+.cov-notes ul { margin: 6px 0 0; padding-left: 18px; }
 .doc-verify { margin: 0 0 12px; padding: 9px 12px; border-left: 3px solid #b5852a; background: color-mix(in srgb, #b5852a 12%, var(--paper)); border-radius: 4px; font: 14px/1.5 var(--sans); }
 .acard-verify { margin: 0; color: #8a6d1f; font: 600 11px var(--sans); }
 .acard-verify::before { content: '◔ '; }

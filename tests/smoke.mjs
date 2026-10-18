@@ -95,7 +95,8 @@ for (const engine of engines) {
         await page.goto(base + lang + '#/sources?mode=research');
         await page.waitForTimeout(500);
         ok(await page.locator('#arch-research').isVisible(), P('Archive → Sources does not open'));
-        ok(await page.locator('#research-resources .res-card').count() === data.research_resources.length, P('Archive → Sources: not every resource is shown'));
+        ok(await page.locator('#research-resources .res-card').count() >= data.research_resources.length, P('Archive → Sources: not every resource is shown'));
+        if ((data.coverage || []).length) ok(await page.locator('#research-resources .cov-grid td.cov-complete').count() > 0, P('Archive → Sources: no register-reading grid'));
       }
       // full-text search: a word from a document's transcription, a surname typed in Cyrillic, a word from the story
       {

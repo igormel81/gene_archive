@@ -34,7 +34,7 @@ KEEP = {"id", "person_id", "given_names", "surname", "display_name", "aliases", 
         "living", "placeholder", "source_id", "lat", "lon", "sort_year", "partners", "children",
         "adopted_children", "probable_children", "people", "sources", "focus", "person", "quick_focus_person",
         "surname_variants", "branch_tags", "v_story", "v_bios", "comments", "bios", "merged_sources",
-        "root_person_id", "start_focus", "snapshot_date"}
+        "root_person_id", "start_focus", "snapshot_date", "part", "resource_id"}
 PATH_KEYS = {"file", "thumb", "back", "bw", "color", "bw_thumb", "color_thumb"}
 SOFT = {"corrections", "research_log"}   # journals: without a translation they stay in the original
 # files and folders shared by all languages (everything else exists per language)

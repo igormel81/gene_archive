@@ -56,11 +56,22 @@ class Validate(unittest.TestCase):
             "media[0]: file must": lambda d: d["places"][0].setdefault("media", []).append({"file": "../x.jpg"}),
             "parish[0]: church is missing": lambda d: d["places"][0].update(parish=[{"years": "1850"}]),
             "parish[0]: no place": lambda d: d["places"][0].update(parish=[{"church": "X", "place_slugs": ["nowhere"]}]),
+            "coverage[0]: no research resource R99": lambda d: d["coverage"][0].update(resource_id="R99"),
+            "status 'read'": lambda d: d["coverage"][0]["entries"].append({"year": 1870, "part": "births", "status": "read"}),
+            "part 'baptisms'": lambda d: d["coverage"][0]["entries"].append({"year": 1870, "part": "baptisms", "status": "complete"}),
+            "coverage[0] entries[0]: no document S999": lambda d: d["coverage"][0]["entries"][0].update(source_ids=["S999"]),
             "estimated date needs a note": lambda d: d["people"][0].update(birth={"date": "ABT 1830", "status": "estimated"}),
         }
         for needle, change in cases.items():
             with self.subTest(needle):
                 self.assertTrue(any(needle in e for e in errors_after(change)), (needle, errors_after(change)[:3]))
+
+    def test_coverage_warnings(self):
+        data = copy.deepcopy(DATA)
+        data["coverage"][0]["entries"].append({"year": 1858, "part": "births", "status": "partial"})
+        warnings = validate(data, EXAMPLE, CFG)[1]
+        self.assertTrue(any("partial without up_to" in w for w in warnings), warnings)
+        self.assertTrue(any("1858 births is listed twice" in w for w in warnings), warnings)
 
     def test_to_verify(self):
         data = copy.deepcopy(DATA)
@@ -277,6 +288,9 @@ class BuildExample(unittest.TestCase):
         self.assertIn("S16", res["R1"]["source_ids"])   # by kind: family papers
         self.assertTrue(res["R2"]["log"])                 # log_match → research-log entries
         self.assertNotIn("log_match", res["R2"])          # matching rules stay in the build
+        cov = {c["resource_id"]: c for c in data["coverage"]}
+        self.assertIn({"year": 1858, "part": "births", "film": "NLI microfilm 04220/03", "frames": "32–38", "status": "complete",
+                       "source_ids": ["S1"]}, cov["R2"]["entries"])
         index = (self.out / "ru" / "index.html").read_text(encoding="utf-8")
         self.assertIn('id="arch-tab-research"', index)
         self.assertIn("Где мы ищем", index)

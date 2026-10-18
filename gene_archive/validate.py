@@ -295,6 +295,34 @@ def validate(data, root=Path("."), cfg=None):
             re.compile(r.get("log_match") or "")
         except re.error as e:
             err(m(f"{where}: log_match is not a valid regular expression ({e})", f"{where}: log_match — неверное регулярное выражение ({e})"))
+    # register-reading coverage: parish → year × part → film, frames, status
+    PARTS, STATES = ("births", "marriages", "deaths"), ("complete", "partial", "not_found")
+    for n, c in enumerate(data.get("coverage", [])):
+        where = f"coverage[{n}]"
+        if not str(c.get("parish") or "").strip():
+            err(m(f"{where}: parish is missing", f"{where}: нет parish (какой приход)"))
+        if c.get("resource_id"):
+            need(where, c["resource_id"], res_ids, "research resource", "источника поиска")
+        for slug in c.get("place_slugs", []):
+            need(where, slug, places, "place", "места")
+        seen = set()
+        for k, e in enumerate(c.get("entries", [])):
+            w = f"{where} entries[{k}]"
+            y = e.get("year")
+            if not isinstance(y, int) or not 1000 <= y <= 2100:
+                err(m(f"{w}: year must be a number like 1858", f"{w}: year — год числом, например 1858"))
+            if e.get("part") not in PARTS:
+                err(m(f"{w}: part {e.get('part')!r} (births, marriages or deaths)", f"{w}: part {e.get('part')!r} (births, marriages или deaths)"))
+            if e.get("status") not in STATES:
+                err(m(f"{w}: status {e.get('status')!r} (complete, partial or not_found)", f"{w}: status {e.get('status')!r} (complete, partial или not_found)"))
+            if e.get("status") == "partial" and not e.get("up_to"):
+                warn(m(f"{w}: partial without up_to — up to which entry was it read?", f"{w}: partial без up_to — до какой записи прочитано?"))
+            if (y, e.get("part")) in seen:
+                warn(m(f"{w}: {y} {e.get('part')} is listed twice", f"{w}: {y} {e.get('part')} записан дважды"))
+            seen.add((y, e.get("part")))
+            need_sources(w, e.get("source_ids"))
+            text_sources(w, e.get("note"))
+
     for n, r in enumerate(data.get("research_log", [])):
         where = f"research_log[{n}]"
         missing = [k for k in ("date", "action", "result") if not r.get(k)]

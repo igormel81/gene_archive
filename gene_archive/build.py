@@ -335,6 +335,7 @@ def build(site_dir, out=None, base_url=None):
         "unmatched_profiles": data.get("unmatched_profiles"),
         "research_log": data.get("research_log", []),
         "research_resources": research_resources(data, sources),
+        "coverage": data.get("coverage", []),
         "surnames": data.get("surnames", {}),
         "restored": restored,
         "bios": re.findall(r'<article class="bio" id="bio-(I\d+)"', bios),
