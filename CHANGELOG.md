@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Tree branches: a surname button starts at the earliest linked ancestor — parents marked as possible relatives
+  (`unlinked_candidate`) and placeholders no longer break the line. "Our family" (`start_person`) shows every known
+  ancestral line up to the earliest ancestor instead of five generations, with empty places only in the two nearest.
+  Ветви древа: кнопка фамилии начинает с самого раннего связанного предка — родители из «возможной родни»
+  (`unlinked_candidate`) и заглушки больше не обрывают линию. «Наша семья» (`start_person`) показывает все известные
+  линии предков до самого раннего, а не пять поколений; пустые места — только в двух ближних поколениях.
+
 - Estimated birth dates: under names `BET 1917 AND 1944` reads "1917…1944" and `ABT`/`EST`/`CAL` "c. 1883" instead of
   an exact year; a new date status `estimated` that needs a `note` saying how; `gene hints` suggests an estimate for
   people without a birth date (`estimate_birth`: eldest child −27, spouse or siblings ±8, parents +18…+45), never

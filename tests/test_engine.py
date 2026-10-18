@@ -534,6 +534,50 @@ console.log(JSON.stringify([year('BET 1917 AND 1944'), year('ABT 1883'), year('E
 
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
+class Branches(unittest.TestCase):
+    """Surname branches of app.js start at the earliest linked ancestor; the start person gets every ancestral line."""
+
+    def run_js(self, people, families, start, code):
+        app = (ROOT / "gene_archive/engine/web/app.js").read_text(encoding="utf-8")
+        anc = app[app.index("  // предков — 5 поколений"):app.index("  // descendant unit")]
+        groups = app[app.index("  function surnameKey(s) {"):app.index("  function renderBranches() {")]
+        script = "var D = " + json.dumps({"people": people, "families": families, "start_focus": start, "root_person_id": start}) + r""";
+var P = {}, parentFam = {}, SITE = {}, LOCALE = { lang: 'en' }, line = null;
+function T(s) { return s; }
+D.people.forEach(function (p) { P[p.id] = p; });
+D.families.forEach(function (f) { f.children.forEach(function (c) { parentFam[c] = f; }); });
+function parentsOf(id) { var f = parentFam[id]; return f ? f.partners.slice() : []; }
+function childrenOf(id) { var o = []; D.families.forEach(function (f) { if (f.partners.indexOf(id) >= 0) o = o.concat(f.children); }); return o; }
+function yearNum(ev) { var m = /\d{4}/.exec((ev && ev.date) || ''); return m ? +m[0] : null; }
+""" + anc + groups + code
+        return json.loads(subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout)
+
+    def test_branch_skips_possible_relatives(self):
+        P = lambda i, sex, sur, **kw: dict(id=i, sex=sex, surname=sur, display_name=f"{i} {sur}", **kw)   # noqa: E731
+        people = [P("Y", "M", "Smith", research_status="unlinked_candidate"), P("X", "M", "Smith", birth={"date": "1850"}),
+                  P("W", "F", "Smith"), P("A", "M", "Smith"), P("B", "F", "Smith"), P("C", "M", "Smith"),
+                  P("Q", "M", "Smith", birth={"date": "1800"})]
+        families = [{"id": "F1", "partners": ["Y"], "children": ["X"]}, {"id": "F2", "partners": ["X", "W"], "children": ["A", "B"]},
+                    {"id": "F3", "partners": ["A"], "children": ["C"]}, {"id": "F4", "partners": ["Q"], "children": []}]
+        out = self.run_js(people, families, "C", "console.log(JSON.stringify(surnameGroups().map(function (g) { return g.focus; })));")
+        self.assertEqual(out, ["X"])   # not Q (older, but no line) and not a random descendant
+
+    def test_start_person_gets_every_ancestral_line(self):
+        # a chain of 8 generations above the start person; the other person sees 5
+        people = [{"id": f"G{i}", "sex": "M", "surname": "Long", "display_name": f"G{i}"} for i in range(9)]
+        families = [{"id": f"F{i}", "partners": [f"G{i + 1}"], "children": [f"G{i}"]} for i in range(8)]
+        code = r"""
+function depth(n) { return n.parents.length ? 1 + Math.max.apply(null, n.parents.map(depth)) : 0; }
+function count(n) { return 1 + n.parents.reduce(function (a, p) { return a + count(p); }, 0); }
+ancLimit = ANC_ALL; var full = buildAnc('G0', 0);
+ancLimit = ANC; var five = buildAnc('G0', 0);
+console.log(JSON.stringify([depth(full), depth(five), count(full)]));
+"""
+        # full: 8 known generations; the missing mothers are drawn as empty places only in the two nearest generations
+        self.assertEqual(self.run_js(people, families, "G0", code), [8, 5, 9 + 2])
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
 class Kinship(unittest.TestCase):
     """The «How we are related» block of app.js, run in node on a small family."""
 

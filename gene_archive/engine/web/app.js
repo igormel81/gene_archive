@@ -180,12 +180,14 @@
 
   // ---------- tree layout (hourglass around the focus person)
   var CW = 200, CH = 86, GX = 20, GY = 64, SW = CW + GX, RH = CH + GY;
-  var ANC = 5, DESC = 3;
+  // предков — 5 поколений; у стартового человека («Наша семья») — все известные линии до самого раннего предка
+  var ANC = 5, DESC = 3, ANC_ALL = 40, ancLimit = ANC;
   var line = null, lineKey = null;   // страница фамилии: её носители; древо раскрывается вниз на все поколения
+  function startFocus() { return D.start_focus && P[D.start_focus] ? D.start_focus : D.root_person_id; }
 
   function buildAnc(id, depth) {
     var node = { id: id, depth: depth, parents: [] };
-    if (depth >= ANC) return node;
+    if (depth >= ancLimit) return node;
     var f = parentFam[id];
     if (!f || !f.partners.length) {
       if (depth < 2) node.parents.push({ ghost: T('родители не установлены'), of: id, depth: depth + 1, parents: [] });
@@ -263,7 +265,8 @@
       return c;
     }
 
-    // ancestors
+    // ancestors: пустые места рисуются только в двух ближних поколениях, дальше ширина растёт лишь за счёт известных людей
+    ancLimit = focus === startFocus() && !line ? ANC_ALL : ANC;
     var root = buildAnc(focus, 0);
     placeAnc(root, { x: 0 });
     var fx = root.x;
@@ -1328,7 +1331,7 @@
     var up = document.querySelector('.story-up'); if (up && name !== 'story') up.hidden = true;
     document.querySelectorAll('.pl-status').forEach(function (x) { if (name !== 'story') x.hidden = true; else if (document.querySelector('#story.filtering')) x.hidden = false; });
     // древо ещё не рисовали (сайт открыли с другого раздела) — начинаем с «Нашей семьи»
-    if (name === 'tree' && !focusId && D) setFocus(D.start_focus && P[D.start_focus] ? D.start_focus : D.root_person_id, { keepView: true });
+    if (name === 'tree' && !focusId && D) setFocus(startFocus(), { keepView: true });
     if (name === 'tree') requestAnimationFrame(function () { fit(false); });
     if (name === 'wide' && !document.documentElement.classList.contains('print-wide')) requestAnimationFrame(function () { renderWide(); wideFit(); });
     if (name !== 'story') storyAnchor = null;
@@ -1410,7 +1413,7 @@
     try {
       var view = r.view || (r.person && first ? 'tree' : r.view) || (first ? 'tree' : currentView);
       if (view === 'tree') {
-        var start = D.start_focus && P[D.start_focus] ? D.start_focus : D.root_person_id;
+        var start = startFocus();
         var f = r.arg && P[r.arg] ? r.arg : (first ? (r.person && P[r.person] ? r.person : start) : (focusId || start));
         if (currentView !== 'tree') showView('tree');
         if (f !== focusId || (r.line || null) !== lineKey) setFocus(f, { line: r.line });
@@ -2892,7 +2895,10 @@
         childrenOf(id).forEach(function (c) { if (!seen[c]) { seen[c] = true; if (set[c]) n++; n += descIn(c, seen); } });
         return n;
       }
-      var tops = ids.filter(function (id) { return !parentsOf(id).some(function (q) { return set[q]; }); });
+      // ветвь начинается с самого раннего связанного предка: родители — «возможная родня» и заглушки
+      // не считаются родителями той же фамилии, иначе линия обрывается и в центре оказывается случайный человек
+      var linkedParent = function (q) { return set[q] && !P[q].placeholder && P[q].research_status !== 'unlinked_candidate'; };
+      var tops = ids.filter(function (id) { return !parentsOf(id).some(linkedParent); });
       var sure = tops.filter(function (id) { return P[id].research_status !== 'unlinked_candidate'; });
       if (sure.length) tops = sure;
       tops.sort(function (a, b) {
@@ -2909,7 +2915,7 @@
   }
   function renderBranches() {
     var host = clear($('branches'));
-    host.appendChild(el('button', { text: T('Наша семья'), onclick: function () { setFocus(D.start_focus || D.root_person_id); } }));
+    host.appendChild(el('button', { text: T('Наша семья'), onclick: function () { setFocus(startFocus()); } }));
     (SITE.quick_focus || []).forEach(function (q) {
       if (P[q.person]) host.appendChild(el('button', { text: q.label, onclick: function () { setFocus(q.person); } }));
     });

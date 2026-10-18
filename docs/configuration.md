@@ -46,7 +46,7 @@ an unknown key is an error, so typos do not go unnoticed. With the `"$schema"` l
 | `languages` | `["en"]` | interface languages: `en`, `ru`, `ro`. The first is published at the site root, the others in `/ru/`, `/ro/`… |
 | `content_language` | first language | the language your texts are written in |
 | `root_person` | `root_person_id` of the data | the person the archive is "about": relations are counted from them, privacy generations too |
-| `start_person` | root person | who stands in the middle when the tree opens (often a grandparent, so more of the tree is visible) |
+| `start_person` | root person | who stands in the middle when the tree opens (often a grandparent, so more of the tree is visible); for this person ("Our family") the tree shows every known ancestral line up to the earliest ancestor, for others five generations up |
 | `quick_focus` | `[]` | buttons above the tree that put a person in the centre |
 | `branches` | `[]` | family branches: `id`, `title`, `focus` (person), `about` |
 | `questions` | `[]` | questions to relatives, each tied to a person; answers appear in that person's card |
