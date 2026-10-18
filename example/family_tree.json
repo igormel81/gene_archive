@@ -2548,7 +2548,9 @@
       "kind": "online_reference",
       "url": "https://example.org/records/hamburg-emigrants/1892-05-06",
       "locator": "Hamburg passenger lists, vol. 1892/5, p. 314 — fictional citation",
-      "scope": "Josef Novák, 25, and Michal Novák, 23, both labourers from Kapušany, Hungary, bound for New York."
+      "scope": "Josef Novák, 25, and Michal Novák, 23, both labourers from Kapušany, Hungary, bound for New York.",
+      "status": "to_verify",
+      "verify_note": "The saved page image is cut off below line 20: check on the full scan that Michal Novák is on the same page as Josef, from Kapušany, aged 23"
     },
     {
       "id": "S10",

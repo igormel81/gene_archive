@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- A "Check by eye" queue: a source status `to_verify` with `verify_note` (what to check), a filter in the Archive,
+  a notice in the document viewer and a `gene validate` warning when such a source is used in `identity_source_ids`.
+  Очередь «Разобрать по снимку»: статус источника `to_verify` с `verify_note` (что проверить), фильтр в «Архиве»,
+  пометка в просмотре документа и предупреждение `gene validate`, если такой документ стоит в `identity_source_ids`.
+
 - Tree branches: a surname button starts at the earliest linked ancestor — parents marked as possible relatives
   (`unlinked_candidate`) and placeholders no longer break the line. "Our family" (`start_person`) shows every known
   ancestral line up to the earliest ancestor instead of five generations, with empty places only in the two nearest.

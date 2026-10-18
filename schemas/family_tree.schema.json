@@ -695,6 +695,16 @@
           "type": "boolean",
           "description": "the family asked to remove it: never published / семья попросила убрать: не публикуется"
         },
+        "status": {
+          "enum": [
+            "to_verify"
+          ],
+          "description": "to_verify: saved before checking — the entry is not visible on the saved fragment or the reading is doubtful; listed under Archive → Check by eye and not to be used as proof in identity_source_ids / to_verify: сохранён до проверки — записи не видно на сохранённом фрагменте или чтение сомнительно; фильтр «Разобрать по снимку», не ссылаться в identity_source_ids"
+        },
+        "verify_note": {
+          "type": "string",
+          "description": "what to check on the image / что проверить по снимку"
+        },
         "merged_into": {
           "$ref": "#/$defs/sourceId"
         },

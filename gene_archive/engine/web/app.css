@@ -689,6 +689,9 @@ th { font: 600 12px var(--sans); color: var(--muted); }
 .doc-meta h2 { font-size: 21px; margin: 6px 0 10px; }
 .doc-meta h3 { font-size: 15px; font-family: var(--sans); margin: 18px 0 8px; }
 .doc-scope { line-height: 1.55; margin: 0 0 10px; }
+.doc-verify { margin: 0 0 12px; padding: 9px 12px; border-left: 3px solid #b5852a; background: color-mix(in srgb, #b5852a 12%, var(--paper)); border-radius: 4px; font: 14px/1.5 var(--sans); }
+.acard-verify { margin: 0; color: #8a6d1f; font: 600 11px var(--sans); }
+.acard-verify::before { content: '◔ '; }
 .doc-links { font: 14px var(--sans); }
 .doc-ppl { display: flex; flex-wrap: wrap; gap: 6px; }
 .doc .panel-close { position: absolute; top: 10px; right: 10px; z-index: 3; box-shadow: 0 2px 8px rgba(0, 0, 0, .18); }

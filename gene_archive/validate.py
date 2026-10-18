@@ -202,6 +202,18 @@ def validate(data, root=Path("."), cfg=None):
         if s.get("preview_page") is not None and not str(s.get("file", "")).lower().endswith(".pdf"):
             warn(m(f"{sid}: preview_page on a file that is not a PDF", f"{sid}: preview_page у файла, который не PDF"))
         text_sources(sid, s.get("scope"))
+        if "status" in s and s["status"] != "to_verify":
+            err(m(f"{sid}: status {s['status']!r} (only to_verify is known)", f"{sid}: статус {s['status']!r} (известен только to_verify)"))
+        if s.get("status") == "to_verify" and not str(s.get("verify_note") or "").strip():
+            warn(m(f"{sid}: to_verify without verify_note — say what to check", f"{sid}: to_verify без verify_note — напишите, что проверить"))
+        text_sources(sid, s.get("verify_note"))
+    # a document waiting to be checked by eye is not proof of who a person is
+    unchecked = {s.get("id") for s in data["sources"] if s.get("status") == "to_verify"}
+    for p in data["people"]:
+        for sid in p.get("identity_source_ids", []):
+            if sid in unchecked:
+                warn(m(f"{p.get('id')}: identity_source_ids uses {sid}, which is still to be checked by eye (to_verify)",
+                       f"{p.get('id')}: в identity_source_ids — {sid}, а он ещё не разобран по снимку (to_verify)"))
 
     # --- places
     for pl in data.get("places", []):

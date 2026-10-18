@@ -362,7 +362,7 @@
   var KNOWN = {
     people: ['id', 'given_names', 'surname', 'birth_surname', 'display_name', 'sex', 'relation', 'aliases', 'identity_source_ids', 'birth', 'death', 'burial', 'notes', 'research_status', 'research_note', 'living', 'placeholder'],
     families: ['id', 'partners', 'relation', 'children', 'probable_children', 'adopted_children', 'probable_note', 'marriage', 'source_ids', 'notes'],
-    sources: ['id', 'title', 'kind', 'file', 'back', 'url', 'locator', 'scope', 'preview_page', 'hidden'],
+    sources: ['id', 'title', 'kind', 'file', 'back', 'url', 'locator', 'scope', 'preview_page', 'hidden', 'status', 'verify_note'],
     places: ['slug', 'name', 'where', 'lat', 'lon', 'geo_note', 'period', 'then', 'now', 'aliases', 'text', 'details', 'sort_year']
   };
   function extraBox(kind, rec, holder) {
@@ -534,6 +534,8 @@
       field(rec, 'kind', T('Вид'), { list: 'dl-kinds' }),
       field(rec, 'preview_page', T('Страница PDF для превью'), { type: 'number' }),
       field(rec, 'hidden', T('Скрыть с сайта (семья попросила убрать)'), { type: 'check', wide: true }),
+      field(rec, 'status', T('Состояние'), { type: 'select', options: [['', '—'], ['to_verify', T('разобрать по снимку')]] }),
+      field(rec, 'verify_note', T('Что проверить по снимку'), { wide: true }),
       fileField(rec, 'file', T('Файл (скан, фото, PDF)')),
       fileField(rec, 'back', T('Оборот снимка')),
       field(rec, 'url', T('Ссылка на запись в интернете'), { type: 'url', wide: true }),
@@ -791,7 +793,7 @@
       'Замечаний нет.': 'Nothing to report.', 'Родился после смерти матери': 'Born after the mother’s death', 'Родился больше чем через год после смерти отца': 'Born over a year after the father’s death',
       'Слишком молодой родитель': 'Parent too young', 'Слишком пожилой родитель': 'Parent too old', 'Слишком ранний брак': 'Married too young', 'Очень долгая жизнь': 'Very long life',
       'Не связаны с древом': 'Not connected to the tree', 'Нет ни одного документа': 'No document at all', 'Дата без документа': 'Date without a document', 'Нет дат': 'No dates',
-      'Семья без документа': 'Family without a document', 'Не указан пол': 'Sex not set', 'Документ ни к кому не привязан': 'Document not referenced', 'Место без координат': 'Place without coordinates', 'Можно оценить год рождения': 'Birth year can be estimated',
+      'Семья без документа': 'Family without a document', 'Не указан пол': 'Sex not set', 'Документ ни к кому не привязан': 'Document not referenced', 'Место без координат': 'Place without coordinates', 'Состояние': 'State', 'разобрать по снимку': 'check by eye', 'Что проверить по снимку': 'What to check on the image', 'Можно оценить год рождения': 'Birth year can be estimated',
       'Сменить пароль': 'Change password', 'К списку': 'Back to the list', 'Пароль изменён. Войдите с новым паролем.': 'Password changed. Sign in with the new password.'
     }
   };
@@ -852,7 +854,7 @@
     ['Замечаний нет.', 'Nicio observație.'], ['Родился после смерти матери', 'Născut după moartea mamei'], ['Родился больше чем через год после смерти отца', 'Născut la peste un an după moartea tatălui'],
     ['Слишком молодой родитель', 'Părinte prea tânăr'], ['Слишком пожилой родитель', 'Părinte prea în vârstă'], ['Слишком ранний брак', 'Căsătorie prea timpurie'], ['Очень долгая жизнь', 'Viață foarte lungă'],
     ['Не связаны с древом', 'Neconectați la arbore'], ['Нет ни одного документа', 'Niciun document'], ['Дата без документа', 'Dată fără document'], ['Нет дат', 'Fără date'],
-    ['Семья без документа', 'Familie fără document'], ['Не указан пол', 'Sex nespecificat'], ['Документ ни к кому не привязан', 'Document neatribuit'], ['Место без координат', 'Loc fără coordonate'], ['Можно оценить год рождения', 'Anul nașterii poate fi estimat'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
+    ['Семья без документа', 'Familie fără document'], ['Не указан пол', 'Sex nespecificat'], ['Документ ни к кому не привязан', 'Document neatribuit'], ['Место без координат', 'Loc fără coordonate'], ['Состояние', 'Stare'], ['разобрать по снимку', 'de verificat pe imagine'], ['Что проверить по снимку', 'Ce trebuie verificat pe imagine'], ['Можно оценить год рождения', 'Anul nașterii poate fi estimat'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
   ].forEach(function (p) { DICT.ro[p[0]] = p[1]; });
 
   // ---------- start

@@ -145,6 +145,11 @@ A person is the biological child (`children`) of at most one family with partner
 - `preview_page`: which page of a PDF to use as the thumbnail.
 - `hidden: true`: the family asked to remove it. The record stays in your JSON but never
   reaches the site or GEDCOM, and links to it are removed during the build.
+- `status: "to_verify"` and `verify_note`: the document was saved before it was checked — the entry
+  is not visible on the saved fragment, or the reading is doubtful. `verify_note` says what to check.
+  Such documents get a "Check by eye" filter in the Archive and a notice in the viewer, and
+  `gene validate` warns when one is used as proof in `identity_source_ids`. Remove the status once
+  the image is checked.
 - `kind` groups documents in the Archive filter:
 
   | Group | `kind` values |

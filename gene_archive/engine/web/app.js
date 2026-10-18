@@ -2541,7 +2541,9 @@
     ['research', T('Находки для проверки'), ['research_scan']]
   ];
   var KIND_OF = {}; KINDS.forEach(function (k) { k[2].forEach(function (x) { KIND_OF[x] = k; }); });
-  var arch = { q: '', kind: null, line: null, sort: 'year' };
+  var arch = { q: '', kind: null, line: null, sort: 'year', verify: false };
+  // «Разобрать по снимку»: документ сохранён до проверки — запись не видна на сохранённом фрагменте или чтение сомнительно
+  function toVerify(s) { return s.status === 'to_verify'; }
   // «Сначала семейное»: фотографии, документы и рукописи семьи впереди, справочники и непроверенные находки — в конце
   var KIND_RANK = { photo: 0, civil: 1, manuscript: 2, grave: 3, military: 4, family: 5, press: 6, other: 7, research: 8, online: 9 };
   var srcPeople = null;
@@ -2674,10 +2676,15 @@
       chip(lc, /ий$/.test(l) ? l.replace(/ий$/, 'ие') : /(ов|ев|ин|ын)$/.test(l) ? l + T('ы') : l, arch.line === l, function () { arch.line = arch.line === l ? null : l; renderSources(); }, lines[l]);
     });
     [['year', T('По времени')], ['family', T('Сначала семейное')], ['id', T('По номеру')]].forEach(function (o) { chip(sc, o[1], arch.sort === o[0], function () { arch.sort = o[0]; renderSources(); }); });
+    var nVerify = D.sources.filter(toVerify).length;
+    $('arch-verify-row').hidden = !nVerify;
+    if (!nVerify) arch.verify = false;
+    chip(clear($('arch-verify')), T('Разобрать по снимку'), arch.verify, function () { arch.verify = !arch.verify; renderSources(); }, nVerify);
     var q = arch.q.toLowerCase();
     var list = D.sources.filter(function (s) {
       if (arch.kind && (KIND_OF[s.kind] || [''])[0] !== arch.kind) return false;
       if (arch.line && srcLines(s).indexOf(arch.line) < 0) return false;
+      if (arch.verify && !toVerify(s)) return false;
       if (q) {
         var hay = [s.id, s.title, s.scope, s.locator].concat(peopleOfSource(s.id).map(function (pid) { return P[pid].display_name; })).join(' ').toLowerCase();
         if (hay.indexOf(q) < 0) return false;
@@ -2698,6 +2705,7 @@
         el('div', { class: 'acard-pic' }, pic ? el('img', { src: pic, alt: '', loading: 'lazy' }) : el('span', { class: 'acard-ph', text: /\.pdf$/i.test(s.file || '') ? 'PDF' : (s.url ? '↗' : '¶') })),
         el('div', { class: 'acard-body' },
           el('p', { class: 'acard-kind' }, el('span', { text: k[1] }), y < 9999 ? el('span', { text: ' · ' + y }) : null, el('span', { class: 'acard-id', text: s.id })),
+          toVerify(s) ? el('p', { class: 'acard-verify', title: s.verify_note || '', text: T('Разобрать по снимку') }) : null,
           el('p', { class: 'acard-title', text: s.title }),
           byPerson[s.id] ? el('p', { class: 'acard-cm', text: byPerson[s.id].length + ' ' + plural(byPerson[s.id].length, T('комментарий'), T('комментария'), T('комментариев')) }) : null,
           ppl.length ? el('p', { class: 'acard-ppl', text: ppl.slice(0, 3).map(function (x) { return P[x].display_name; }).join(', ') + (ppl.length > 3 ? T(' и ещё ') + (ppl.length - 3) : '') }) : null)));
@@ -2799,6 +2807,8 @@
     var k = KIND_OF[s.kind] || ['other', T('Прочее')];
     meta.appendChild(el('p', { class: 'acard-kind' }, el('span', { text: k[1] }), el('span', { class: 'acard-id', text: s.id })));
     meta.appendChild(el('h2', { id: 'doc-title', text: s.title }));
+    if (toVerify(s)) meta.appendChild(el('p', { class: 'doc-verify' }, el('b', { text: T('Разобрать по снимку. ') }),
+      s.verify_note || T('Чтение не проверено: запись не видна на сохранённом фрагменте или прочитана неуверенно.')));
     if (s.scope) meta.appendChild(el('p', { class: 'doc-scope', text: s.scope }));
     if (s.locator) meta.appendChild(el('p', { class: 'where' }, el('b', { text: T('Где хранится: ') }), s.locator));
     if (rest && rest.date) meta.appendChild(el('p', { class: 'where' }, el('b', { text: T('Датировка: ') }), rest.date));

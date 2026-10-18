@@ -60,6 +60,17 @@ class Validate(unittest.TestCase):
             with self.subTest(needle):
                 self.assertTrue(any(needle in e for e in errors_after(change)), (needle, errors_after(change)[:3]))
 
+    def test_to_verify(self):
+        data = copy.deepcopy(DATA)
+        unchecked = [x["id"] for x in data["sources"] if x.get("status") == "to_verify"]
+        self.assertTrue(unchecked)   # the example shows the queue
+        data["people"][0].setdefault("identity_source_ids", []).append(unchecked[0])
+        errors, warnings = validate(data, EXAMPLE, CFG)
+        self.assertEqual(errors, [])
+        self.assertTrue(any(unchecked[0] in w and "to_verify" in w for w in warnings), warnings)
+        data["sources"][0]["status"] = "checked"
+        self.assertTrue(any("only to_verify" in e for e in validate(data, EXAMPLE, CFG)[0]))
+
     def test_site_json_references(self):
         cfg = dict(CFG, questions=[{"person": "I999", "text": "?"}])
         self.assertTrue(any("I999" in e for e in validate(DATA, EXAMPLE, cfg)[0]))
