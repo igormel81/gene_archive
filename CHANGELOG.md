@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Estimated birth dates: under names `BET 1917 AND 1944` reads "1917…1944" and `ABT`/`EST`/`CAL` "c. 1883" instead of
+  an exact year; a new date status `estimated` that needs a `note` saying how; `gene hints` suggests an estimate for
+  people without a birth date (`estimate_birth`: eldest child −27, spouse or siblings ±8, parents +18…+45), never
+  for people who would be born after 1935.
+  Оценочные даты рождения: под именами `BET 1917 AND 1944` — «1917…1944», `ABT`/`EST`/`CAL` — «ок. 1883», а не точный
+  год; новый статус даты `estimated`, к которому нужно пояснение в `note`; `gene hints` предлагает оценку людям без
+  даты рождения (`estimate_birth`: старший ребёнок −27, супруг или братья и сёстры ±8, родители +18…+45), но не тем,
+  кто по расчёту родился позже 1935 года.
+
 - Person card: the note of a birth, death or burial (`note`: cause of death, Old/New Style, how to find the grave)
   is shown under the date; a Burial row; a death without a date is shown when its place or note is known;
   deaths from other documents (`death_alternatives`) are listed like births.

@@ -65,15 +65,21 @@
     if (m) return T('с ') + fmtDate(m[1]);
     return v;
   }
-  function year(v) {
+  // год для подписи: «1917…1944» для BET 1917 AND 1944, «ок. 1883» для ABT/EST/CAL и для оценки (status: estimated)
+  function year(v, status) {
     if (!v) return '';
+    var r = /^(?:BET|FROM) \D*(\d{4}) (?:AND|TO) \D*(\d{4})$/.exec(v);
+    if (r) return r[1] === r[2] ? r[1] : r[1] + '…' + r[2];
     var m = /\d{4}/.exec(v);
-    return m ? (v.indexOf('ABT') === 0 ? T('ок. ') : v.indexOf('AFT') === 0 ? T('после ') : '') + m[0] : '';
+    if (!m) return '';
+    return (/^(ABT|EST|CAL) /.test(v) || status === 'estimated' ? T('ок. ') : /^AFT /.test(v) ? T('после ') : /^BEF /.test(v) ? T('до ') : '') + m[0];
   }
+  function evYear(ev) { return ev ? year(ev.date, ev.status) : ''; }
+  function yearNum(ev) { var m = /\d{4}/.exec((ev && ev.date) || ''); return m ? +m[0] : null; }
   function lifespan(p) {
-    var b = year(p.birth && p.birth.date);
-    if (!b && p.birth_alternatives && p.birth_alternatives.length) b = year(p.birth_alternatives[0].date);
-    var d = year(p.death && p.death.date);
+    var b = evYear(p.birth);
+    if (!b && p.birth_alternatives && p.birth_alternatives.length) b = evYear(p.birth_alternatives[0]);
+    var d = evYear(p.death);
     if (b && d) return b + ' – ' + d;
     if (b) return T('р. ') + b;
     if (d) return '† ' + d;
@@ -867,7 +873,7 @@
   }
   function eventText(ev) {
     var parts = [];
-    if (ev.date) parts.push(fmtDate(ev.date));
+    if (ev.date) parts.push(fmtDate(ev.date) + (ev.status === 'estimated' ? T(' (оценка)') : ''));
     // номер документа в тексте места («повторное свидетельство, S232») уже стоит кнопкой рядом — из текста убираем
     if (ev.place_as_recorded) parts.push(ev.place_as_recorded.replace(/,?\s*\bS\d+\b/g, '').replace(/\(\s*\)/g, '').replace(/\s+\)/g, ')').trim());
     var out = [parts.join(', ') || T('дата неизвестна'), ' '].concat((ev.source_ids || []).map(srcChip));
@@ -2894,7 +2900,7 @@
         if (db !== da) return db - da;
         var ma = P[a].sex === 'M' ? 0 : 1, mb = P[b].sex === 'M' ? 0 : 1;
         if (ma !== mb) return ma - mb;
-        var ya = parseInt(year((P[a].birth || {}).date), 10) || 9999, yb = parseInt(year((P[b].birth || {}).date), 10) || 9999;
+        var ya = yearNum(P[a].birth) || 9999, yb = yearNum(P[b].birth) || 9999;
         return ya - yb;
       });
       // линия фамилии обычно идёт по мужчине: при равенстве предпочитаем носителя фамилии по рождению

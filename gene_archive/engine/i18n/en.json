@@ -593,5 +593,6 @@
  "Имя, село, слово из документа…": "Name, village, a word from a document…",
  "начните набирать имя, название села или слово из документа — найдутся люди, документы (по расшифровкам), места, главы «Истории», наводки и вопросы. Падежи, старое написание (ъ, і, ѣ) и латиница не мешают: «Сынкове» найдёт Сынково, «Kolodin» — Колодина.": "start typing a name, a village or a word from a document — you get people, documents (by their transcriptions), places, chapters of the Story, leads and questions. Word endings, the pre-1918 Russian spelling and Latin or Cyrillic letters do not get in the way: “Kolodin” also finds the name written in Cyrillic.",
  "Погребение": "Burial",
- "Смерть (по другому документу)": "Death (according to another document)"
+ "Смерть (по другому документу)": "Death (according to another document)",
+ " (оценка)": " (estimate)"
 }

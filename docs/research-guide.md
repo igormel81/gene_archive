@@ -451,6 +451,8 @@ gene build        # builds the site; refuses when validation fails
 - **Let the site tell you what next.** `gene hints` (or the editor's "Checks" tab)
   lists impossible facts — born after the mother's death, a parent aged 12 — and gaps:
   dates without documents, people outside the tree, documents nobody refers to.
+  For people without a birth date it suggests an estimate from their relatives' years;
+  write it with `"status": "estimated"` and the explanation in `note`.
   It is a ready to-do list for your next weekend.
 - **Share findings where others search.** `gene gedcom --for geni` makes a file for
   Geni and MyHeritage, whose matches find distant cousins; `gene gedcom --for public`

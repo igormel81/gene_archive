@@ -1043,11 +1043,12 @@
       "placeholder": false,
       "aliases": [],
       "birth": {
-        "date": "ABT 1885",
-        "status": "uncertain_family_report",
+        "date": "BET 1880 AND 1890",
+        "status": "estimated",
         "source_ids": [
           "S16"
-        ]
+        ],
+        "note": "Estimate: Kate Harper remembers him as a few years older than Margaret (born 1889); their son Robert was born in 1919"
       },
       "death": {
         "date": "1950",
@@ -3407,6 +3408,16 @@
       "reason": "Adoption decree found in the Orphans' Court docket",
       "source_ids": [
         "S13"
+      ]
+    },
+    {
+      "person_id": "I24",
+      "field": "birth",
+      "previous": "ABT 1885",
+      "current": "BET 1880 AND 1890",
+      "reason": "No record of his birth; the remembered 1885 replaced by an estimate from Margaret's and Robert's years",
+      "source_ids": [
+        "S16"
       ]
     }
   ],

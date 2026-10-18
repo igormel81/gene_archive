@@ -21,7 +21,8 @@ STYLE = """body{display:block}main.archive-page{max-width:820px;margin:auto;padd
 TR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюяіїєґ",
               ["a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
                "f", "kh", "ts", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya", "i", "yi", "ye", "g"]))
-YEAR = re.compile(r"(ABT |AFT |BEF |EST |CAL )?(\d{4})")
+YEAR = re.compile(r"(ABT |AFT |BEF |EST |CAL )?(?:\d{1,2} )?(?:[A-Z]{3} )?(\d{4})")
+RANGE = re.compile(r"(?:BET|FROM) \D*(\d{4}) (?:AND|TO) \D*(\d{4})$")
 
 
 def esc(value):
@@ -92,8 +93,12 @@ class Pages:
     # --- helpers
     def years(self, p):
         def year(ev):
-            mm = YEAR.match(str((p.get(ev) or {}).get("date", "")))
-            return ("~" if mm and mm[1] else "") + mm[2] if mm else ""
+            e = p.get(ev) or {}
+            rr = RANGE.match(str(e.get("date", "")))
+            if rr:   # BET 1917 AND 1944 → 1917…1944: not one exact year
+                return rr[1] if rr[1] == rr[2] else f"{rr[1]}…{rr[2]}"
+            mm = YEAR.match(str(e.get("date", "")))
+            return ("~" if mm[1] or e.get("status") == "estimated" else "") + mm[2] if mm else ""
         b, d = year("birth"), year("death")
         return f'{b or "?"}–{d}' if d else b
 

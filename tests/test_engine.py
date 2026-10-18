@@ -54,6 +54,7 @@ class Validate(unittest.TestCase):
             "research_resources[0]": lambda d: d["research_resources"][0].update(source_ids=["S999"]),
             "regular expression": lambda d: d["research_resources"][0].update(log_match="(("),
             "media[0]: file must": lambda d: d["places"][0].setdefault("media", []).append({"file": "../x.jpg"}),
+            "estimated date needs a note": lambda d: d["people"][0].update(birth={"date": "ABT 1830", "status": "estimated"}),
         }
         for needle, change in cases.items():
             with self.subTest(needle):
@@ -479,6 +480,57 @@ class Hints(unittest.TestCase):
         self.assertNotIn(("unused_source", "S1"), got)
         self.assertEqual(hints(data)[0]["code"], "born_after_mother_death")   # impossible facts first
         self.assertIn("Mother", text(hints(data)[0], "ru"))
+
+
+class EstimateBirth(unittest.TestCase):
+    def test_suggestions(self):
+        from gene_archive.hints import hints, note
+        P = lambda i, b=None, **kw: dict(id=i, display_name=i, sex="M", notes=[], **({"birth": {"date": b}} if b else {}), **kw)   # noqa: E731
+        data = {
+            "root_person_id": "K1",
+            "people": [P("A"), P("B", "1860"), P("K1", "1885"), P("K2", "1883"),     # A: eldest child 1883 → ABT 1856
+                       P("S"), P("W", "1890"),                                      # S: wife 1890 → 1882…1898
+                       P("X"), P("Y", "1900"), P("Z", "1904"),                      # X: siblings 1900–1904
+                       P("C"),                                                      # C: parents 1860 → 1878…1905
+                       P("L"), P("M", "1950"),                                      # L: wife 1950 → would be living
+                       P("D", birth_alternatives=[{"date": "ABT 1850"}]), P("E", "1880"),
+                       P("U", research_status="unlinked_candidate")],
+            "families": [{"id": "F1", "partners": ["A", "B"], "children": ["K1", "K2"]},
+                         {"id": "F2", "partners": ["S", "W"], "children": []},
+                         {"id": "F3", "partners": [], "children": ["X", "Y", "Z"]},
+                         {"id": "F4", "partners": ["B"], "children": ["C"]},
+                         {"id": "F5", "partners": ["L", "M"], "children": []},
+                         {"id": "F6", "partners": ["D", "E"], "children": ["U"]}],
+            "sources": [],
+        }
+        got = {h["id"]: h for h in hints(data) if h["code"] == "estimate_birth"}
+        self.assertEqual({k: h["params"]["date"] for k, h in got.items()},
+                         {"A": "ABT 1856", "S": "BET 1882 AND 1898", "X": "BET 1892 AND 1912", "C": "BET 1878 AND 1905"})
+        self.assertIn("1883", note(got["A"]))
+        self.assertIn("старшего ребёнка (1883)", note(got["A"], "ru"))
+
+
+@unittest.skipUnless(shutil.which("node"), "node is not installed")
+class YearLabels(unittest.TestCase):
+    """Years under names in the tree: a range is not shown as one exact year."""
+
+    def test_labels(self):
+        app = (ROOT / "gene_archive/engine/web/app.js").read_text(encoding="utf-8")
+        block = app[app.index("  // год для подписи"):app.index("  function fmtStamp(")]
+        script = "function T(s) { return s; }\n" + block + r"""
+console.log(JSON.stringify([year('BET 1917 AND 1944'), year('ABT 1883'), year('EST 1864'), year('1883', 'estimated'), year('1883'),
+  year('BEF 1950'), year('9 OCT 1899'), lifespan({ birth: { date: 'BET 1880 AND 1890', status: 'estimated' }, death: { date: '1950' } }),
+  lifespan({ birth: { date: 'BET 1917 AND 1944' } })]));
+"""
+        out = subprocess.run(["node", "-e", script], capture_output=True, text=True, check=True).stdout
+        self.assertEqual(json.loads(out), ["1917…1944", "ок. 1883", "ок. 1864", "ок. 1883", "1883", "до 1950", "1899",
+                                           "1880…1890 – 1950", "р. 1917…1944"])
+
+    def test_static_pages(self):
+        from gene_archive import discovery
+        pages = discovery.Pages(Path("."), {"people": [], "sources": [], "places": []}, {}, set(), False, False)
+        self.assertEqual(pages.years({"birth": {"date": "BET 1880 AND 1890"}, "death": {"date": "9 OCT 1950"}}), "1880…1890–1950")
+        self.assertEqual(pages.years({"birth": {"date": "1883", "status": "estimated"}}), "~1883")
 
 
 @unittest.skipUnless(shutil.which("node"), "node is not installed")

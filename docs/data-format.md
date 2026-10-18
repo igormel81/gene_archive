@@ -100,7 +100,21 @@ Anything else (`"before the war"`) is an error: put such wording in `note`.
 Style, "calculated from the age", how to find the grave. The card shows a death or a burial even
 without a date when its place or note is known.
 `status` says how we know: `documented`, `family_report`, `uncertain_family_report`,
-`calculated_from_age`, `gravestone`, `publication`, `probable`.
+`calculated_from_age`, `gravestone`, `publication`, `probable`, `estimated`.
+
+**Estimated dates.** When only relatives' years are known, write an estimate with `"status": "estimated"`
+and say in `note` how it was made — the note is required:
+
+```json
+"birth": {"date": "BET 1880 AND 1890", "status": "estimated",
+          "note": "Estimate from the birth year of the eldest child (1907) and of the wife (1885)"}
+```
+
+Under names the site shows a range as "1880…1890" and `ABT`/`EST`/`CAL` or an estimate as "c. 1883",
+never as one exact year. `gene hints` suggests an estimate for people without a birth date
+(code `estimate_birth`): from the eldest child (−27 years), the spouse or brothers and sisters (±8),
+or the parents (18 to 45 years later). It suggests nothing when the estimate would fall after 1935:
+such a person may be living.
 
 ## Family — `families[]`
 

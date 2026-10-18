@@ -6,7 +6,8 @@ has no document, a mother is 61 at a birth, a document is not referenced by anyo
     gene hints <folder> [--json]          and the "Checks" tab of the online editor
 
 Each hint is {"code", "kind", "id", "params"}; texts for people are in HINTS (ru/en) here and
-in the editor's dictionary.
+in the editor's dictionary. `estimate_birth` suggests a birth date for a person without one
+(params: date — a GEDCOM date to write with status "estimated", basis, year — what it rests on).
 """
 import collections
 import re
@@ -14,8 +15,8 @@ import re
 SRC_IN_TEXT = re.compile(r"\bS\d+\b")
 # order = importance: impossible facts first, then gaps
 CODES = ("born_after_mother_death", "born_after_father_death", "parent_young", "parent_old", "married_young",
-         "long_life", "unconnected", "no_documents", "event_no_source", "no_dates", "family_no_source",
-         "no_sex", "unused_source", "place_no_coords")
+         "long_life", "unconnected", "no_documents", "event_no_source", "no_dates", "estimate_birth",
+         "family_no_source", "no_sex", "unused_source", "place_no_coords")
 HINTS = {   # code → (English, Russian) with {name}, {other}, {age}, {event}
     "born_after_mother_death": ("{name} was born after the death of the mother, {other}", "{name} родился(ась) после смерти матери — {other}"),
     "born_after_father_death": ("{name} was born more than a year after the death of the father, {other}", "{name} родился(ась) больше чем через год после смерти отца — {other}"),
@@ -31,8 +32,40 @@ HINTS = {   # code → (English, Russian) with {name}, {other}, {age}, {event}
     "no_sex": ("{name}: sex not set", "{name}: не указан пол"),
     "unused_source": ("{name}: nobody refers to this document", "{name}: на документ никто не ссылается"),
     "place_no_coords": ("{name}: no coordinates for the map", "{name}: нет координат для карты"),
+    "estimate_birth": ("{name}: no birth date — estimate {date}: {note}", "{name}: нет даты рождения — оценка {date}: {note}"),
 }
 EVENTS = {"birth": ("birth", "рождение"), "death": ("death", "смерть"), "marriage": ("marriage", "брак")}
+# estimate_birth: how the estimate was made → the note to write next to it (English, Russian)
+BASIS = {
+    "child": ("estimate from the birth year of the eldest child ({year}) minus 27", "оценка по году рождения старшего ребёнка ({year}) минус 27 лет"),
+    "spouse": ("estimate from the spouse's birth year ({year}), ±8 years", "оценка по году рождения супруга ({year}), ±8 лет"),
+    "siblings": ("estimate from the birth years of brothers and sisters ({year}), ±8 years", "оценка по годам рождения братьев и сестёр ({year}), ±8 лет"),
+    "parents": ("estimate from the parents' birth years ({year}): 18 to 45 years later", "оценка по годам рождения родителей ({year}): через 18–45 лет"),
+}
+LIVING_AFTER = 1935   # an estimate later than this would make the person one of the living: no suggestion
+
+
+def estimate_birth(pid, people, fams, parents):
+    """A suggested birth date for a person without one, from the closest relatives with known years:
+    the eldest child (−27), the spouse (±8), brothers and sisters (±8), the parents (+18…+45).
+    Returns (gedcom date, basis, years used) or None."""
+    yr = lambda x: year(people[x].get("birth"), True) if x in people else None   # noqa: E731
+    kids = [c for f in fams if pid in f.get("partners", []) for c in f.get("children", [])
+            if c not in f.get("probable_children", [])]
+    ys = sorted(y for y in map(yr, kids) if y)
+    if ys:
+        return f"ABT {ys[0] - 27}", "child", str(ys[0])
+    ys = sorted({y for f in fams if pid in f.get("partners", []) for x in f["partners"] if x != pid for y in [yr(x)] if y})
+    if ys:
+        return f"BET {ys[0] - 8} AND {ys[0] + 8}", "spouse", str(ys[0])
+    own = [f for f in parents.get(pid, []) if pid in f.get("children", []) and pid not in f.get("probable_children", [])]
+    ys = sorted(y for f in own for x in f.get("children", []) if x != pid and x not in f.get("probable_children", []) for y in [yr(x)] if y)
+    if ys:
+        return f"BET {ys[0] - 8} AND {ys[-1] + 8}", "siblings", f"{ys[0]}–{ys[-1]}" if ys[0] != ys[-1] else str(ys[0])
+    ys = sorted(y for f in own for x in f.get("partners", []) for y in [yr(x)] if y)
+    if ys and ys[-1] + 18 <= ys[0] + 45:
+        return f"BET {ys[-1] + 18} AND {ys[0] + 45}", "parents", ", ".join(map(str, ys))
+    return None
 
 
 def year(ev, exact=False):
@@ -76,6 +109,12 @@ def hints(data):
         b, d = year(p.get("birth"), True), year(p.get("death"), True)
         if not (p.get("birth") or {}).get("date") and not (p.get("death") or {}).get("date"):
             add("no_dates", "people", pid, name=name(pid))
+        if not any((e or {}).get("date") for e in [p.get("birth")] + list(p.get("birth_alternatives") or [])) \
+                and p.get("living") is not True and p.get("research_status") != "unlinked_candidate":
+            est = estimate_birth(pid, people, fams, parents)
+            nums = [int(x) for x in re.findall(r"\d{4}", est[0])] if est else []
+            if est and sum(nums) / len(nums) <= LIVING_AFTER:
+                add("estimate_birth", "people", pid, name=name(pid), date=est[0], basis=est[1], year=est[2])
         if p.get("sex") not in ("M", "F"):
             add("no_sex", "people", pid, name=name(pid))
         refs = set()
@@ -158,4 +197,12 @@ def text(h, lang="en"):
     params = dict(h["params"])
     if "event" in params:
         params["event"] = EVENTS[params["event"]][1 if lang == "ru" else 0]
+    if "basis" in params:
+        params["note"] = note(h, lang)
     return (ru if lang == "ru" else en).format(**params)
+
+
+def note(h, lang="en"):
+    """For estimate_birth: the explanation to write into the date's note."""
+    en, ru = BASIS[h["params"]["basis"]]
+    return (ru if lang == "ru" else en).format(**h["params"])

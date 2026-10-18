@@ -330,7 +330,8 @@
   }
   var DATE_HINT = 'Например: 1899, 1899-10-09, 9.10.1899, около 1899, до 1950, между 1900 и 1905.';
   var STATUSES = [['', '—'], ['documented', 'по документу'], ['family_report', 'со слов семьи'], ['uncertain_family_report', 'со слов семьи, неточно'],
-    ['calculated_from_age', 'вычислено по возрасту'], ['gravestone', 'по надгробию'], ['publication', 'по публикации'], ['probable', 'вероятно']];
+    ['calculated_from_age', 'вычислено по возрасту'], ['gravestone', 'по надгробию'], ['publication', 'по публикации'], ['probable', 'вероятно'],
+    ['estimated', 'оценка (как получена — в примечании)']];
   function eventBox(rec, ev, title) {
     var d = field(rec, ev + '.date', T('Дата'), { hint: T(DATE_HINT), onchange: function (v, hint) {
       var n = normalizeDate(v || '');
@@ -620,7 +621,7 @@
     parent_young: 'Слишком молодой родитель', parent_old: 'Слишком пожилой родитель', married_young: 'Слишком ранний брак',
     long_life: 'Очень долгая жизнь', unconnected: 'Не связаны с древом', no_documents: 'Нет ни одного документа',
     event_no_source: 'Дата без документа', no_dates: 'Нет дат', family_no_source: 'Семья без документа', no_sex: 'Не указан пол',
-    unused_source: 'Документ ни к кому не привязан', place_no_coords: 'Место без координат'
+    unused_source: 'Документ ни к кому не привязан', place_no_coords: 'Место без координат', estimate_birth: 'Можно оценить год рождения'
   };
   function showHints(pane) {
     clear(pane);
@@ -740,7 +741,7 @@
       'По одному в строке.': 'One per line.', 'Дата': 'Date', 'Например: 1899, 1899-10-09, 9.10.1899, около 1899, до 1950, между 1900 и 1905.': 'For example: 1899, 1899-10-09, about 1899, before 1950, between 1900 and 1905.',
       'Будет записано как: ': 'Will be saved as: ', 'Место (как в источнике)': 'Place (as recorded)', 'Откуда известно': 'How we know', 'Место на карте': 'Place on the map',
       'Примечание': 'Note', 'по документу': 'documented', 'со слов семьи': 'family report', 'со слов семьи, неточно': 'family report, uncertain',
-      'вычислено по возрасту': 'calculated from age', 'по надгробию': 'gravestone', 'по публикации': 'publication', 'вероятно': 'probable',
+      'вычислено по возрасту': 'calculated from age', 'по надгробию': 'gravestone', 'по публикации': 'publication', 'вероятно': 'probable', 'оценка (как получена — в примечании)': 'estimate (say how in the note)',
       'Другие поля (JSON)': 'Other fields (JSON)', 'Поля, для которых нет формы (места жительства, профили, другие версии дат…), — в формате JSON, как в family_tree.json.': 'Fields without a form (residences, profiles, alternative dates…) as JSON, as in family_tree.json.',
       'Номер будет присвоен при сохранении.': 'The id is assigned on saving.', 'Почему изменено (попадёт в журнал исправлений)': 'Why (goes to the corrections log)',
       'Причина правки': 'Reason', 'Сохранить': 'Save', 'Удалить': 'Delete', 'Удалить запись ': 'Delete record ',
@@ -790,7 +791,7 @@
       'Замечаний нет.': 'Nothing to report.', 'Родился после смерти матери': 'Born after the mother’s death', 'Родился больше чем через год после смерти отца': 'Born over a year after the father’s death',
       'Слишком молодой родитель': 'Parent too young', 'Слишком пожилой родитель': 'Parent too old', 'Слишком ранний брак': 'Married too young', 'Очень долгая жизнь': 'Very long life',
       'Не связаны с древом': 'Not connected to the tree', 'Нет ни одного документа': 'No document at all', 'Дата без документа': 'Date without a document', 'Нет дат': 'No dates',
-      'Семья без документа': 'Family without a document', 'Не указан пол': 'Sex not set', 'Документ ни к кому не привязан': 'Document not referenced', 'Место без координат': 'Place without coordinates',
+      'Семья без документа': 'Family without a document', 'Не указан пол': 'Sex not set', 'Документ ни к кому не привязан': 'Document not referenced', 'Место без координат': 'Place without coordinates', 'Можно оценить год рождения': 'Birth year can be estimated',
       'Сменить пароль': 'Change password', 'К списку': 'Back to the list', 'Пароль изменён. Войдите с новым паролем.': 'Password changed. Sign in with the new password.'
     }
   };
@@ -810,7 +811,7 @@
     ['Дата', 'Data'], ['Например: 1899, 1899-10-09, 9.10.1899, около 1899, до 1950, между 1900 и 1905.', 'De exemplu: 1899, 1899-10-09, 9.10.1899, about 1899, before 1950, between 1900 and 1905.'],
     ['Будет записано как: ', 'Va fi salvat ca: '], ['Место (как в источнике)', 'Locul (ca în sursă)'], ['Откуда известно', 'De unde se știe'], ['Место на карте', 'Locul pe hartă'], ['Примечание', 'Notă'],
     ['по документу', 'din document'], ['со слов семьи', 'din spusele familiei'], ['со слов семьи, неточно', 'din spusele familiei, nesigur'], ['вычислено по возрасту', 'calculat după vârstă'],
-    ['по надгробию', 'după piatra funerară'], ['по публикации', 'dintr-o publicație'], ['вероятно', 'probabil'], ['Другие поля (JSON)', 'Alte câmpuri (JSON)'],
+    ['по надгробию', 'după piatra funerară'], ['по публикации', 'dintr-o publicație'], ['вероятно', 'probabil'], ['оценка (как получена — в примечании)', 'estimare (cum s-a obținut — în notă)'], ['Другие поля (JSON)', 'Alte câmpuri (JSON)'],
     ['Поля, для которых нет формы (места жительства, профили, другие версии дат…), — в формате JSON, как в family_tree.json.', 'Câmpurile fără formular (reședințe, profiluri, alte variante de date…) în format JSON, ca în family_tree.json.'],
     ['Номер будет присвоен при сохранении.', 'Numărul se atribuie la salvare.'], ['Почему изменено (попадёт в журнал исправлений)', 'De ce (intră în jurnalul de corecturi)'], ['Причина правки', 'Motivul'],
     ['Сохранить', 'Salvează'], ['Удалить', 'Șterge'], ['Удалить запись ', 'Ștergeți înregistrarea '], ['Ссылки на неё в других записях нужно убрать заранее — иначе удаление не пройдёт.', 'Eliminați mai întâi trimiterile la ea din alte înregistrări, altfel ștergerea este refuzată.'],
@@ -851,7 +852,7 @@
     ['Замечаний нет.', 'Nicio observație.'], ['Родился после смерти матери', 'Născut după moartea mamei'], ['Родился больше чем через год после смерти отца', 'Născut la peste un an după moartea tatălui'],
     ['Слишком молодой родитель', 'Părinte prea tânăr'], ['Слишком пожилой родитель', 'Părinte prea în vârstă'], ['Слишком ранний брак', 'Căsătorie prea timpurie'], ['Очень долгая жизнь', 'Viață foarte lungă'],
     ['Не связаны с древом', 'Neconectați la arbore'], ['Нет ни одного документа', 'Niciun document'], ['Дата без документа', 'Dată fără document'], ['Нет дат', 'Fără date'],
-    ['Семья без документа', 'Familie fără document'], ['Не указан пол', 'Sex nespecificat'], ['Документ ни к кому не привязан', 'Document neatribuit'], ['Место без координат', 'Loc fără coordonate'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
+    ['Семья без документа', 'Familie fără document'], ['Не указан пол', 'Sex nespecificat'], ['Документ ни к кому не привязан', 'Document neatribuit'], ['Место без координат', 'Loc fără coordonate'], ['Можно оценить год рождения', 'Anul nașterii poate fi estimat'], ['К списку', 'Înapoi la listă'], ['Пароль изменён. Войдите с новым паролем.', 'Parola a fost schimbată. Intrați cu parola nouă.']
   ].forEach(function (p) { DICT.ro[p[0]] = p[1]; });
 
   // ---------- start

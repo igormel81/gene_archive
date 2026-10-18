@@ -345,9 +345,10 @@
         "calculated_from_age",
         "gravestone",
         "publication",
-        "probable"
+        "probable",
+        "estimated"
       ],
-      "description": "how we know it / откуда известно"
+      "description": "how we know it; `estimated`: an estimate from relatives' years, explained in `note` / откуда известно; `estimated` — оценка по годам родных, пояснение в `note`"
     },
     "event": {
       "type": "object",

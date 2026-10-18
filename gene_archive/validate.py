@@ -120,6 +120,9 @@ def validate(data, root=Path("."), cfg=None):
             text_sources(where, ev.get(k))
         for slug in ev.get("place_slugs", []):
             need(where, slug, places, "place", "места")
+        if ev.get("status") == "estimated" and not str(ev.get("note") or "").strip():
+            err(m(f"{where}: an estimated date needs a note saying how it was estimated",
+                  f"{where}: у оценочной даты нужно пояснение, как она получена (note)"))
         year = None
         if ev.get("date"):
             year = parse_date(ev["date"])
