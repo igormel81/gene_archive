@@ -1,7 +1,18 @@
 # Changelog / История изменений
 
-## Unreleased
+## 0.6.0 — 2026-10-18
 
+- **Ukrainian interface** (`--lang uk`) next to Russian, English and Romanian.
+  **Украинский интерфейс** (`--lang uk`) рядом с русским, английским и румынским.
+- Install with `pip install "gene-archive[images]"` (PyPI) — the README, the GitHub Pages template and the release
+  notes no longer install from git; new tagline "Your family's website: the tree, the documents and your ancestors' stories".
+  Установка с PyPI вместо git — в README, шаблоне GitHub Pages и описании выпусков; новый заголовок «Сайт вашей
+  семьи: древо, документы и истории предков».
+- The "Surname page" button under People → Surnames led to a missing address (`familii/`, and accented surnames
+  such as Novák got a different slug); the build now hands the app the pages it wrote.
+  Кнопка «Страница фамилии» вела на несуществующий адрес; теперь сборка сама передаёт сайту адреса страниц.
+- New sites' `AGENTS.md` knows the new fields: `estimated` dates with a `note`, `to_verify` sources, `parish`, `coverage`.
+  `AGENTS.md` новых сайтов знает новые поля: оценочные даты, `to_verify`, `parish`, `coverage`.
 - "Archive in numbers" (`#/stats`, in the More menu and on the Archive page): headline counts, where the documents
   come from (by `kind`), what confirms the people (`identity_source_ids`), per-surname people, open leads,
   corrections and the earliest ancestor, births by century, research-log activity — computed at build time

@@ -340,6 +340,8 @@ def build(site_dir, out=None, base_url=None):
         "stats": stats.archive_stats(data, [(k, ids) for k, ids in discovery.Pages(tmp, data, cfg, living, False, False).surname_groups()
                                            if len(ids) >= cfg["min_surname_page"]], living, restored),
         "surnames": data.get("surnames", {}),
+        "surname_pages": {k: discovery.slugify(k) for k, ids in discovery.Pages(tmp, data, cfg, living, False, False).surname_groups()
+                          if len(ids) >= cfg["min_surname_page"]},
         "restored": restored,
         "bios": re.findall(r'<article class="bio" id="bio-(I\d+)"', bios),
     }

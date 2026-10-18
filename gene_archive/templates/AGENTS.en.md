@@ -50,7 +50,10 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 - Doubtful things go to `research_leads`, or get `research_status: "unlinked_candidate"`,
   `probable_children` and the word "probably" in the text — never into established facts.
 - Every event has a `status`: `documented`, `family_report`, `uncertain_family_report`,
-  `calculated_from_age`, `gravestone`, `publication`, `probable`. A date computed from an age is `CAL 1881`.
+  `calculated_from_age`, `gravestone`, `publication`, `probable`, `estimated`. A date computed from an age is `CAL 1881`.
+- A birth known only from relatives is an estimate: `BET 1850 AND 1860` with `status: "estimated"` and a required
+  `note` ("Estimated from the eldest child's birth (1883)"); `gene hints` suggests ready estimates.
+  Any date's explanation (Old Style, cause of death, how to find the grave) goes into the event's `note`.
 - When sources disagree, keep both versions (`birth_alternatives`) with their sources.
 - Every change of a fact → an entry in `corrections` (`person_id`, `field`, `previous`, `current`,
   `reason`, `source_ids`) and a line in `research_log` (`date`, `action`, `result`, `scope`).
@@ -68,6 +71,12 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 - The back of a photo — the `back` field; its inscription goes into `scope`: "Inscription on the back: «…»".
 - Put photo files the way they are viewed (not sideways): the site shows the file as is.
 - A document the family asked to remove gets `"hidden": true` (keep the record and the file).
+- A record read but not visible on the saved image, or a doubtful reading → `"status": "to_verify"` and
+  `verify_note` (what to check); such a document cannot be used in `identity_source_ids`.
+- A village whose registers were kept by another village's church → the place's `parish` field (church, years,
+  `source_ids`).
+- Page-by-page reading of registers (parish → year → births/marriages/deaths → film and frames → read / up to
+  No. … / not found) goes into `coverage`: check what has been read before reading, and never read it twice.
 
 ## Life stories (`notes`)
 

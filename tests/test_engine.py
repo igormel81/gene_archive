@@ -323,6 +323,12 @@ class BuildExample(unittest.TestCase):
             text = re.sub(r'<div class="language-tools">.*?</details></div>', "", (self.out / page).read_text(encoding="utf-8"), flags=re.S)
             self.assertIsNone(cyr.search(re.sub(r"<script.*?</script>", "", text, flags=re.S)), page)
 
+    def test_surname_page_links(self):   # the app links only to surname pages the build wrote
+        pages = json.loads((self.out / "data.json").read_text())["surname_pages"]
+        self.assertTrue(pages)
+        for key, slug in pages.items():
+            self.assertTrue((self.out / "surnames" / f"{slug}.html").exists(), key)
+
     def test_place_pages(self):
         page = (self.out / "places" / "louisburgh.html").read_text(encoding="utf-8")
         self.assertIn("<h1>Louisburgh</h1>", page)

@@ -1747,11 +1747,7 @@
     if (!shown.length) host.appendChild(el('p', { class: 'empty', text: q ? T('По этому фильтру дат нет. Попробуйте другое имя или месяц.') : calendar.day ? T('На этот день семейных дат пока нет.') : T('В этом месяце известных дат пока нет.') }));
   }
 
-  // «Люди» → «Фамилии»: карточки фамилий со ссылками на их страницы (familii/<slug>.html) и на ветвь в древе
-  var TRANSLIT = { а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' };
-  function surnameSlug(k) {   // как translit() в tools/site_discovery.py
-    return k.toLowerCase().split('').map(function (c) { return c in TRANSLIT ? TRANSLIT[c] : c; }).join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  }
+  // «Люди» → «Фамилии»: карточки фамилий со ссылками на их страницы (surnames/<slug>.html, адреса — из сборки) и на ветвь в древе
   function surnamePlural(k) { return /ий$/.test(k) ? k.replace(/ий$/, 'ие') : /(ов|ев|ин|ын)$/.test(k) ? k + T('ы') : k; }
   function renderSurnames(q) {
     var host = clear($('people-surnames')), dir = location.pathname.replace(/[^\/]*$/, '');
@@ -1769,7 +1765,7 @@
         el('p', { class: 'fam-meta', text: g.ids.length + ' ' + plural(g.ids.length, T('человек'), T('человека'), T('человек')) + (years.length ? ' · ' + Math.min.apply(null, years) + '–' + Math.max.apply(null, years) : '') }),
         top.length ? el('p', { class: 'fam-places', text: top.join(', ') }) : null,
         el('div', { class: 'fam-actions' },
-          el('a', { class: 'btn', href: dir + 'familii/' + surnameSlug(g.key) + '.html', text: T('Страница фамилии') }),
+          (D.surname_pages || {})[g.key] ? el('a', { class: 'btn', href: dir + 'surnames/' + D.surname_pages[g.key] + '.html', text: T('Страница фамилии') }) : null,
           el('button', { class: 'btn', text: T('Ветвь в древе'), onclick: function () { showView('tree'); setFocus(g.focus, { line: g.key }); } }))));
     });
   }
