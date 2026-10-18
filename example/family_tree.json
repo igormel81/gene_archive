@@ -2839,6 +2839,9 @@
         "novak"
       ],
       "sort_year": 1880,
+      "sort_years": {
+        "novak": 1892
+      },
       "text": "Both lines of the family entered America here: Michael Harper at Castle Garden in 1880 (S4), Josef Novák at the new Ellis Island station in 1892 (S5). Kate Doyle was born in the city.",
       "details": [
         "Castle Garden at the tip of Manhattan handled immigrants until 1890; Ellis Island opened on 1 January 1892, a few months before Josef arrived."
@@ -2908,6 +2911,9 @@
         "novak"
       ],
       "sort_year": 1880,
+      "sort_years": {
+        "novak": 1912
+      },
       "text": "The steel city where the Irish Harpers of Lawrenceville and the Slovak Novaks of the South Side lived for decades before Tom Harper and Dorothy Novak married at St. Matthew's in 1949 (S17).",
       "details": [
         "Michael Harper arrived in 1880 and worked in the mills of the Strip District (S14, S10). The Novaks came from Windber in 1912.",
@@ -3116,7 +3122,7 @@
       "groups": [
         "novak"
       ],
-      "sort_year": 1892,
+      "sort_year": 1893,
       "text": "Josef Novak's first American home and the place of his marriage in 1894 (S7). His brother Štefan's family stayed in Chicago for good.",
       "details": [
         "Slovak immigrants in the 1890s found work in the packing houses around the Union Stock Yards. Frank and Helen Novak were born here before the family moved to the coal fields.",

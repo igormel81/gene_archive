@@ -121,7 +121,7 @@ def tag_story_places(text, patterns):
 
 
 # --- template -----------------------------------------------------------------------------------
-def fill_index(template, cfg, has_story, has_news, has_help):
+def fill_index(template, cfg, has_story, has_news, has_help, has_places=False):
     esc = lambda s: html.escape(str(s), quote=True)
     contact = ""
     c = cfg.get("contact") or {}
@@ -137,6 +137,8 @@ def fill_index(template, cfg, has_story, has_news, has_help):
     if has_help:
         more.append('<a href="help.html">Как пользоваться</a>')
     more.append('<a href="people/">Указатель людей</a>')
+    if has_places:
+        more.append('<a href="places/">Указатель мест</a>')
     for link in cfg.get("links") or []:
         more.append(f'<a href="{esc(link["href"])}">{esc(link["label"])}</a>')
     if c.get("email"):
@@ -247,7 +249,7 @@ def build(site_dir, out=None, base_url=None):
         if (site_dir / folder).is_dir():
             shutil.copytree(site_dir / folder, tmp / folder)
     template = (web / "index.html").read_text(encoding="utf-8")
-    (tmp / "index.html").write_text(fill_index(template, cfg, bool(story), bool(news), help_page.exists()), encoding="utf-8")
+    (tmp / "index.html").write_text(fill_index(template, cfg, bool(story), bool(news), help_page.exists(), bool(data.get("places"))), encoding="utf-8")
 
     # documents, previews, restored copies
     sources = [{k: v for k, v in s.items() if k not in ("email_subject", "email_date", "email_message_id")} for s in data["sources"]]

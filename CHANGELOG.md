@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Places: a full page for every place instead of the side panel — a cover, the story with footnotes, the family's
+  people by generation, the timeline, documents with previews, a mini-map and the place's stops on the branch roads;
+  the Places page shows each branch as a road with numbered stops on its own map; all places on one map behind a
+  separate link; static `places/<slug>.html` pages and `places/` in the sitemap and the More menu. New optional
+  `sort_years` for places shared by branches.
+  Места: вместо боковой панели — страница каждого места: обложка, история со сносками, люди семьи по поколениям,
+  хронология, документы с превью, мини-карта и остановки места на дорогах ветвей; на странице «Места» каждая ветвь —
+  дорога с пронумерованными остановками на своей карте; все места на одной карте — по отдельной ссылке; статические
+  страницы `places/<slug>.html` и `places/` в карте сайта и в меню «Ещё». Новое поле `sort_years` для общих мест ветвей.
+
 - A "Check by eye" queue: a source status `to_verify` with `verify_note` (what to check), a filter in the Archive,
   a notice in the document viewer and a `gene validate` warning when such a source is used in `identity_source_ids`.
   Очередь «Разобрать по снимку»: статус источника `to_verify` с `verify_note` (что проверить), фильтр в «Архиве»,

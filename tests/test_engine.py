@@ -302,9 +302,24 @@ class BuildExample(unittest.TestCase):
 
     def test_no_russian_interface_left_in_english(self):
         cyr = re.compile("[А-Яа-яЁё]")
-        for page in ["index.html", "help.html", "people/index.html", "people/I12.html", "surnames/harper.html"]:
+        for page in ["index.html", "help.html", "people/index.html", "people/I12.html", "surnames/harper.html",
+                     "places/index.html", "places/windber.html"]:
             text = re.sub(r'<div class="language-tools">.*?</details></div>', "", (self.out / page).read_text(encoding="utf-8"), flags=re.S)
             self.assertIsNone(cyr.search(re.sub(r"<script.*?</script>", "", text, flags=re.S)), page)
+
+    def test_place_pages(self):
+        page = (self.out / "places" / "louisburgh.html").read_text(encoding="utf-8")
+        self.assertIn("<h1>Louisburgh</h1>", page)
+        self.assertIn('href="../people/I3.html"', page)              # people of the place, linked to their pages
+        self.assertIn('href="../#/places?place=louisburgh"', page)   # on to the full page in the app
+        self.assertIn('"@type": "Place"', page)
+        living = {p["id"] for p in json.loads((self.out / "data.json").read_text())["people"] if p.get("living")}
+        for slug in [x.name for x in (self.out / "places").glob("*.html")]:
+            text = (self.out / "places" / slug).read_text(encoding="utf-8")
+            for pid in living:
+                self.assertNotIn(f"people/{pid}.html", text, slug)
+        self.assertIn('href="../places/pittsburgh.html"', (self.out / "surnames" / "harper.html").read_text(encoding="utf-8"))
+        self.assertIn('href="places/"', (self.out / "index.html").read_text(encoding="utf-8"))
 
     def test_paths_in_language_folders(self):
         html = (self.out / "ru" / "index.html").read_text(encoding="utf-8")
@@ -331,6 +346,8 @@ class BuildExample(unittest.TestCase):
     def test_sitemap_and_robots(self):
         sitemap = (self.out / "sitemap.xml").read_text(encoding="utf-8")
         self.assertIn("https://example.org/family/ru/people/I12.html", sitemap)
+        self.assertIn("https://example.org/family/places/louisburgh.html", sitemap)
+        self.assertIn("https://example.org/family/ro/places/</loc>", sitemap)
         self.assertIn("Disallow: /family/api/", (self.out / "robots.txt").read_text(encoding="utf-8"))
 
     def test_thumbnails_and_files(self):

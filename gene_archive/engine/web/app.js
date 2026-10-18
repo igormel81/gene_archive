@@ -914,7 +914,6 @@
     opts = opts || {};
     var p = P[id];
     selectedId = id;
-    selectedPlace = null;
     document.querySelectorAll('.card.selected').forEach(function (c) { c.classList.remove('selected'); });
     var cardEl = document.querySelector('.card[data-id="' + id + '"]');
     if (cardEl) cardEl.classList.add('selected');
@@ -1022,7 +1021,6 @@
     $('panel').setAttribute('aria-hidden', 'true');
     $('scrim').hidden = true;
     selectedId = null;
-    selectedPlace = null;
     document.querySelectorAll('.card.selected').forEach(function (c) { c.classList.remove('selected'); });
     syncUrl();
   }
@@ -1335,7 +1333,7 @@
     if (name === 'tree') requestAnimationFrame(function () { fit(false); });
     if (name === 'wide' && !document.documentElement.classList.contains('print-wide')) requestAnimationFrame(function () { renderWide(); wideFit(); });
     if (name !== 'story') storyAnchor = null;
-    if (name === 'places') setTimeout(updatePlaceMap, 0);
+    if (name === 'places') setTimeout(drawPlaceMaps, 0);
     window.scrollTo({ top: 0, behavior: 'instant' });
     syncUrl();
   }
@@ -1350,6 +1348,7 @@
     var q = [];
     if (currentView === 'story' && storyPlace) q.push('place=' + encodeURIComponent(storyPlace));
     if (currentView === 'places' && selectedPlace) q.push('place=' + encodeURIComponent(selectedPlace));
+    else if (currentView === 'places' && placeMode === 'map') q.push('mode=map');
     if (currentView === 'tree' && lineKey) q.push('line=' + encodeURIComponent(lineKey));
     if (currentView === 'people' && peopleMode === 'calendar') {
       q.push('mode=calendar', 'month=' + calendar.year + '-' + String(calendar.month + 1).padStart(2, '0'));
@@ -1434,8 +1433,8 @@
         storyAnchor = r.arg; storyPlace = r.place;
         if (storyReady) applyStory(); else pendingStory = true;
       }
-      if (view === 'places' && r.place && D.places.some(function (p) { return p.slug === r.place; })) openPlace(r.place);
-      else if (view === 'places' && selectedPlace) closePanel();
+      if (view === 'places' && r.place && placeBySlug(r.place)) openPlace(r.place);
+      else if (view === 'places') placesHome(r.mode);
       if (view === 'sources') setArchMode(['restored', 'corrections', 'research'].indexOf(r.mode) >= 0 ? r.mode : 'docs');
       if (r.doc && (S[r.doc] || (D.merged_sources || {})[r.doc])) { if (docOpen !== r.doc) openDoc(r.doc); } else if (docOpen) closeDoc();
       if (r.person && P[r.person]) { if (selectedId !== r.person) openPerson(r.person); }
@@ -2155,8 +2154,8 @@
     }).observe(nav);
   }
 
-  // ---------- family atlas
-  var placeFilter = 'all', placeMap = null, placeLayers = null, placeMapReady = false, placeMarkers = {};
+  // ---------- places: a page per place, branch roads with numbered stops, all places on one map
+  var placeFilter = 'all', placeMode = 'routes', placeMaps = [], baseGeo = null;
   // «Архангельск → Архангельская область» и «Москва → Москва» читаются как повтор: показываем одну строку.
   function placeThenNow(pl) {
     var then = (pl.then || pl.where || '').trim(), now = (pl.now || pl.where || '').trim();
@@ -2167,7 +2166,9 @@
   }
   function placeBySlug(slug) { return D.places.filter(function (p) { return p.slug === slug; })[0]; }
   function placeGroup(id) { return (D.place_groups || []).filter(function (g) { return g.id === id; })[0]; }
-  function placeColor(id) { var g = placeGroup(id); return g ? g.color : '#8a4b2a'; }
+  // цвет ветви идёт и в разметку значка на карте: только безопасные записи цвета
+  function placeColor(id) { var g = placeGroup(id), c = g && g.color; return c && /^(#[0-9a-f]{3,8}|[a-z]+|rgba?\([\d\s.,%]+\))$/i.test(c) ? c : '#8a4b2a'; }
+  function placeHref(slug) { return '#/places?place=' + encodeURIComponent(slug); }
   function matchedPlace(place) {
     var value = (place || '').toLocaleLowerCase('ru-RU');
     return D.places.filter(function (p) {
@@ -2198,7 +2199,7 @@
     return events;
   }
   // Ссылки на документы в тексте места — сноски: «(S4, S9)» превращается в маленькие номера ¹ ², которые открывают документ.
-  // Номера общие для всей панели и совпадают с нумерованным списком источников внизу.
+  // Номера общие для всей страницы места и совпадают с нумерованным списком документов внизу.
   var placeRefNums = null;
   function placeRefNumber(id) {
     if (!placeRefNums) return null;
@@ -2209,19 +2210,21 @@
     var text = (value || '').replace(/\s*\(((?:S\d+[,;\s]*)+)\)/g, function (m, ids) { return ' ' + ids.trim(); });
     var out = [];
     text.split(/(\bS\d+\b)/g).forEach(function (part) {
-      if (!/^S\d+$/.test(part)) { out.push(part.replace(/\s+([,;.])/g, '$1').replace(/[,;]\s*$/, function (x) { return /S\d/.test(part) ? x : x; })); return; }
+      if (!/^S\d+$/.test(part)) { out.push(part.replace(/\s+([,;.])/g, '$1')); return; }
       if (!S[part]) return;
       var n = placeRefNumber(part);
       out.push(el('sup', { class: 'place-fn' }, el('button', { type: 'button', title: S[part].title, 'aria-label': T('Источник ') + n + ': ' + S[part].title,
-        text: String(n), onclick: function () { showSource(part); } })));
+        text: String(n), onclick: function () { openDoc(part); } })));
     });
     // между соседними сносками убираем запятые и пробелы, чтобы получилось ¹ ² без мусора
     for (var i = 1; i < out.length - 1; i++) if (typeof out[i] === 'string' && /^[\s,;]*$/.test(out[i]) && typeof out[i - 1] !== 'string' && typeof out[i + 1] !== 'string') out[i] = '';
     return out;
   }
+  // текст без номеров документов — для коротких подписей в списке остановок
+  function plainPlaceText(t) { return (t || '').replace(/\s*\((?:S\d+[,;\s]*)+\)/g, '').replace(/\s*\bS\d+\b/g, '').replace(/\(\s*\)/g, '').replace(/\s+([,;.])/g, '$1'); }
   function placeSourceLink(id) {
     var s = S[id]; if (!s) return null;
-    return el('li', {}, el('a', { class: 'place-source-link', href: '#', onclick: function (e) { e.preventDefault(); showSource(id); }, text: s.title }));
+    return el('li', {}, el('a', { class: 'place-source-link', href: '#/places?doc=' + id, onclick: function (e) { e.preventDefault(); openDoc(id); }, text: s.title }));
   }
   function placeMedia(m) {
     return el('figure', { class: 'place-media' },
@@ -2229,60 +2232,163 @@
       el('figcaption', {}, m.caption,
         m.credit ? el('span', { class: 'place-credit' }, ' · ', m.credit_url ? el('a', { href: m.credit_url, target: '_blank', rel: 'noopener', text: m.credit }) : m.credit) : null));
   }
-  function openPlace(slug) {
-    var pl = placeBySlug(slug); if (!pl) return;
-    selectedPlace = slug; selectedId = null;
-    var body = clear($('panel-body'));
-    placeRefNums = { map: {}, order: [] };
-    var g = placeGroup(pl.groups[0]);
-    body.appendChild(el('p', { class: 'p-rel', text: g ? g.name.replace(/ · /g, ', ') : T('Семейное место') }));
-    body.appendChild(el('h2', { class: 'p-name', text: pl.name }));
-    body.appendChild(el('p', { class: 'place-period', text: pl.period || '' }));
+
+  // поколения от главного человека: родители +1, дети −1, супруги, братья и сёстры — то же поколение
+  var GEN = null;
+  function generationOf(id) {
+    if (!GEN) {
+      GEN = {};
+      var root = D.root_person_id, todo = [root];
+      GEN[root] = 0;
+      while (todo.length) {
+        var x = todo.shift();
+        var adopted = [];
+        (spouseFams[x] || []).forEach(function (f) { adopted = adopted.concat(f.adopted_children || []); });
+        [[parentsOf(x), 1], [spousesOf(x), 0], [siblingsOf(x), 0], [childrenOf(x).concat(adopted), -1]].forEach(function (r) {
+          r[0].forEach(function (y) { if (P[y] && GEN[y] == null) { GEN[y] = GEN[x] + r[1]; todo.push(y); } });
+        });
+      }
+    }
+    return GEN[id];
+  }
+  function generationLabel(g) {
+    if (g == null) return T('Другие люди');
+    var named = { '-2': T('Внуки'), '-1': T('Дети'), 0: T('Наше поколение'), 1: T('Родители'), 2: T('Деды'), 3: T('Прадеды'), 4: T('Прапрадеды'), 5: T('5-е колено'), 6: T('6-е колено') };
+    return named[g] || (g < 0 ? T('Правнуки и младше') : T('Предки, колено ') + g);
+  }
+  // кто из семьи связан с местом: родился, жил, умер, похоронен (по ссылкам на место в событиях) и кого назвали в описании места
+  function placePeople(pl) {
+    var roles = {}, order = [];
+    function add(id, role) {
+      if (!P[id] || P[id].placeholder) return;
+      if (!roles[id]) { roles[id] = []; order.push(id); }
+      if (role && roles[id].indexOf(role) < 0) roles[id].push(role);
+    }
+    function here(r) { return recordPlaces(r).some(function (x) { return x.slug === pl.slug; }); }
+    D.people.forEach(function (p) {
+      if (p.birth && here(p.birth)) add(p.id, 'birth');
+      (p.residences || []).forEach(function (r) { if (here(r)) add(p.id, 'residence'); });
+      if (p.death && here(p.death)) add(p.id, 'death');
+      if (p.burial && here(p.burial)) add(p.id, 'burial');
+    });
+    (pl.people || []).forEach(function (id) { add(id); });
+    return order.map(function (id) { return { id: id, roles: roles[id] }; });
+  }
+  function placePeopleBlock(people) {
+    var ROLE = { birth: T('рождение'), residence: T('жизнь'), death: T('смерть'), burial: T('погребение') };
+    var groups = {};
+    people.forEach(function (x) { var g = generationOf(x.id); (groups[g == null ? 'none' : g] = groups[g == null ? 'none' : g] || []).push(x); });
+    var keys = Object.keys(groups).sort(function (a, b) { return a === 'none' ? 1 : b === 'none' ? -1 : b - a; });   // старшие поколения сверху
+    return el('div', { class: 'place-gens' }, keys.map(function (k) {
+      var items = groups[k].sort(function (a, b) { return (yearNum(P[a.id].birth) || 9999) - (yearNum(P[b.id].birth) || 9999); });
+      var ys = items.map(function (x) { return yearNum(P[x.id].birth); }).filter(Boolean);
+      return el('section', { class: 'place-gen' },
+        el('h4', {}, generationLabel(k === 'none' ? null : +k), ys.length ? el('small', { text: ' · ' + (Math.min.apply(null, ys) === Math.max.apply(null, ys) ? ys[0] : Math.min.apply(null, ys) + '–' + Math.max.apply(null, ys)) }) : null),
+        el('div', { class: 'rel-chips' }, items.map(function (x) { return personChip(x.id, x.roles.map(function (r) { return ROLE[r]; }).join(', ')); })));
+    }));
+  }
+  // обложка места: первая картинка места, иначе семейный снимок или надгробие из его документов
+  function placeCover(pl, ids) {
+    var m = (pl.media || []).filter(function (x) { return x.file && isImage(x.file); })[0];
+    if (m) return { src: m.file, alt: m.caption || pl.name, open: function () { window.open(m.file, '_blank', 'noopener'); } };
+    var s = ids.map(function (id) { return S[id]; }).filter(function (s) {
+      return s && /^(family_photo|gravestone|gravestone_image|memorial_image)$/.test(s.kind) && (isImage(s.file) || s.thumb);
+    })[0];
+    var rest = s && (D.restored || []).filter(function (r) { return r.source_id === s.id && r.color; })[0];
+    return s ? { src: rest ? rest.color : isImage(s.file) ? s.file : s.thumb, alt: s.title, open: function () { openDoc(s.id); } } : null;
+  }
+
+  // ---------- branch roads: places of a branch in the order of years
+  function routeYear(pl) {
+    if (Number.isFinite(pl.sort_year)) return pl.sort_year;
+    var p = pl.period || '';
+    if (/середин[аы] XX/.test(p)) return 1950;
+    if (/XIX/.test(p) && !/\d{4}/.test(p)) return 1850;
+    var ys = (p.match(/1[89]\d{2}|20\d{2}/g) || []).map(Number);
+    if (!ys.length) return 9999;
+    var y = ys.filter(function (x) { return x >= 1850; })[0] || ys[0];
+    if (/^\s*до\s/.test(p) && ys[0] === y) y -= 5;
+    return y;
+  }
+  function routeYearLabel(period) {
+    var parts = (period || '').split(';').map(function (x) { return x.split(' — ')[0].trim(); }).filter(Boolean);
+    var withYear = parts.filter(function (x) { return /\d{4}|XX|XIX/.test(x); });
+    var t = (withYear.length ? withYear[withYear.length - 1] : parts[0]) || '';
+    return t.replace(/середина\s+/i, 'сер. ').replace(/^около\s+/i, 'ок. ');
+  }
+  // год места на дороге ветви: у общего для двух ветвей места — свой для каждой (sort_years)
+  function stopYear(pl, gid) { var y = (pl.sort_years || {})[gid]; return Number.isFinite(y) ? y : routeYear(pl); }
+  // остановки ветви по годам; переезды из place_routes («откуда → куда») задают порядок и при равных годах
+  function routeLines(all) {
+    return (D.place_groups || []).filter(function (g) { return all || placeFilter === 'all' || placeFilter === g.id; }).map(function (g) {
+      var left = D.places.filter(function (p) { return (p.groups || []).indexOf(g.id) >= 0; });
+      var edges = (D.place_routes || []).filter(function (r) { return r.group === g.id; });
+      var cmp = function (a, b) { return stopYear(a, g.id) - stopYear(b, g.id) || a.name.localeCompare(b.name, 'ru'); };
+      var stops = [];
+      while (left.length) {
+        var free = left.filter(function (p) { return !edges.some(function (r) { return r.to_place === p.slug && left.some(function (q) { return q.slug === r.from_place; }); }); });
+        var next = (free.length ? free : left).slice().sort(cmp)[0];   // круг из переездов — просто по годам
+        stops.push(next); left.splice(left.indexOf(next), 1);
+      }
+      return { group: g, stops: stops };
+    }).filter(function (l) { return l.stops.length; });
+  }
+  function groupName(g) { return g.name.replace(/ · /g, ', '); }
+  function routeLabel(a, b, group) {
+    var r = (D.place_routes || []).filter(function (x) {
+      return x.group === group && x.from_place === a.slug && x.to_place === b.slug;
+    })[0];
+    return r ? r.label.replace(/^[^:]+:\s*/, '') : '';
+  }
+  function placeDistanceKm(a, b) {
+    if (!placeHasCoordinates(a) || !placeHasCoordinates(b)) return null;
+    var rad = Math.PI / 180, dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+    var h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
+    return Math.round(6371.0088 * 2 * Math.asin(Math.min(1, Math.sqrt(h))));
+  }
+  function routeStop(pl, g, n) {
     var tn = placeThenNow(pl);
-    body.appendChild(el('div', { class: 'place-then-now' + (tn.then ? '' : ' single') },
-      tn.then ? el('span', {}, el('small', { text: T('Тогда') }), tn.then) : null,
-      el('span', {}, el('small', { text: tn.then ? T('Сейчас') : T('Где') }), tn.now)));
-    body.appendChild(el('p', { class: 'place-summary' }, readablePlaceText(pl.text)));
-    if (pl.geo_note) body.appendChild(el('p', { class: 'place-geo-note', text: T('Точка на карте: ') + pl.geo_note + '.' }));
-    if (pl.people && pl.people.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('Люди') }));
-      body.appendChild(el('div', { class: 'rel-chips' }, pl.people.map(function (id) { return P[id] ? personChip(id) : null; })));
-    }
-    if (pl.details && pl.details.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('История места') }));
-      pl.details.forEach(function (t) { body.appendChild(el('p', { class: 'place-detail' }, readablePlaceText(t))); });
-    }
-    var events = placeChronology(pl);
-    if (events.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('Хронология') }));
-      body.appendChild(el('ol', { class: 'place-timeline' }, events.map(function (e) {
-        return el('li', {}, el('time', { text: e.date }), el('span', { text: e.text }),
-          e.sources.length ? el('div', { class: 'place-event-sources' }, e.sources.filter(function (id) { return S[id]; }).map(function (id) {
-            return el('button', { title: S[id].title, text: S[id].title, onclick: function () { showSource(id); } });
-          })) : null);
-      })));
-    }
-    if (pl.media && pl.media.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('Фотографии и карты') }));
-      body.appendChild(el('div', { class: 'place-media-grid' }, pl.media.map(placeMedia)));
-    }
-    if (pl.materials && pl.materials.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('Посмотреть и прочитать') }));
-      body.appendChild(el('ul', { class: 'place-links' }, pl.materials.map(function (m) {
-        return el('li', {}, el('a', { href: m.url, target: '_blank', rel: 'noopener', text: m.label }));
-      })));
-    }
-    (pl.sources || []).forEach(function (id) { if (S[id]) placeRefNumber(id); });
-    var refs = placeRefNums.order.filter(function (id) { return S[id]; });
-    placeRefNums = null;
-    if (refs.length) {
-      body.appendChild(el('h3', { class: 'p-sec', text: T('Документы и источники') }));
-      body.appendChild(el('ol', { class: 'place-links place-sources' }, refs.map(placeSourceLink)));
-    }
-    var panel = $('panel'); panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); panel.scrollTop = 0;
-    if (window.matchMedia('(max-width: 720px)').matches) $('scrim').hidden = false;
-    focusPlaceOnMap(slug);
-    syncUrl();
+    var people = (pl.people || []).filter(function (id) { return P[id]; });
+    var names = people.slice(0, 4).map(function (id) { return P[id].display_name.replace(/\s*\(.*?\)\s*/, ' ').trim(); });
+    return el('li', { class: 'route-stop', 'data-slug': pl.slug, style: '--route-color:' + placeColor(g.id) },
+      el('div', { class: 'route-year', title: pl.period || '', text: Number.isFinite((pl.sort_years || {})[g.id]) ? String(pl.sort_years[g.id]) : routeYearLabel(pl.period) }),
+      el('div', { class: 'route-body' },
+        el('span', { class: 'route-num', 'aria-hidden': 'true', text: String(n) }),
+        el('h4', {}, el('a', { class: 'route-name', href: placeHref(pl.slug), text: pl.name })),
+        el('p', { class: 'route-where' }, tn.then ? [el('span', { text: tn.then }), el('span', { class: 'route-arrow', 'aria-label': T('сейчас'), text: ' → ' })] : null, tn.now),
+        pl.text ? el('p', { class: 'route-text', text: plainPlaceText(pl.text) }) : null,
+        names.length ? el('p', { class: 'route-people', text: names.join(', ') + (people.length > 4 ? T(' и ещё ') + (people.length - 4) : '') }) : null,
+        el('a', { class: 'route-more', href: placeHref(pl.slug), text: T('Открыть историю места') })));
+  }
+  function routeGap(a, b, group) {
+    var km = placeDistanceKm(a, b), label = routeLabel(a, b, group);
+    var txt = km === null ? T('Привязка одного из мест не уточнена') : (km < 3 ? T('рядом') : km + T(' км по прямой'));
+    return el('li', { class: 'route-gap', 'aria-hidden': 'true' }, el('span', { text: txt + (label ? '. ' + label : '') }));
+  }
+  function renderPlaces() {
+    var filter = clear($('place-filters'));
+    var opts = [{ id: 'all', name: T('Все дороги') }].concat((D.place_groups || []).map(function (g) { return { id: g.id, name: groupName(g), color: placeColor(g.id) }; }));
+    opts.forEach(function (o) {
+      filter.appendChild(el('button', { type: 'button', class: placeFilter === o.id ? 'active' : '', 'aria-pressed': String(placeFilter === o.id),
+        style: o.color ? '--route-color:' + o.color : null, text: o.name,
+        onclick: function () { placeFilter = o.id; renderPlaces(); var top = $('view-places'); if (top) top.scrollIntoView({ block: 'start' }); } }));
+    });
+    removeMaps('branch');
+    var host = clear($('places'));
+    routeLines().forEach(function (line) {
+      var g = line.group, items = [];
+      line.stops.forEach(function (pl, i) { if (i) items.push(routeGap(line.stops[i - 1], pl, g.id)); items.push(routeStop(pl, g, i + 1)); });
+      var located = line.stops.some(placeHasCoordinates);
+      host.appendChild(el('section', { class: 'route-line', style: '--route-color:' + placeColor(g.id) },
+        el('header', { class: 'route-line-head' }, el('h3', { text: groupName(g) }), g.about ? el('p', { text: g.about }) : null),
+        el('div', { class: 'route-grid' + (located ? '' : ' no-map') },
+          el('ol', { class: 'route-stops' }, items),
+          located ? el('div', { class: 'route-map-col' }, el('div', { class: 'branch-map', 'data-group': g.id, role: 'region', 'aria-label': T('Карта дороги: ') + groupName(g) }),
+            el('p', { class: 'route-map-note', text: T('Номера — остановки по годам; пунктир соединяет их по прямой. Нажмите на номер, чтобы открыть страницу места.') })) : null)));
+    });
+    renderPlaceSuggestions();
+    renderPlaceIndex();
+    if (currentView === 'places') drawPlaceMaps();
   }
   function renderPlaceSuggestions() {
     var found = {};
@@ -2303,9 +2409,9 @@
     var items = Object.keys(found).map(function (key) { return found[key]; });
     items.sort(function (a, b) { return b.people.length - a.people.length || a.place.localeCompare(b.place, 'ru'); });
     var host = clear($('place-suggestions'));
-    var unlocated = D.places.filter(function (p) { return !placeHasCoordinates(p) && (placeFilter === 'all' || p.groups.indexOf(placeFilter) >= 0); });
+    var unlocated = D.places.filter(function (p) { return !placeHasCoordinates(p) && (placeFilter === 'all' || (p.groups || []).indexOf(placeFilter) >= 0); });
     if (unlocated.length) host.appendChild(el('ul', { class: 'place-suggestion-list' }, unlocated.map(function (p) {
-      return el('li', {}, el('button', { type: 'button', class: 'route-name', text: p.name, onclick: function () { openPlace(p.slug); } }));
+      return el('li', {}, el('a', { class: 'route-name', href: placeHref(p.slug), text: p.name }));
     })));
     if (!items.length) {
       if (!unlocated.length) host.appendChild(el('p', { class: 'empty', text: T('Места этой ветви имеют карточки и точки на карте.') }));
@@ -2315,84 +2421,7 @@
     host.appendChild(el('ul', { class: 'place-suggestion-list' }, items.slice(0, 5).map(row)));
     if (items.length > 5) host.appendChild(el('details', {}, el('summary', { text: T('Ещё ') + (items.length - 5) + ' ' + plural(items.length - 5, T('место'), T('места'), T('мест')) }), el('ul', { class: 'place-suggestion-list' }, items.slice(5).map(row))));
   }
-  // ---------- «Места»: дороги семьи. Слева маршрут ветви по годам, справа карта, которая следует за чтением.
-  function routeYear(pl) {
-    if (Number.isFinite(pl.sort_year)) return pl.sort_year;
-    var p = pl.period || '';
-    if (/середин[аы] XX/.test(p)) return 1950;
-    if (/XIX/.test(p) && !/\d{4}/.test(p)) return 1850;
-    var ys = (p.match(/1[89]\d{2}|20\d{2}/g) || []).map(Number);
-    if (!ys.length) return 9999;
-    var y = ys.filter(function (x) { return x >= 1850; })[0] || ys[0];
-    if (/^\s*до\s/.test(p) && ys[0] === y) y -= 5;
-    return y;
-  }
-  function routeYearLabel(period) {
-    var parts = (period || '').split(';').map(function (x) { return x.split(' — ')[0].trim(); }).filter(Boolean);
-    var withYear = parts.filter(function (x) { return /\d{4}|XX|XIX/.test(x); });
-    var t = (withYear.length ? withYear[withYear.length - 1] : parts[0]) || '';
-    return t.replace(/середина\s+/i, 'сер. ').replace(/^около\s+/i, 'ок. ');
-  }
-  function routeLines() {
-    return (D.place_groups || []).filter(function (g) { return placeFilter === 'all' || placeFilter === g.id; }).map(function (g) {
-      var stops = D.places.filter(function (p) { return p.groups.indexOf(g.id) >= 0; });
-      stops.sort(function (a, b) { return routeYear(a) - routeYear(b) || a.name.localeCompare(b.name, 'ru'); });
-      return { group: g, stops: stops };
-    }).filter(function (l) { return l.stops.length; });
-  }
-  function routeLabel(a, b, group) {
-    var r = (D.place_routes || []).filter(function (x) {
-      return x.group === group && x.from_place === a.slug && x.to_place === b.slug;
-    })[0];
-    return r ? r.label.replace(/^[^:]+:\s*/, '') : '';
-  }
-  function placeDistanceKm(a, b) {
-    if (!placeHasCoordinates(a) || !placeHasCoordinates(b)) return null;
-    var rad = Math.PI / 180, dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
-    var h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2;
-    return Math.round(6371.0088 * 2 * Math.asin(Math.min(1, Math.sqrt(h))));
-  }
-  function routeStop(pl, g) {
-    var tn = placeThenNow(pl);
-    var people = (pl.people || []).filter(function (id) { return P[id]; });
-    var names = people.slice(0, 4).map(function (id) { return P[id].display_name.replace(/\s*\(.*?\)\s*/, ' ').trim(); });
-    var shared = pl.groups.length > 1 && placeFilter === 'all' && pl.groups[0] !== g.id;
-    return el('li', { class: 'route-stop' + (shared ? ' shared' : ''), 'data-slug': pl.slug, style: '--route-color:' + g.color },
-      el('div', { class: 'route-year', title: pl.period || '', text: routeYearLabel(pl.period) }),
-      el('div', { class: 'route-body' },
-        el('h4', {}, el('button', { type: 'button', class: 'route-name', text: pl.name, onclick: function () { openPlace(pl.slug); } })),
-        el('p', { class: 'route-where' }, tn.then ? [el('span', { text: tn.then }), el('span', { class: 'route-arrow', 'aria-label': T('сейчас'), text: ' → ' })] : null, tn.now),
-        shared ? el('p', { class: 'route-text muted', text: T('Это место есть и на дороге другой ветви — подробности в карточке.') })
-          : el('p', { class: 'route-text', text: (pl.text || '').replace(/\s*\((?:S\d+[,;\s]*)+\)/g, '').replace(/\s*\bS\d+\b/g, '').replace(/\(\s*\)/g, '').replace(/\s+([,;.])/g, '$1') }),
-        names.length ? el('p', { class: 'route-people', text: names.join(', ') + (people.length > 4 ? T(' и ещё ') + (people.length - 4) : '') }) : null,
-        el('button', { type: 'button', class: 'route-more', text: T('Открыть историю места'), onclick: function () { openPlace(pl.slug); } })));
-  }
-  function routeGap(a, b, group) {
-    var km = placeDistanceKm(a, b), label = routeLabel(a, b, group);
-    var txt = km === null ? T('Привязка одного из мест не уточнена') : (km < 3 ? T('рядом') : km + T(' км по прямой'));
-    return el('li', { class: 'route-gap', 'aria-hidden': 'true' }, el('span', { text: txt + (label ? '. ' + label : '') }));
-  }
-  function renderPlaces() {
-    var filter = clear($('place-filters'));
-    var opts = [{ id: 'all', name: T('Все дороги') }].concat((D.place_groups || []).map(function (g) { return { id: g.id, name: g.name.replace(/ · /g, ', '), color: g.color }; }));
-    opts.forEach(function (o) {
-      filter.appendChild(el('button', { type: 'button', class: placeFilter === o.id ? 'active' : '', 'aria-pressed': String(placeFilter === o.id),
-        style: o.color ? '--route-color:' + o.color : null, text: o.name,
-        onclick: function () { placeFilter = o.id; renderPlaces(); var top = $('view-places'); if (top) top.scrollIntoView({ block: 'start' }); } }));
-    });
-    var host = clear($('places'));
-    routeLines().forEach(function (line) {
-      var g = line.group, items = [];
-      line.stops.forEach(function (pl, i) { if (i) items.push(routeGap(line.stops[i - 1], pl, g.id)); items.push(routeStop(pl, g)); });
-      host.appendChild(el('section', { class: 'route-line', style: '--route-color:' + g.color },
-        el('header', { class: 'route-line-head' }, el('h3', { text: g.name.replace(/ · /g, ', ') }), el('p', { text: g.about })),
-        el('ol', { class: 'route-stops' }, items)));
-    });
-    renderPlaceSuggestions();
-    renderPlaceIndex();
-    updatePlaceMap();
-  }
-  // Алфавитный указатель всех мест: ссылка ведёт к карточке места в списке и к точке на карте.
+  // Алфавитный указатель всех мест: каждое ведёт на свою страницу.
   function renderPlaceIndex() {
     var host = $('place-index'); if (!host) return;
     clear(host);
@@ -2402,130 +2431,239 @@
     places.forEach(function (pl) {
       var first = pl.name.charAt(0).toUpperCase();
       if (first !== letter) { letter = first; host.appendChild(el('span', { class: 'place-index-letter', text: letter })); }
-      host.appendChild(el('a', { href: '#/places?place=' + pl.slug, text: pl.name, onclick: function (e) {
-        e.preventDefault();
-        if (placeFilter !== 'all' && pl.groups.indexOf(placeFilter) < 0) { placeFilter = 'all'; renderPlaces(); }
-        var node = document.querySelector('#places .route-stop[data-slug="' + pl.slug + '"]');
-        if (node) { node.scrollIntoView({ block: 'center', behavior: 'smooth' }); node.classList.add('flash'); setTimeout(function () { node.classList.remove('flash'); }, 1600); }
-        flyToPlace(pl.slug, true);
-      } }));
+      host.appendChild(el('a', { href: placeHref(pl.slug), text: pl.name }));
     });
   }
-  // Какая остановка сейчас «читается»: та, что ближе всего к верхней трети экрана.
-  var routeObserver = null, routeActive = null, routeFlyTimer = null;
-  function watchRouteStops() {
-    if (routeObserver) routeObserver.disconnect();
-    if (!('IntersectionObserver' in window)) return;
-    var visible = {};
-    routeObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { var key = e.target.getAttribute('data-slug'); if (e.isIntersecting) visible[key] = e.target; else delete visible[key]; });
-      var best = null, bestD = Infinity, mark = window.innerHeight * (window.matchMedia('(max-width: 720px)').matches ? 0.62 : 0.35);
-      Object.keys(visible).forEach(function (k) { var r = visible[k].getBoundingClientRect(), d = Math.abs(r.top + Math.min(r.height, 120) / 2 - mark); if (d < bestD) { bestD = d; best = visible[k]; } });
-      if (best) setRouteActive(best);
-    }, { rootMargin: '-10% 0px -25% 0px', threshold: [0, .25, .5, 1] });
-    document.querySelectorAll('#places .route-stop').forEach(function (n) { routeObserver.observe(n); });
+
+  // ---------- the place page
+  function renderPlacePage(pl) {
+    var page = clear($('place-page'));
+    placeRefNums = { map: {}, order: [] };
+    var groups = (pl.groups || []).map(placeGroup).filter(Boolean);
+    var main = el('div', { class: 'place-main' });
+    var tn = placeThenNow(pl);
+    var lead = el('p', { class: 'place-summary' }, readablePlaceText(pl.text));
+    var parish = parishBlock(pl);
+    var details = (pl.details || []).map(function (t) { return el('p', { class: 'place-detail' }, readablePlaceText(t)); });
+    var events = placeChronology(pl);
+    // номера сносок раздаются по порядку текста, затем — остальные документы места
+    (pl.sources || []).forEach(function (id) { if (S[id]) placeRefNumber(id); });
+    var refs = placeRefNums.order.filter(function (id) { return S[id]; });
+    placeRefNums = null;
+    var cover = placeCover(pl, refs);
+    var people = placePeople(pl);
+
+    page.appendChild(el('nav', { class: 'place-crumbs' }, el('a', { href: '#/places', text: T('← Все места') }),
+      el('a', { href: '#/places?mode=map', text: T('Все места на одной карте') })));
+    page.appendChild(el('header', { class: 'place-hero' + (cover ? ' with-cover' : '') },
+      cover ? el('button', { type: 'button', class: 'place-cover', title: cover.alt, onclick: cover.open }, el('img', { src: cover.src, alt: cover.alt })) : null,
+      el('div', { class: 'place-hero-text' },
+        el('p', { class: 'eyebrow place-groups-line' }, groups.length ? groups.map(function (g, i) { return [i ? ' · ' : '', el('span', { style: '--route-color:' + placeColor(g.id), class: 'place-group-tag', text: groupName(g) })]; }) : T('Семейное место')),
+        el('h2', { class: 'place-title', id: 'place-title', text: pl.name }),
+        pl.period ? el('p', { class: 'place-period', text: pl.period }) : null,
+        el('div', { class: 'place-then-now' + (tn.then ? '' : ' single') },
+          tn.then ? el('span', {}, el('small', { text: T('Тогда') }), tn.then) : null,
+          el('span', {}, el('small', { text: tn.then ? T('Сейчас') : T('Где') }), tn.now)),
+        el('p', { class: 'place-hero-actions' }, el('button', { class: 'btn', type: 'button', text: T('Поделиться'), onclick: function (e) { shareLink(e.currentTarget, 'place-' + pl.slug); } })))));
+    var side = el('aside', { class: 'place-side' });
+    if (placeHasCoordinates(pl)) side.appendChild(el('div', { class: 'place-minimap', id: 'place-minimap', role: 'region', 'aria-label': T('Карта: ') + pl.name }));
+    else side.appendChild(el('p', { class: 'place-nomap', text: T('Точка на карте для этого места пока не уточнена.') }));
+    if (pl.geo_note) side.appendChild(el('p', { class: 'place-geo-note', text: T('Точка на карте: ') + pl.geo_note + '.' }));
+    side.appendChild(placeRoutesNav(pl));
+    page.appendChild(el('div', { class: 'place-layout' }, main, side));
+
+    if (pl.text) main.appendChild(lead);
+    if (parish) main.appendChild(parish);
+    if (details.length) { main.appendChild(el('h3', { class: 'p-sec', text: T('История места') })); details.forEach(function (p) { main.appendChild(p); }); }
+    if (people.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Люди') + ' · ' + people.length }));
+      if (P[D.root_person_id]) main.appendChild(el('p', { class: 'place-gens-note', text: T('Поколения считаются от: ') + P[D.root_person_id].display_name }));
+      main.appendChild(placePeopleBlock(people));
+    }
+    if (events.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Хронология') }));
+      main.appendChild(el('ol', { class: 'place-timeline' }, events.map(function (e) {
+        return el('li', {}, el('time', { text: e.date }), el('span', { text: e.text }),
+          e.sources.length ? el('div', { class: 'place-event-sources' }, e.sources.filter(function (id) { return S[id]; }).map(function (id) {
+            return el('button', { title: S[id].title, text: S[id].title, onclick: function () { openDoc(id); } });
+          })) : null);
+      })));
+    }
+    if (pl.media && pl.media.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Фотографии и карты') }));
+      main.appendChild(el('div', { class: 'place-media-grid' }, pl.media.map(placeMedia)));
+    }
+    if (refs.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Документы и источники') }));
+      var th = thumbs(refs.filter(function (id) { return S[id].file; }));
+      if (th) main.appendChild(th);
+      main.appendChild(el('ol', { class: 'place-links place-sources' }, refs.map(placeSourceLink)));
+    }
+    if (pl.materials && pl.materials.length) {
+      main.appendChild(el('h3', { class: 'p-sec', text: T('Посмотреть и прочитать') }));
+      main.appendChild(el('ul', { class: 'place-links' }, pl.materials.map(function (m) {
+        return el('li', {}, el('a', { href: m.url, target: '_blank', rel: 'noopener', text: m.label }));
+      })));
+    }
   }
-  function setRouteActive(node) {
-    if (routeActive === node) return;
-    if (routeActive) routeActive.classList.remove('active');
-    routeActive = node; node.classList.add('active');
-    var slug = node.getAttribute('data-slug');
-    clearTimeout(routeFlyTimer);
-    routeFlyTimer = setTimeout(function () { flyToPlace(slug, false); }, 260);
+  // на какой дороге ветви стоит место: номер остановки, соседние остановки
+  function placeRoutesNav(pl) {
+    var box = el('div', { class: 'place-route-nav' });
+    routeLines(true).forEach(function (line) {
+      var i = line.stops.indexOf(pl); if (i < 0) return;
+      var prev = line.stops[i - 1], next = line.stops[i + 1];
+      box.appendChild(el('div', { class: 'place-route-step', style: '--route-color:' + placeColor(line.group.id) },
+        el('p', {}, el('b', { text: groupName(line.group) }), ' · ' + T('остановка ') + (i + 1) + T(' из ') + line.stops.length),
+        el('p', { class: 'place-route-links' },
+          prev ? el('a', { href: placeHref(prev.slug), text: '← ' + prev.name }) : null,
+          next ? el('a', { class: 'next', href: placeHref(next.slug), text: next.name + ' →' }) : null)));
+    });
+    return box;
   }
+  function parishBlock(pl) { return null; }
+
+  // ---------- maps (Leaflet): OpenStreetMap tiles, and the outlines from geo/ when the tiles do not load
   function placeMapColors() {
     var m = /(\d+),\s*(\d+),\s*(\d+)/.exec(getComputedStyle(document.body).backgroundColor) || [0, 255, 255, 255];
     var dark = (0.299 * m[1] + 0.587 * m[2] + 0.114 * m[3]) < 110;
     return dark ? { dark: true, land: '#2c2923', border: '#4a463d', water: '#1b2426' } : { dark: false, land: '#f3efe4', border: '#b9b3a3', water: '#d9e4e2' };
   }
-  function markPlace(slug) {
-    Object.keys(placeMarkers).forEach(function (k) {
-      var m = placeMarkers[k], on = k === slug;
-      m.setStyle({ radius: on ? 10 : 6, weight: on ? 3 : 1.5, fillOpacity: on ? 1 : .85 });
-      var t = m.getTooltip() && m.getTooltip().getElement(); if (t) t.classList.toggle('on', on);
-      if (on) m.bringToFront();
+  function removeMaps(kind) {
+    placeMaps = placeMaps.filter(function (m) { if (kind && m.kind !== kind) return true; m.map.remove(); return false; });
+  }
+  // inPage: карта внутри страницы — на телефоне её не тянут пальцем, чтобы палец прокручивал страницу
+  function baseMap(node, kind, inPage) {
+    var col = placeMapColors();
+    var touch = window.matchMedia('(pointer: coarse)').matches;
+    var map = L.map(node, { scrollWheelZoom: false, zoomControl: true, zoomSnap: .5, attributionControl: true, dragging: !(inPage && touch) });
+    node.style.background = col.water;
+    map.attributionControl.setPrefix('');
+    // сайт отдаёт Referrer-Policy: no-referrer, а OSM без Referer отвечает плитками «Access blocked» (403):
+    // для плиток передаём только адрес сайта, без пути страницы
+    var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18, referrerPolicy: 'strict-origin-when-cross-origin', className: 'place-tiles' + (col.dark ? ' dark' : ''),
+      attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    }).addTo(map);
+    map.attributionControl.addAttribution(T('Координаты: <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a>'));
+    map.createPane('base-geo'); map.getPane('base-geo').style.zIndex = 200; map.getPane('base-geo').style.pointerEvents = 'none';
+    var tileErrors = 0;
+    tiles.on('tileerror', function () {
+      if (++tileErrors !== 4) return;
+      map.attributionControl.addAttribution(T('Границы: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>'));
+      baseGeo = baseGeo || fetch(ROOT + 'geo/family-region-countries.geojson').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
+      baseGeo.then(function (geo) { L.geoJSON(geo, { pane: 'base-geo', interactive: false, style: { color: col.border, weight: 1, fillColor: col.land, fillOpacity: 1 } }).addTo(map); })
+        .catch(function () { node.classList.add('no-basemap'); });
+    });
+    L.control.scale({ imperial: false, metric: true, position: 'bottomleft' }).addTo(map);
+    placeMaps.push({ kind: kind, map: map, node: node });
+    return map;
+  }
+  function stopIcon(n, color) {
+    return L.divIcon({ className: 'stop-pin', html: '<span style="--route-color:' + color + '">' + n + '</span>', iconSize: [26, 26], iconAnchor: [13, 13] });
+  }
+  // карта дороги ветви: пронумерованные остановки по годам и пунктир между ними
+  function drawBranchMap(node) {
+    var line = routeLines(true).filter(function (l) { return l.group.id === node.getAttribute('data-group'); })[0];
+    if (!line) return;
+    var map = baseMap(node, 'branch', true), color = placeColor(line.group.id), pts = [], markers = {};
+    line.stops.forEach(function (pl, i) {
+      if (!placeHasCoordinates(pl)) return;
+      pts.push([pl.lat, pl.lon]);
+      var m = L.marker([pl.lat, pl.lon], { icon: stopIcon(i + 1, color), title: (i + 1) + '. ' + pl.name, riseOnHover: true });
+      m.bindTooltip((i + 1) + '. ' + pl.name, { direction: 'top', offset: [0, -13], className: 'stop-label' });
+      m.on('click', function () { location.hash = placeHref(pl.slug); });
+      m.addTo(map); markers[pl.slug] = m;
+    });
+    if (pts.length > 1) L.polyline(pts, { color: color, weight: 2.5, opacity: .75, dashArray: '2 7', lineCap: 'round', interactive: false }).addTo(map);
+    if (pts.length > 1) map.fitBounds(pts, { padding: [32, 32], maxZoom: 7 }); else map.setView(pts[0], 7);
+    // остановка в списке под указателем — её номер на карте
+    var section = node.closest('.route-line');
+    if (section) section.querySelectorAll('.route-stop').forEach(function (li) {
+      var m = markers[li.getAttribute('data-slug')]; if (!m) return;
+      var on = function (yes) { var e = m.getElement(); if (e) e.classList.toggle('on', yes); if (yes) m.openTooltip(); else m.closeTooltip(); };
+      li.addEventListener('mouseenter', function () { on(true); });
+      li.addEventListener('mouseleave', function () { on(false); });
     });
   }
-  var lastFly = null;
-  function flyToPlace(slug, zoomIn) {
-    var p = placeBySlug(slug); if (!placeMap || !p || !placeHasCoordinates(p)) return;
-    markPlace(slug);
-    var z = Math.max(placeMap.getZoom(), zoomIn ? 8 : 6), target = L.latLng(p.lat, p.lon);
-    if (lastFly === slug + z) return;   // уже летим туда же
-    lastFly = slug + z;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { placeMap.setView(target, z); return; }
-    placeMap.stop();
-    // рядом — плавный сдвиг без смены масштаба; далеко — «полёт» с облётом
-    var far = placeMap.distance(placeMap.getCenter(), target) > 600000 || Math.abs(placeMap.getZoom() - z) > 1;
-    if (far) placeMap.flyTo(target, z, { duration: 1.1, easeLinearity: .2 });
-    else placeMap.setView(target, z, { animate: true, pan: { duration: .7, easeLinearity: .2 } });
+  // мини-карта страницы места: само место и соседние места тех же ветвей
+  function drawMiniMap(pl, node) {
+    var map = baseMap(node, 'mini', true);
+    placeMaps[placeMaps.length - 1].slug = pl.slug;
+    D.places.forEach(function (x) {
+      if (x === pl || !placeHasCoordinates(x) || !(x.groups || []).some(function (g) { return (pl.groups || []).indexOf(g) >= 0; })) return;
+      L.circleMarker([x.lat, x.lon], { radius: 5, color: '#fff', weight: 1.5, fillColor: placeColor((x.groups || [])[0]), fillOpacity: .85 })
+        .bindTooltip(x.name, { direction: 'top', offset: [0, -6] }).on('click', function () { location.hash = placeHref(x.slug); }).addTo(map);
+    });
+    L.circleMarker([pl.lat, pl.lon], { radius: 9, color: '#fff', weight: 3, fillColor: placeColor((pl.groups || [])[0]), fillOpacity: 1 })
+      .bindTooltip(pl.name, { permanent: true, direction: 'top', offset: [0, -10], className: 'here-label' }).addTo(map);
+    map.setView([pl.lat, pl.lon], 7);
   }
-  function focusPlaceOnMap(slug) { flyToPlace(slug, true); }
-  function highlightPlaceMarker(slug) { markPlace(slug); }
-  function updatePlaceMap() {
-    if (currentView !== 'places' || !window.L || !$('place-map')) return;
-    var bar = document.querySelector('.bar'); if (bar) document.documentElement.style.setProperty('--bar-h', bar.offsetHeight + 'px');
-    if (!placeMapReady) {
-      var col = placeMapColors();
-      placeMap = L.map('place-map', { scrollWheelZoom: false, zoomControl: true, zoomSnap: .5, attributionControl: true });
-      $('place-map').style.background = col.water;
-      placeMap.attributionControl.setPrefix('');
-      // подложка: OpenStreetMap (реки, города, подписи на местных языках), приглушённая фильтром .place-tiles;
-      // без сети — контуры стран из geo/
-      // сайт отдаёт Referrer-Policy: no-referrer, а OSM без Referer отвечает плитками «Access blocked» (403):
-      // для плиток передаём только адрес сайта, без пути страницы
-      var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18, referrerPolicy: 'strict-origin-when-cross-origin', className: 'place-tiles' + (col.dark ? ' dark' : ''),
-        attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
-      }).addTo(placeMap);
-      var tileErrors = 0;
-      tiles.on('tileerror', function () { if (++tileErrors === 4) loadBaseGeo(); });
-      placeMap.attributionControl.addAttribution(T('Координаты: <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a>'));
-      placeMap.createPane('base-geo'); placeMap.getPane('base-geo').style.zIndex = 200; placeMap.getPane('base-geo').style.pointerEvents = 'none';
-      var loadBaseGeo = function () {
-        placeMap.attributionControl.addAttribution(T('Границы: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>'));
-        fetch(ROOT + 'geo/family-region-countries.geojson').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-          .then(function (geo) { L.geoJSON(geo, { pane: 'base-geo', interactive: false, style: { color: col.border, weight: 1, fillColor: col.land, fillOpacity: 1 } }).addTo(placeMap); })
-          .catch(function () { $('place-map').classList.add('no-basemap'); });
-      };
-      L.control.scale({ imperial: false, metric: true, position: 'bottomleft' }).addTo(placeMap);
-      placeLayers = L.layerGroup().addTo(placeMap); placeMapReady = true;
-    }
-    placeMap.invalidateSize(); placeLayers.clearLayers(); placeMarkers = {};
-    var bounds = [];
-    routeLines().forEach(function (line) {
-      var color = line.group.color;
+  // общая карта: все места всех ветвей, переезды из источников — пунктиром
+  function drawAllMap(node) {
+    var map = baseMap(node, 'all', false), bounds = [], seen = {};
+    routeLines(true).forEach(function (line) {
+      var color = placeColor(line.group.id);
       line.stops.forEach(function (p) {
-        if (!placeHasCoordinates(p)) return;
+        if (!placeHasCoordinates(p) || seen[p.slug]) return;
+        seen[p.slug] = true;
         bounds.push([p.lat, p.lon]);
-        if (placeMarkers[p.slug]) return;
-        var m = L.circleMarker([p.lat, p.lon], { radius: 6, color: '#fff', weight: 1.5, fillColor: color, fillOpacity: .85 });
-        m.bindTooltip(p.name, { permanent: true, direction: 'top', offset: [0, -8], className: 'place-label' });
-        m.on('click', function () {
-          var n = document.querySelector('#places .route-stop[data-slug="' + p.slug + '"]');
-          if (n) n.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          openPlace(p.slug);
-        });
-        m.on('mouseover', function () { var t = m.getTooltip().getElement(); if (t) t.classList.add('hover'); });
-        m.on('mouseout', function () { var t = m.getTooltip().getElement(); if (t) t.classList.remove('hover'); });
-        m.addTo(placeLayers); placeMarkers[p.slug] = m;
+        L.circleMarker([p.lat, p.lon], { radius: 6.5, color: '#fff', weight: 1.5, fillColor: color, fillOpacity: .9 })
+          .bindTooltip(p.name, { permanent: true, direction: 'top', offset: [0, -8], className: 'place-label' })
+          .on('click', function () { location.hash = placeHref(p.slug); }).addTo(map);
       });
       (D.place_routes || []).filter(function (r) { return r.group === line.group.id; }).forEach(function (r) {
         var a = placeBySlug(r.from_place), b = placeBySlug(r.to_place);
         if (!a || !b || !placeHasCoordinates(a) || !placeHasCoordinates(b)) return;
-        var edge = L.polyline([[a.lat, a.lon], [b.lat, b.lon]], { color: color, weight: 2.5, opacity: .75, dashArray: '2 7', lineCap: 'round' });
-        edge.bindTooltip(r.label); edge.addTo(placeLayers);
+        L.polyline([[a.lat, a.lon], [b.lat, b.lon]], { color: color, weight: 2.5, opacity: .75, dashArray: '2 7', lineCap: 'round' }).bindTooltip(r.label).addTo(map);
       });
     });
     if (bounds.length) {
-      // стартовый кадр — основное скопление мест (до 2500 км от медианной точки); дальние места видны при переходе к ним
+      // стартовый кадр — основное скопление мест (до 2500 км от медианной точки); дальние видны при отдалении
       var med = function (i) { var v = bounds.map(function (b) { return b[i]; }).sort(function (x, y) { return x - y; }); return v[Math.floor(v.length / 2)]; };
       var mid = L.latLng(med(0), med(1));
       var core = bounds.filter(function (b) { return mid.distanceTo(b) < 2500000; });
-      placeMap.fitBounds(core.length >= 2 ? core : bounds, { padding: [30, 30], maxZoom: 7 });
+      map.fitBounds(core.length >= 2 ? core : bounds, { padding: [30, 30], maxZoom: 7 });
     }
-    routeActive = null;
-    watchRouteStops();
+  }
+  // карты рисуются, только когда их часть раздела видна: у скрытой карты нет размера
+  function drawPlaceMaps() {
+    if (currentView !== 'places' || !window.L) return;
+    var bar = document.querySelector('.bar'); if (bar) document.documentElement.style.setProperty('--bar-h', bar.offsetHeight + 'px');
+    var nodes = selectedPlace ? [$('place-minimap')] : placeMode === 'map' ? [$('place-map')] : Array.prototype.slice.call(document.querySelectorAll('#places .branch-map'));
+    nodes.forEach(function (node) {
+      if (!node) return;
+      var have = placeMaps.filter(function (m) { return m.node === node; })[0];
+      if (have) { have.map.invalidateSize(); return; }
+      if (node.id === 'place-minimap') { removeMaps('mini'); drawMiniMap(placeBySlug(selectedPlace), node); }
+      else if (node.id === 'place-map') drawAllMap(node);
+      else drawBranchMap(node);
+    });
+  }
+  // три вида раздела: дороги ветвей, общая карта, страница места
+  function showPlaceSub() {
+    var sub = selectedPlace ? 'page' : placeMode === 'map' ? 'map' : 'home';
+    $('places-home').hidden = sub !== 'home';
+    $('places-map-page').hidden = sub !== 'map';
+    $('place-page').hidden = sub !== 'page';
+  }
+  function placesHome(mode) {
+    var was = selectedPlace || placeMode;
+    selectedPlace = null; placeMode = mode === 'map' ? 'map' : 'routes';
+    showPlaceSub();
+    if (was !== placeMode) window.scrollTo({ top: 0, behavior: 'instant' });
+    drawPlaceMaps();
+  }
+  function openPlace(slug) {
+    var pl = placeBySlug(slug); if (!pl) return;
+    if (currentView !== 'places') showView('places');
+    if (selectedPlace !== slug || $('place-page').hidden) {
+      selectedPlace = slug;
+      renderPlacePage(pl);
+      showPlaceSub();
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    drawPlaceMaps();
+    syncUrl();
   }
 
   // ---------- архив
@@ -3048,7 +3186,7 @@
       close(false);
       if (d.kind === 'person') { showView('tree'); setFocus(d.key); openPerson(d.key); }
       else if (d.kind === 'source') showSource(d.key);
-      else if (d.kind === 'place') { showView('places'); openPlace(d.key); }
+      else if (d.kind === 'place') openPlace(d.key);
       else if (d.kind === 'story') { location.hash = '#/story' + (d.key ? '/' + d.key : ''); }
       else showView('questions');
     }
@@ -3282,7 +3420,8 @@
     SITE = D.site || {};
     document.body.classList.toggle('no-comments', !SITE.comments);
     index();
-    document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { showView(b.dataset.view); }); });
+    // вкладка «Места» всегда открывает начало раздела — дороги ветвей, а не последнюю открытую страницу места
+    document.querySelectorAll('.tabs button').forEach(function (b) { b.addEventListener('click', function () { if (b.dataset.view === 'places') { selectedPlace = null; placeMode = 'routes'; showPlaceSub(); } showView(b.dataset.view); }); });
     initHeader();
     $('panel-close').onclick = closePanel;
     $('scrim').onclick = closePanel;

@@ -76,8 +76,10 @@ free hosting, full history in git, GEDCOM in and out.
 
 ### 🗺 Places and the family story
 
-- A map (Leaflet + OpenStreetMap) with family branches, moves between places,
-  "then and now" names and timelines.
+- A page for every place: its story, the family's people there by generation, documents, a mini-map,
+  "then and now" names and which church kept the registers; static `places/…` pages for search engines.
+- The roads of the family's branches: places in the order of years, numbered stops on each branch's map
+  (Leaflet + OpenStreetMap), and all places on one map.
 - The **Story** page: your narrative with a timeline and a "by place" filter.
 - **Questions to relatives**: what the family does not know yet — answered right on the site.
 

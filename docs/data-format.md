@@ -183,6 +183,13 @@ A person is the biological child (`children`) of at most one family with partner
 `place_groups`: `{"id", "name", "color", "about"}` — branches of the family on the map.
 `place_routes`: `{"group", "from_place", "to_place", "label", "sources"}` — moves drawn as arrows.
 
+Every place gets its own page — in the app (`#/places?place=krasnoye`: the story, people by generation,
+documents, a mini-map) and as a static `places/krasnoye.html` for search engines, listed in the sitemap
+with `places/` as the index. On the Places page each branch (`place_groups`) is a road: its places in the
+order of `sort_year`, numbered on the branch's map; a move in `place_routes` keeps "from" before "to" when
+the years are equal. A place shared by two branches can come at a different time on each road:
+`"sort_years": {"novak": 1912}` overrides `sort_year` for that branch.
+
 ## Research journal
 
 - `research_leads[]` — open questions and hints: `{"id": "L3", "title", "status", "record",

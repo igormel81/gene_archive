@@ -775,6 +775,13 @@
         "sort_year": {
           "type": "integer"
         },
+        "sort_years": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "description": "year of this place on the road of one branch, when a shared place comes at a different time for it: {\"novak\": 1912} / год места на дороге одной ветви, если общее место приходится у неё на другое время"
+        },
         "text": {
           "type": "string",
           "description": "short description / короткое описание"

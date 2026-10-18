@@ -225,6 +225,10 @@ def validate(data, root=Path("."), cfg=None):
         need_sources(where, pl.get("sources"))
         for g in pl.get("groups", []):
             need(where, g, groups, "place group", "группы мест")
+        for g, y in (pl.get("sort_years") or {}).items():
+            need(f"{where} sort_years", g, groups, "place group", "группы мест")
+            if not isinstance(y, int):
+                err(m(f"{where} sort_years: {g} must be a year", f"{where} sort_years: {g} — год числом"))
         for k in ("text", "details"):
             text_sources(where, pl.get(k))
         for n, t in enumerate(pl.get("timeline", [])):

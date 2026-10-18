@@ -715,7 +715,9 @@ body.doc-open { overflow: hidden; }
 
 /* ---------- «Места»: дороги семьи — маршрут по годам и карта, которая следует за чтением */
 .page.routes { max-width: 1320px; }
-.routes-head .sub { max-width: 62ch; }
+.routes-head .sub { max-width: 66ch; }
+.routes-links { margin: 0 0 4px; }
+.routes-links .btn, .place-crumbs a { text-decoration: none; color: var(--ink); }
 .route-filters { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 18px 0 8px; border-bottom: 1px solid var(--line); }
 .route-filters button { position: relative; background: none; border: 0; padding: 8px 0 10px 16px; font: 500 14px var(--sans); color: var(--muted); cursor: pointer; }
 .route-filters button::before { content: ''; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; margin-top: -5px; border-radius: 50%; background: var(--route-color, var(--ink)); opacity: .8; }
@@ -724,57 +726,92 @@ body.doc-open { overflow: hidden; }
 .route-filters button:hover { color: var(--ink); }
 .route-filters button.active { color: var(--ink); box-shadow: inset 0 -2px 0 var(--route-color, var(--accent)); }
 .route-filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.routes-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 44%); gap: 40px; align-items: start; margin-top: 26px; }
-.routes-map { position: sticky; top: calc(var(--bar-h, 64px) + 14px); }
-.route-map, .route-map.leaflet-container { height: calc(100vh - var(--bar-h, 64px) - 70px); min-height: 380px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font: 12px var(--sans); }
-.route-map-note { margin: 8px 2px 0; color: var(--muted); font: 12px/1.45 var(--sans); }
-.route-line { margin: 0 0 64px; }
+/* дорога ветви: слева остановки по годам, справа её карта с теми же номерами */
+.route-line { margin: 30px 0 64px; }
 .route-line-head { margin: 0 0 22px; }
 .route-line-head h3 { margin: 0; font-size: 26px; line-height: 1.2; }
 .route-line-head p { margin: 4px 0 0; color: var(--muted); font: 14px var(--sans); }
+.route-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 42%); gap: 40px; align-items: start; }
+.route-grid.no-map { grid-template-columns: minmax(0, 1fr); }
+.route-map-col { position: sticky; top: calc(var(--bar-h, 64px) + 14px); }
+.branch-map, .branch-map.leaflet-container { height: min(520px, calc(100vh - var(--bar-h, 64px) - 90px)); min-height: 300px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font: 12px var(--sans); }
+.route-map-note { margin: 8px 2px 0; color: var(--muted); font: 12px/1.45 var(--sans); }
 .route-stops { list-style: none; margin: 0; padding: 0; }
 .route-stop { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); }
-.route-year { padding: 3px 18px 0 0; text-align: right; font: 600 15px/1.35 var(--serif); font-variant-numeric: tabular-nums oldstyle-nums; color: var(--route-color); }
-.route-body { position: relative; padding: 0 0 6px 26px; border-left: 2px solid color-mix(in srgb, var(--route-color) 45%, transparent); }
-.route-body::before { content: ''; position: absolute; left: -7px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--route-color); transition: transform .25s, background-color .25s; }
-.route-stop.active .route-body::before { background: var(--route-color); transform: scale(1.35); }
+.route-year { padding: 3px 22px 0 0; text-align: right; font: 600 15px/1.35 var(--serif); font-variant-numeric: tabular-nums oldstyle-nums; color: var(--route-color); }
+.route-body { position: relative; padding: 0 0 6px 28px; border-left: 2px solid color-mix(in srgb, var(--route-color) 45%, transparent); }
+.route-num { position: absolute; left: -13px; top: 1px; width: 24px; height: 24px; border-radius: 50%; background: var(--route-color); color: #fff; font: 700 12px/24px var(--sans); text-align: center; box-shadow: 0 0 0 3px var(--bg); }
 .route-body h4 { margin: 0; }
-.route-name { background: none; border: 0; padding: 0; margin: 0; color: var(--ink); font: 600 21px/1.25 var(--serif); text-align: left; cursor: pointer; }
-.route-name:hover { text-decoration: underline; text-decoration-color: var(--route-color); text-underline-offset: 4px; }
+.route-name { color: var(--ink); font: 600 21px/1.25 var(--serif); text-decoration: none; }
+.route-name:hover { text-decoration: underline; text-decoration-color: var(--route-color, var(--accent)); text-underline-offset: 4px; }
 .route-where { margin: 4px 0 0; color: var(--muted); font: 13px/1.45 var(--sans); }
 .route-arrow { color: var(--route-color); }
 .route-text { margin: 10px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.62; }
-.route-text.muted { color: var(--muted); font-size: 14px; }
 .route-people { margin: 8px 0 0; font: 13px/1.5 var(--sans); color: var(--ink); opacity: .85; }
-.route-more { margin: 8px 0 0; padding: 0; background: none; border: 0; color: var(--accent); font: 500 13px var(--sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.route-more { display: inline-block; margin: 8px 0 0; color: var(--accent); font: 500 13px var(--sans); text-underline-offset: 3px; }
 .route-name:focus-visible, .route-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.route-stop.shared .route-name { font-size: 18px; }
 .route-gap { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); }
 .route-gap::before { content: ''; }
-.route-gap span { display: block; padding: 10px 0 26px 26px; border-left: 2px dotted color-mix(in srgb, var(--route-color, var(--muted)) 55%, transparent); color: var(--muted); font: italic 13px/1.4 var(--serif); }
-.route-line .route-gap span { border-left-color: color-mix(in srgb, var(--route-color) 55%, transparent); }
-.route-map .leaflet-tooltip.place-label { display: none; background: transparent; border: 0; box-shadow: none; padding: 0 3px; color: var(--ink); font: 600 12px var(--sans); white-space: nowrap;
+.route-gap span { display: block; padding: 10px 0 26px 28px; border-left: 2px dotted color-mix(in srgb, var(--route-color, var(--muted)) 55%, transparent); color: var(--muted); font: italic 13px/1.4 var(--serif); }
+/* номера остановок на картах */
+.stop-pin span { display: block; width: 26px; height: 26px; border-radius: 50%; background: var(--route-color); color: #fff; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .35); font: 700 12px/22px var(--sans); text-align: center; transition: transform .15s; }
+.stop-pin.on span { transform: scale(1.3); }
+.leaflet-tooltip.stop-label, .leaflet-tooltip.here-label { font: 600 12.5px var(--sans); }
+.leaflet-tooltip.here-label { background: var(--paper); color: var(--ink); border-color: var(--line); }
+.route-map, .route-map.leaflet-container { height: calc(100vh - var(--bar-h, 64px) - 220px); min-height: 380px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font: 12px var(--sans); }
+.route-map .leaflet-tooltip.place-label { background: transparent; border: 0; box-shadow: none; padding: 0 3px; color: var(--ink); font: 600 12px var(--sans); white-space: nowrap;
   text-shadow: 0 0 3px var(--paper), 0 0 3px var(--paper), 0 0 2px var(--paper); }
 .route-map .leaflet-tooltip.place-label::before { display: none; }
-.route-map .leaflet-tooltip.place-label.on, .route-map .leaflet-tooltip.place-label.hover { display: block; }
-.route-map .leaflet-tooltip.place-label.on { font-size: 13.5px; z-index: 700; }
 .routes .place-unmatched { margin-top: 10px; }
+/* страница места */
+.place-page { max-width: 1180px; }
+.place-crumbs { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 18px; font: 14px var(--sans); }
+.place-crumbs a { color: var(--accent); }
+.place-hero { display: grid; gap: 28px; align-items: end; margin-bottom: 28px; }
+.place-hero.with-cover { grid-template-columns: minmax(0, 46%) minmax(0, 1fr); }
+.place-cover { padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.place-cover img { display: block; width: 100%; max-height: 380px; object-fit: cover; }
+.place-title { font-size: clamp(30px, 4.4vw, 46px); margin: 6px 0 4px; }
+.place-groups-line .place-group-tag { color: var(--route-color); }
+.place-hero-actions { margin: 12px 0 0; }
+.place-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 34%); gap: 44px; align-items: start; }
+.place-main { max-width: 70ch; }
+.place-main .place-summary { font-size: 18px; line-height: 1.6; font-weight: 400; }
+.place-main .place-detail { line-height: 1.65; }
+.place-side { position: sticky; top: calc(var(--bar-h, 64px) + 14px); }
+.place-minimap, .place-minimap.leaflet-container { height: 300px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font: 12px var(--sans); }
+.place-nomap { margin: 0; padding: 14px; border: 1px dashed var(--line); border-radius: 10px; color: var(--muted); font: 13px/1.45 var(--sans); }
+.place-route-nav { margin-top: 14px; display: grid; gap: 10px; }
+.place-route-step { padding: 10px 12px; border-left: 4px solid var(--route-color); background: var(--paper); border-radius: 6px; font: 13px/1.45 var(--sans); }
+.place-route-step p { margin: 0; }
+.place-route-links { display: flex; justify-content: space-between; gap: 12px; margin-top: 4px !important; }
+.place-route-links .next { margin-left: auto; text-align: right; }
+.place-gens-note { margin: 0; color: var(--muted); font: 13px var(--sans); }
+.place-gens { display: grid; gap: 14px; margin: 10px 0 0; }
+.place-gen h4 { margin: 0 0 6px; font: 600 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.place-gen h4 small { letter-spacing: 0; text-transform: none; font-weight: 400; }
+.place-main .thumbs { margin: 10px 0 12px; }
 @media (max-width: 900px) {
-  .routes-body { grid-template-columns: 1fr; gap: 0; }
-  .routes-map { order: -1; top: var(--bar-h, 0px); z-index: 5; background: var(--bg); padding: 6px 0 10px; margin: 0 -16px; }
-  .route-map, .route-map.leaflet-container { height: 34vh; min-height: 220px; border-radius: 0; border-left: 0; border-right: 0; }
-  .route-map-note { display: none; }
-  .routes-list { padding-top: 18px; }
+  .route-grid { grid-template-columns: 1fr; gap: 12px; }
+  .route-map-col { position: static; order: -1; margin: 0 -16px; }
+  .branch-map, .branch-map.leaflet-container { height: 260px; min-height: 0; border-radius: 0; border-left: 0; border-right: 0; }
+  .route-map-col .route-map-note { margin: 6px 16px 4px; }
+  .route-map, .route-map.leaflet-container { height: 62vh; min-height: 300px; }
   .route-stop, .route-gap { grid-template-columns: 4.6rem minmax(0, 1fr); }
-  .route-year { font-size: 13px; padding-right: 12px; }
-  .route-body { padding-left: 20px; }
-  .route-gap span { padding-left: 20px; }
+  .route-year { font-size: 13px; padding-right: 16px; }
+  .route-body { padding-left: 22px; }
+  .route-gap span { padding-left: 22px; }
   .route-filters { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; }
   .route-filters::-webkit-scrollbar { display: none; }
   .route-filters button { flex: none; white-space: nowrap; }
   .route-line-head h3 { font-size: 22px; }
+  .place-hero.with-cover, .place-layout { grid-template-columns: 1fr; }
+  .place-hero { gap: 16px; }
+  .place-cover img { max-height: 260px; }
+  .place-side { position: static; }
+  .place-minimap, .place-minimap.leaflet-container { height: 220px; }
 }
-@media (prefers-reduced-motion: reduce) { .route-body::before { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .stop-pin span { transition: none; } }
 .place-fn { line-height: 0; margin-left: 1px; }
 .place-fn button { background: none; border: 0; padding: 0 1px; color: var(--accent); font: 600 11px var(--sans); cursor: pointer; vertical-align: super; line-height: 1; }
 .place-fn button:hover { text-decoration: underline; }
@@ -782,10 +819,6 @@ body.doc-open { overflow: hidden; }
 ol.place-sources { padding-left: 22px; }
 ol.place-sources .place-source-link { display: inline; text-align: left; line-height: inherit; }
 ol.place-sources li::marker { color: var(--accent); font: 600 12px var(--sans); }
-@media (max-width: 900px) {
-  body.places-mode .bar { position: static; }
-  body.places-mode .routes-map { top: 0; }
-}
 
 /* фотография с оборотом: карточка переворачивается */
 .sfig.photo.flip { max-width: 380px; text-align: center; }

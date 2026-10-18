@@ -68,6 +68,28 @@ for (const engine of engines) {
           ok(seen, P(`card ${right} is hidden under the open panel`));
         }
       }
+      // Places: branch roads with numbered stops on their maps, a page per place, all places on one map
+      if ((data.places || []).length) {
+        await page.goto(base + lang + '#/places');
+        await page.waitForTimeout(700);
+        ok(await page.locator('#places .route-stop').count() > 0, P('places: no stops on the branch roads'));
+        if ((data.place_groups || []).length) ok(await page.locator('#places .branch-map .stop-pin').count() > 0, P('places: no numbered stops on the branch maps'));
+        const pl = data.places.find((x) => Number.isFinite(x.lat)) || data.places[0];
+        await page.locator(`#places .route-stop[data-slug="${pl.slug}"] a.route-name`).first().click();
+        await page.waitForTimeout(700);
+        ok(page.url().includes('place=' + pl.slug), P(`places: a stop does not lead to the page of ${pl.slug}`));
+        ok(await page.locator('#place-page:not([hidden]) .place-title').count() === 1, P(`place page ${pl.slug} does not open`));
+        ok(await page.locator('#places-home').isHidden(), P('place page: the list of roads is still shown'));
+        if (Number.isFinite(pl.lat)) ok(await page.locator('#place-minimap.leaflet-container').count() === 1, P(`place page ${pl.slug}: no mini-map`));
+        ok(await page.locator('#place-page .place-gen .chip').count() > 0, P(`place page ${pl.slug}: no people`));
+        const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        ok(wide <= 1, P(`place page ${pl.slug} scrolls sideways by ${wide}px`));
+        await page.goto(base + lang + '#/places?mode=map');
+        await page.waitForTimeout(700);
+        ok(await page.locator('#places-map-page:not([hidden]) #place-map.leaflet-container').count() === 1, P('the map of all places does not open'));
+        const stat = await page.request.get(base + lang + `places/${pl.slug}.html`);
+        ok(stat.ok() && (await stat.text()).includes(pl.name), P(`static page places/${pl.slug}.html is missing`));
+      }
       // Archive → Sources
       if ((data.research_resources || []).length) {
         await page.goto(base + lang + '#/sources?mode=research');

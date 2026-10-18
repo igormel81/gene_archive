@@ -208,24 +208,25 @@
   </section>
 
   <section id="view-places" class="view">
-    <div class="page routes">
+    <div class="page routes" id="places-home">
       <header class="routes-head">
         <h2>Места</h2>
-        <p class="sub">Места жизни, учёбы, службы и погребения наших родных. Выберите ветвь: в карточках — события, документы и сведения, которые ещё требуют проверки.</p>
+        <p class="sub">Где жили, учились, служили и похоронены наши родные. У каждого места своя страница: история, люди по поколениям, документы и карта. Ниже — дороги ветвей семьи: места по годам, пронумерованные остановки на карте.</p>
+        <p class="routes-links"><a class="btn" href="#/places?mode=map">Все места на одной карте</a></p>
         <div id="place-filters" class="route-filters" role="group" aria-label="Выбрать ветвь семьи"></div>
         <details class="place-index" id="place-index-box"><summary>Указатель мест <span class="pill" id="place-index-count"></span></summary><div id="place-index" class="place-index-list"></div></details>
       </header>
-      <div class="routes-body">
-        <div class="routes-list">
-          <div id="places"></div>
-          <section class="place-unmatched" aria-labelledby="place-unmatched-title"><h3 id="place-unmatched-title">Что ещё нужно уточнить</h3><p class="sub">Эти места известны из документов, но точная современная привязка пока не проверена.</p><div id="place-suggestions"></div></section>
-        </div>
-        <div class="routes-map">
-          <div id="place-map" class="route-map" role="region" aria-label="Карта мест семьи"></div>
-          <p class="route-map-note">Точки — сёла и города, иногда ориентиры. Пунктир показывает переезды, указанные в источниках, по прямой между местами. Места без проверенных координат доступны в карточках.</p>
-        </div>
-      </div>
+      <div id="places"></div>
+      <section class="place-unmatched" aria-labelledby="place-unmatched-title"><h3 id="place-unmatched-title">Что ещё нужно уточнить</h3><p class="sub">Эти места известны из документов, но точная современная привязка пока не проверена.</p><div id="place-suggestions"></div></section>
     </div>
+    <div class="page routes places-map-page" id="places-map-page" hidden>
+      <nav class="place-crumbs"><a href="#/places">← Все места</a></nav>
+      <h2>Все места на одной карте</h2>
+      <p class="sub">Все места всех ветвей семьи. Пунктир — переезды, указанные в источниках, по прямой между местами. Нажмите на точку, чтобы открыть страницу места.</p>
+      <div id="place-map" class="route-map all-map" role="region" aria-label="Карта мест семьи"></div>
+      <p class="route-map-note">Точки — сёла и города, иногда ориентиры. Места без проверенных координат есть в указателе мест.</p>
+    </div>
+    <article class="page place-page" id="place-page" hidden aria-labelledby="place-title"></article>
   </section>
 
   <section id="view-sources" class="view">

@@ -1,6 +1,7 @@
 """Static pages for search engines, sharing and readers without JavaScript.
 
-people/<id>.html, people/index.html, surnames/<slug>.html, history.html, news.html, s/<key>.html
+people/<id>.html, people/index.html, surnames/<slug>.html, places/<slug>.html, places/index.html,
+history.html, news.html, s/<key>.html
 (pages the "Share" button links to, with covers for messengers),
 sitemap.xml and robots.txt (the last two only when site.json has base_url).
 Texts here are written in the interface source language (Russian) and translated
@@ -199,7 +200,7 @@ class Pages:
         body = f'<header class="fam-hero"><p class="eyebrow">Фамилия в семейном архиве</p><h1>{esc(key)}</h1>'
         if places:
             body += '<p class="fam-route">' + " · ".join(
-                f'<a href="../#/places?place={x}">{esc(self.place_name[x])}</a>' for x in places) + "</p>"
+                f'<a href="../places/{x}.html">{esc(self.place_name[x])}</a>' for x in places) + "</p>"
         body += '<div class="fam-stats">'
         body += f'<div><b>{len(people)}</b><span>{plural(len(people), "человек", "человека", "человек")}</span></div>'
         if years:
@@ -218,6 +219,64 @@ class Pages:
                       "Родословная, документы, места и годы жизни.", heading=False, kind="CollectionPage")
         return slug, len(people)
 
+    # --- places: places/<slug>.html and places/index.html
+    def place_people(self, pl):
+        """People of a place: named in it, or born, living, dying or buried there (by place_slugs); never the living."""
+        ids = list(pl.get("people", []))
+        for p in self.data["people"]:
+            evs = [p.get(e) or {} for e in ("birth", "death", "burial")] + list(p.get("residences") or [])
+            if any(pl["slug"] in ev.get("place_slugs", []) for ev in evs):
+                ids.append(p["id"])
+        people = [self.byid[i] for i in dict.fromkeys(ids) if i in self.byid]
+        return [q for q in people if q["id"] not in self.living and not q.get("placeholder")]
+
+    def place(self, pl):
+        slug = pl["slug"]
+        body = '<header class="fam-hero"><p class="eyebrow">Место в семейном архиве</p><h1>' + esc(pl["name"]) + "</h1>"
+        if pl.get("period"):
+            body += f'<p class="fam-route">{esc(pl["period"])}</p>'
+        body += "</header>"
+        for label, key in (("Где:", "where"), ("Тогда:", "then"), ("Сейчас:", "now")):
+            if pl.get(key):
+                body += f"<p><b>{label}</b> " + esc(pl[key]) + "</p>"
+        if pl.get("text"):
+            body += "<p>" + esc(pl["text"]) + "</p>"
+        body += self.parish_html(pl)
+        if pl.get("details"):
+            body += "<h2>История места</h2>" + "".join(f"<p>{esc(x)}</p>" for x in pl["details"])
+        people = self.place_people(pl)
+        if people:
+            body += "<h2>Люди</h2><ul>" + "".join(self.person_li(q, "../") for q in sorted(people, key=lambda q: (self.years(q) or "9999", q["display_name"]))) + "</ul>"
+        if pl.get("timeline"):
+            body += "<h2>Хронология</h2><ul>" + "".join(f'<li><b>{esc(t.get("date", ""))}</b> {esc(t.get("text", ""))}</li>' for t in pl["timeline"]) + "</ul>"
+        ids = list(pl.get("sources", []))
+        for t in [pl.get("text")] + list(pl.get("details") or []):
+            ids += re.findall(r"\bS\d+\b", t or "")
+        cited = [self.sources[i] for i in dict.fromkeys(ids) if i in self.sources]
+        if cited:
+            body += "<h2>Документы и источники</h2><ul>" + "".join(
+                f'<li><a href="../#/sources?doc={s["id"]}">{esc(s["id"])}. {esc(s["title"])}</a></li>' for s in cited) + "</ul>"
+        body += f'<p><a href="../#/places?place={slug}">Открыть страницу места на сайте: карта, фотографии, документы</a></p>'
+        entity = {"@type": "Place", "name": pl["name"]}
+        if "lat" in pl:
+            entity["geo"] = {"@type": "GeoCoordinates", "latitude": pl["lat"], "longitude": pl["lon"]}
+        title = pl["name"] + (f", {pl['where']}" if pl.get("where") else "")
+        self.document(f"places/{slug}.html", title, '<div class="fam-page">' + body + "</div>",
+                      "История места, люди семьи, документы и карта.", heading=False, entity=entity)
+
+    def parish_html(self, pl):
+        return ""
+
+    def places(self):
+        places = sorted(self.data.get("places", []), key=lambda pl: pl["name"])
+        if not places:
+            return
+        for pl in places:
+            self.place(pl)
+        items = "".join(f'<li><a href="{pl["slug"]}.html">{esc(pl["name"])}</a>' + (f' <span class="pl">{esc(pl["where"])}</span>' if pl.get("where") else "") + "</li>" for pl in places)
+        self.document("places/index.html", "Места семейного архива", f"<ul>{items}</ul>",
+                      "Все места, где жила семья: сёла, города, приходы и кладбища.", kind="CollectionPage")
+
     def build(self, story_html, news_html, help_html=""):
         names = sorted(self.data["people"], key=lambda p: p["display_name"])
         for p in names:
@@ -234,6 +293,7 @@ class Pages:
         index += "<h2>Все люди</h2><ul>" + "".join(self.person_li(p, "../") for p in names if not p.get("placeholder")) + "</ul>"
         self.document("people/index.html", "Люди семейного архива", index, "Алфавитный указатель людей семейного архива.",
                       kind="CollectionPage")
+        self.places()
         if story_html:
             history = re.sub(r'<a([^>]*?)data-p="(I\d+)"([^>]*)>', lambda mm: f'<a{mm[1]}href="people/{mm[2]}.html"{mm[3]}>', story_html)
             self.document("history.html", "История семьи", history, "История семьи по документам и воспоминаниям.", heading=False)
