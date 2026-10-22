@@ -153,6 +153,32 @@
           "resolution": {
             "type": "string",
             "description": "how it ended / чем закончилось"
+          },
+          "next": {
+            "type": "string",
+            "description": "Specific next step / Следующий шаг"
+          },
+          "checked": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO date or null / Дата проверки или null"
+          },
+          "stage": {
+            "type": "string"
+          },
+          "blocked_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -192,6 +218,13 @@
           },
           "source_ids": {
             "$ref": "#/$defs/sourceIds"
+          },
+          "visibility": {
+            "enum": [
+              "private",
+              "public"
+            ],
+            "description": "Private by default, including legacy entries; public requires review / По умолчанию закрыто, включая старые записи; public — после проверки"
           }
         }
       },
@@ -223,6 +256,13 @@
           "scope": {
             "type": "string",
             "description": ""
+          },
+          "visibility": {
+            "enum": [
+              "private",
+              "public"
+            ],
+            "description": "Private by default, including legacy entries; public requires review / По умолчанию закрыто, включая старые записи; public — после проверки"
           }
         }
       },
@@ -332,7 +372,10 @@
                   "enum": [
                     "births",
                     "marriages",
-                    "deaths"
+                    "deaths",
+                    "confessions",
+                    "revisions",
+                    "census"
                   ],
                   "description": "part of the register / часть книги"
                 },
@@ -364,6 +407,11 @@
                 }
               }
             }
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^C\\d+$",
+            "description": "Stable ID assigned by gene apply; optional on legacy records / Номер от gene apply, необязателен у старых записей"
           }
         }
       }
@@ -383,6 +431,14 @@
         }
       },
       "description": "surname histories for surname pages / история родов для страниц фамилий"
+    },
+    "id_counters": {
+      "type": "object",
+      "description": "Monotonic ID high-water marks, including deleted/restored records / Максимальные выданные номера, включая удалённые записи",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
     }
   },
   "$defs": {

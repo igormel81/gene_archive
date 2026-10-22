@@ -22,8 +22,8 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
 ## How to work
 
 1. Before editing, check `git status`: the folder may contain someone else's uncommitted changes.
-2. A new id is the next after the maximum (`I`, `F`, `S`, `L`); ids are never reused:
-   `python3 -c "import json;d=json.load(open('family_tree.json'));[print(k,max([int(x['id'][1:]) for x in d[k]]+[0])+1) for k in ('people','families','sources','research_leads')]"`
+2. Let `gene apply` allocate new IDs from current records, history and `id_counters`;
+   do not calculate the next ID from current records alone or reuse a deleted ID.
 3. After editing: `gene validate` (0 errors), then `gene build`. The site does not build with data errors.
 4. Show what changed (`git diff --stat` and a few words) and commit one topic per commit if the owner
    asked you to commit.
@@ -93,3 +93,20 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
   of living relatives into other people's stories without their consent.
 - Do not send archive data to outside services (translators, people-search sites) unless the owner asks.
 - Letters to archives and relatives only with the owner's explicit permission.
+
+
+## Reliable edits and public journals
+
+- Use `gene apply`: editor, CLI and builder share a folder lock. Do not run unrelated
+  Git commands during a save. A failed commit rolls back JSON and is a failed save.
+- Let the engine allocate IDs. Never reuse deleted IDs or reduce `id_counters`, even
+  after restoring an old version.
+- `kind: "research_resources"` edits R# resources; `kind: "coverage"` edits C# reading
+  progress. Parts: births, marriages, deaths, confessions, revisions, census.
+- With living-person protection enabled, journals are private by default. Set
+  `visibility: "public"` only after reviewing the text and within the owner's consent.
+  Do not publish all legacy journals automatically; do not delete private originals.
+- Build into `_site/` or a separate output folder, never the source folder or its
+  resource directories/ancestors.
+- Preserve next/checked/stage/blocked_by on leads. Research restrictions belong to the
+  individual project; do not copy another family's restrictions without authorization.

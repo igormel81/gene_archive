@@ -1,5 +1,27 @@
 # Changelog / История изменений
 
+## 0.7.0 — 2026-10-22
+
+- Protect source archives from unsafe build output paths; use unique temporary/backup
+  directories and coordinate builders with writers across local processes.
+  Защита исходников от опасного пути сборки; уникальные временные папки и общая блокировка.
+- Roll back JSON and staging on a failed Git commit; never report it as a successful save.
+  При отказе git-коммита JSON и индекс восстанавливаются, возвращается ошибка.
+- **Privacy change:** with living-person protection enabled, journal entries (including
+  legacy ones) require explicit `visibility: "public"` after review. Private originals
+  remain intact. See [migration notes](https://github.com/igormel81/gene_archive/blob/main/docs/reliable-edits.md).
+  **Изменение приватности:** журналы, включая старые записи, закрыты до проверки и явной
+  отметки public. Исходные журналы не удаляются: [подробности](https://github.com/igormel81/gene_archive/blob/main/docs/reliable-edits.ru.md).
+- IDs are not reused after deletion/restoration; deleting an unreferenced family works.
+  Номера не переиспользуются после удаления/восстановления; пустую семью можно удалить.
+- Reject day zero and reversed date ranges; preserve partially specified valid ranges.
+  Нулевой день и обратные диапазоны отклоняются; неполные корректные даты сохраняются.
+- `gene apply` supports research_resources and coverage with dry runs and history;
+  reading progress includes confession lists, revisions and censuses. Legacy coverage
+  records gain stable IDs only when explicitly edited. Schemas and agent rules updated.
+  Источники поиска и прочитанное меняются через gene apply; добавлены исповедные ведомости,
+  ревизии и переписи; обновлены схемы и правила для агентов.
+
 ## 0.6.1 — 2026-10-18
 
 - `gene init <folder> --example` works after `pip install gene-archive`: the demo family is downloaded from the

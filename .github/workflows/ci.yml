@@ -21,7 +21,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: sudo apt-get update -q && sudo apt-get install -y --no-install-recommends poppler-utils
-      - run: pip install ".[images]"
+      - run: pip install ".[images]" pyflakes
+      - run: pyflakes gene_archive tests
       - run: python -m unittest discover tests -v
       - name: The CLI works from an installed package
         run: |
@@ -44,3 +45,14 @@ jobs:
       - run: gene build example
       - run: npm install --no-save playwright && npx playwright install --with-deps chromium webkit
       - run: SMOKE_ENGINES=chromium,webkit node tests/smoke.mjs
+
+  mcp-contract:
+    name: Released genealogy-mcp consumer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ".[images]" genealogy-mcp==0.7.0
+      - run: python tests/integration/check_mcp.py

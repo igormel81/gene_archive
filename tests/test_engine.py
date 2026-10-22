@@ -255,14 +255,14 @@ class BuildExample(unittest.TestCase):
         cls.tmp.cleanup()
 
     def test_editions(self):
-        for prefix, lang, tab in (("", "en", "Tree"), ("ru/", "ru", "Древо"), ("ro/", "ro", "Arbore")):
+        for prefix, lang, tab in (("", "en", "Tree"), ("ru/", "ru", "Древо"), ("ro/", "ro", "Arbore"), ("uk/", "uk", "Дерево")):
             html = (self.out / prefix / "index.html").read_text(encoding="utf-8")
             self.assertIn(f'<html lang="{lang}"', html)
             self.assertIn(f'data-view="tree" aria-selected="true">{tab}<', html)
             self.assertTrue((self.out / prefix / "data.json").exists())
             self.assertTrue((self.out / prefix / "people" / "index.html").exists())
             self.assertIn(f"i18n/{lang}.js", html)
-        self.assertEqual(self.result["missing_translations"], {"ru": [], "en": [], "ro": []})
+        self.assertEqual(self.result["missing_translations"], {"ru": [], "en": [], "ro": [], "uk": []})
 
     def test_help_page(self):
         for prefix, words in (("", ("How we are related", "Suggest a correction", "Living people")),

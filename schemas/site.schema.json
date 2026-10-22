@@ -38,7 +38,8 @@
         "enum": [
           "ru",
           "en",
-          "ro"
+          "ro",
+          "uk"
         ]
       },
       "description": "interface languages; the first is at the site root / языки интерфейса; первый — в корне сайта"

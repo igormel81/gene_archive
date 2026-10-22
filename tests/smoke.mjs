@@ -24,8 +24,8 @@ for (let i = 0; i < 50; i++) {
 }
 
 const data = JSON.parse(fs.readFileSync(path.join(site, 'data.json'), 'utf8'));
-const langs = [''].concat(fs.readdirSync(site).filter((d) => ['ru', 'en', 'ro'].includes(d)).map((d) => d + '/'));
-const TREE_TAB = { en: 'Tree', ru: 'Древо', ro: 'Arbore' };
+const langs = [''].concat(fs.readdirSync(site).filter((d) => ['ru', 'en', 'ro', 'uk'].includes(d)).map((d) => d + '/'));
+const TREE_TAB = { en: 'Tree', ru: 'Древо', ro: 'Arbore', uk: 'Дерево' };
 const living = data.people.filter((p) => p.living).map((p) => p.id);
 const engines = (process.env.SMOKE_ENGINES || 'chromium').split(',').map((n) => ({ chromium, webkit }[n.trim()]));
 const failures = [];

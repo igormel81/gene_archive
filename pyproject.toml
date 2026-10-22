@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gene-archive"
-version = "0.6.1"
-description = "Your family's website: the tree, the documents and your ancestors' stories — every fact backed by its document. A static site generator with an online editor, GEDCOM, in English, Russian and Romanian"
+version = "0.7.0"
+description = "Your family's website: the tree, the documents and your ancestors' stories — every fact backed by its document. A static site generator with an online editor, GEDCOM, in English, Russian, Romanian and Ukrainian"
 readme = "README.md"
 license = {text = "AGPL-3.0-or-later"}
 authors = [{name = "Igor Melnikov"}]
@@ -19,6 +19,7 @@ classifiers = [
   "Natural Language :: Russian",
   "Natural Language :: English",
   "Natural Language :: Romanian",
+  "Natural Language :: Ukrainian",
 ]
 
 [project.optional-dependencies]

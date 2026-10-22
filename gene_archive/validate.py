@@ -59,7 +59,14 @@ def parse_date(value):
                 continue
             if day and not mon:
                 return None
-            if day and int(day) > calendar.monthrange(int(year), MONTHS.index(mon) + 1)[1]:
+            if not 1 <= int(year) <= 9999 or (day and not 1 <= int(day) <= calendar.monthrange(int(year), MONTHS.index(mon) + 1)[1]):
+                return None
+        if len(g) == 6 and g[5] is not None:
+            d1, m1, y1, d2, m2, y2 = g
+            start = (int(y1), MONTHS.index(m1) + 1 if m1 else 1, int(d1) if d1 else 1)
+            end_mon = MONTHS.index(m2) + 1 if m2 else 12
+            end = (int(y2), end_mon, int(d2) if d2 else calendar.monthrange(int(y2), end_mon)[1])
+            if start > end:
                 return None
         return int(g[2])
     return None
@@ -86,7 +93,7 @@ def validate(data, root=Path("."), cfg=None):
                 err(m(f"{kind}: id {i} is used twice", f"{kind}: номер {i} повторяется"))
             seen.add(i)
         ids[kind] = seen
-    people, fams, srcs = ids["people"], ids["families"], ids["sources"]
+    people, srcs = ids["people"], ids["sources"]
     slugs = [p.get("slug") for p in data.get("places", [])]
     places = set(slugs)
     for s in slugs:
@@ -257,6 +264,14 @@ def validate(data, root=Path("."), cfg=None):
         need(where, r.get("group"), groups, "place group", "группы мест")
         need_sources(where, r.get("sources"))
 
+    for key, value in (data.get('id_counters') or {}).items():
+        if key not in 'IFSLRC' or len(key) != 1 or type(value) is not int or value < 0:
+            err('id_counters: expected nonnegative integer counters for I/F/S/L/R/C')
+    for kind in ('corrections', 'research_log'):
+        for entry in data.get(kind, []):
+            if entry.get('visibility', 'private') not in ('public', 'private'):
+                err(kind + ': visibility must be public or private')
+
     # --- research journal
     for lead in data.get("research_leads", []):
         lid = lead.get("id")
@@ -277,8 +292,8 @@ def validate(data, root=Path("."), cfg=None):
         # the log keeps corrections about deleted people too: only the id format is checked; "*" = many people
         if c.get("person_id") and not re.fullmatch(r"I\d+|\*", c["person_id"]):
             err(m(f"{where}: invalid person_id {c['person_id']!r}", f"{where}: неверный person_id {c['person_id']!r}"))
-        if c.get("family_id"):
-            need(where, c["family_id"], fams, "family", "семьи")
+        if c.get("family_id") and not re.fullmatch(r"F\d+|\*", c["family_id"]):
+            err(m(f"{where}: invalid family_id", f"{where}: неверный family_id"))
         need_sources(where, c.get("source_ids"))
     res_ids = set()
     for n, r in enumerate(data.get("research_resources", [])):
@@ -296,8 +311,13 @@ def validate(data, root=Path("."), cfg=None):
         except re.error as e:
             err(m(f"{where}: log_match is not a valid regular expression ({e})", f"{where}: log_match — неверное регулярное выражение ({e})"))
     # register-reading coverage: parish → year × part → film, frames, status
-    PARTS, STATES = ("births", "marriages", "deaths"), ("complete", "partial", "not_found")
+    PARTS, STATES = ("births", "marriages", "deaths", "confessions", "revisions", "census"), ("complete", "partial", "not_found")
+    coverage_ids = set()
     for n, c in enumerate(data.get("coverage", [])):
+        if 'id' in c:
+            if not re.fullmatch(r'C\d+', str(c['id'])) or c['id'] in coverage_ids:
+                err('coverage: invalid or duplicate id ' + str(c['id']))
+            coverage_ids.add(c['id'])
         where = f"coverage[{n}]"
         if not str(c.get("parish") or "").strip():
             err(m(f"{where}: parish is missing", f"{where}: нет parish (какой приход)"))
@@ -312,7 +332,7 @@ def validate(data, root=Path("."), cfg=None):
             if not isinstance(y, int) or not 1000 <= y <= 2100:
                 err(m(f"{w}: year must be a number like 1858", f"{w}: year — год числом, например 1858"))
             if e.get("part") not in PARTS:
-                err(m(f"{w}: part {e.get('part')!r} (births, marriages or deaths)", f"{w}: part {e.get('part')!r} (births, marriages или deaths)"))
+                err(m(f"{w}: part {e.get('part')!r} (births, marriages, deaths, confessions, revisions or census)", f"{w}: part {e.get('part')!r} (births, marriages, deaths, confessions, revisions или census)"))
             if e.get("status") not in STATES:
                 err(m(f"{w}: status {e.get('status')!r} (complete, partial or not_found)", f"{w}: status {e.get('status')!r} (complete, partial или not_found)"))
             if e.get("status") == "partial" and not e.get("up_to"):

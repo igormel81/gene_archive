@@ -9,10 +9,11 @@ import json
 import re
 import shutil
 import subprocess
+import tempfile
 from html.parser import HTMLParser
 from pathlib import Path
 
-from . import config, discovery, ged_export, localize, privacy, stats
+from . import config, discovery, ged_export, localize, privacy, stats, locking
 from .messages import m
 from .validate import validate
 
@@ -184,6 +185,7 @@ def public_data(cfg, raw):
     if cfg["privacy"].get("hide_living", True):
         living = privacy.living_people(data, root, int(cfg["privacy"].get("living_years", 100)))
         data = privacy.redact(data, living)
+        data = privacy.public_journals(data, living)
     return data, living
 
 
@@ -216,6 +218,35 @@ def research_resources(data, sources):
 def build(site_dir, out=None, base_url=None):
     site_dir = Path(site_dir).resolve()
     out = Path(out).resolve() if out else site_dir / "_site"
+    if site_dir == out or site_dir.is_relative_to(out) or out.is_file():
+        raise BuildError("Output must not replace the source folder, its ancestors or an input file")
+    reserved = ('sources', 'content', 'translations', 'assets', 'img', 'geo', 'web', '.git', '.gene-state', '.cache')
+    if any(out.is_relative_to(site_dir / name) for name in reserved):
+        raise BuildError("Output overlaps an input/resource directory")
+    if not (site_dir / "family_tree.json").is_file():
+        load_site(site_dir)
+    with locking.site_lock(site_dir), locking.output_lock(out):
+        cfg, raw = load_site(site_dir)
+        paths = [site_dir / str(s[k]) for s in raw.get('sources', []) for k in ('file', 'back') if s.get(k)]
+        if any(p.resolve().is_relative_to(out) for p in paths):
+            raise BuildError("Output contains an input document")
+        if (out / 'family_tree.json').exists() or (out / 'site.json').exists():
+            raise BuildError('Output contains source archive files')
+        if out.is_dir() and any(out.iterdir()) and not ((out / '.gene-archive-output').is_file() or
+                ((out / 'data.json').is_file() and (out / 'app.js').is_file())):
+            raise BuildError('Output is a nonempty directory not recognised as a generated site')
+        out.parent.mkdir(parents=True, exist_ok=True)
+        tmp = Path(tempfile.mkdtemp(prefix='.' + out.name + '-build-', dir=out.parent))
+        try:
+            return _build(site_dir, out, base_url, tmp)
+        finally:
+            if tmp.exists():
+                shutil.rmtree(tmp)
+
+
+def _build(site_dir, out, base_url, tmp):
+    site_dir = Path(site_dir).resolve()
+    out = Path(out).resolve() if out else site_dir / "_site"
     cfg, raw = load_site(site_dir)
     if base_url is not None:   # e.g. the GitHub Pages address, known only when publishing
         cfg["base_url"] = base_url if not base_url or base_url.endswith("/") else base_url + "/"
@@ -228,10 +259,6 @@ def build(site_dir, out=None, base_url=None):
     root = cfg["root_person"] or data["root_person_id"]
     cache = site_dir / ".cache"
 
-    tmp = out.with_name(out.name + ".build")
-    if tmp.exists():
-        shutil.rmtree(tmp)
-    tmp.mkdir(parents=True)
     web = ENGINE / "web"
     for name in ("app.js", "app.css", "languages.js"):
         shutil.copy2(web / name, tmp / name)
@@ -364,13 +391,19 @@ def build(site_dir, out=None, base_url=None):
             text = re.sub(r'((?:src|href)="(?:\.\./)?' + re.escape(name) + r')"', r'\1?v=' + v + '"', text)
         page.write_text(text, encoding="utf-8")
 
-    old = out.with_name(out.name + ".old")
-    if old.exists():
-        shutil.rmtree(old)
+    (tmp / '.gene-archive-output').write_text('gene-archive\n', encoding='utf-8')
+    old = None
     if out.exists():
+        old = Path(tempfile.mkdtemp(prefix='.' + out.name + '-old-', dir=out.parent))
+        old.rmdir()
         out.rename(old)
-    tmp.rename(out)
-    if old.exists():
+    try:
+        tmp.rename(out)
+    except BaseException:
+        if old is not None:
+            old.rename(out)
+        raise
+    if old is not None:
         shutil.rmtree(old)
     return {"out": out, "people": len(people), "living": len(living), "families": len(data["families"]),
             "sources": len(sources), "indexed": indexed, "warnings": warnings, "missing_translations": report}

@@ -11,7 +11,7 @@ Requests (one JSON object, a list, or one object per line):
         (nested objects too; a field set to null is removed)
   {"op": "delete", "kind": K, "id": "I12", "reason": "…"}
   {"op": "log", "action": "what was searched and where", "result": "what came out", "scope": "…"}
-K is one of people, families, sources, places, research_leads (person, family, source, place, lead also work).
+K is one of people, families, sources, places, research_leads, research_resources, coverage (person, family, source, place, lead also work).
 Answer: one JSON object per request, {"ok": true, ...} or {"ok": false, "error": "…", "errors": [...]}.
 """
 import copy
@@ -49,7 +49,7 @@ def parse(text):
 def run_one(store, user, req, dry_run=False):
     op = req.get("op", "save")
     if op == "log":
-        return store.log(user, req.get("action"), req.get("result"), req.get("scope", ""), dry_run=dry_run)
+        return store.log(user, req.get("action"), req.get("result"), req.get("scope", ""), dry_run=dry_run, visibility=req.get("visibility", "private"))
     kind = ALIASES.get(req.get("kind"), req.get("kind"))
     if kind not in KINDS:
         raise SaveError(f"kind must be one of {', '.join(KINDS)}", 400)
@@ -65,6 +65,10 @@ def run_one(store, user, req, dry_run=False):
     record = req.get("record")
     if not isinstance(record, dict):
         raise SaveError("record must be an object", 400)
+    if kind == 'coverage' and isinstance(req.get('base'), dict) and not req['base'].get('id'):
+        base = req['base']
+        return store.save(user, kind, merge(base, record), base=base, reason=req.get('reason', ''),
+                          source_ids=req.get('source_ids'), dry_run=dry_run)
     key = record.get(key_field) or req.get("id")
     if key and key in current:   # update: merge into the stored record, which is also the base (no lost edits)
         base = current[key]
@@ -78,7 +82,7 @@ def run_one(store, user, req, dry_run=False):
 
 
 def apply(folder, requests, author="gene apply", login="cli", dry_run=False):
-    store = Store(folder)
+    store = Store(folder, initialize_git=not dry_run)
     user = {"name": login, "display": author, "role": "editor"}
     out = []
     for req in requests:

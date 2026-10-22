@@ -27,10 +27,12 @@ import shutil
 import sqlite3
 import subprocess
 import threading
+import tempfile
 import time
 from pathlib import Path
 
 from .validate import parse_date, validate
+from .locking import site_lock
 
 ROLES = ("admin", "editor")
 NAME_RE = re.compile(r"[a-z0-9][a-z0-9._-]{1,31}")
@@ -41,6 +43,7 @@ SCRYPT = dict(n=2 ** 14, r=8, p=1, dklen=32)
 KINDS = {   # family_tree.json list → (key field, id prefix)
     "people": ("id", "I"), "families": ("id", "F"), "sources": ("id", "S"),
     "places": ("slug", None), "research_leads": ("id", "L"),
+    "research_resources": ("id", "R"), "coverage": ("id", "C"),
 }
 UPLOAD_TYPES = {".jpg": b"\xff\xd8\xff", ".jpeg": b"\xff\xd8\xff", ".png": b"\x89PNG\r\n\x1a\n",
                 ".webp": b"RIFF", ".gif": b"GIF8", ".pdf": b"%PDF-"}
@@ -424,7 +427,7 @@ class Git:
             args = ["commit", "-q", "--allow-empty", "-m", message]
         r = subprocess.run(["git", *ident, *args], cwd=self.folder, capture_output=True, timeout=60)
         if r.returncode != 0:
-            return None
+            raise SaveError(f"Git commit failed (exit {r.returncode}): " + r.stderr.decode('utf-8', 'replace')[-1000:], 500)
         return self.run("rev-parse", "HEAD").stdout.decode().strip()
 
     def history(self, limit=100):
@@ -449,16 +452,17 @@ class Git:
 class Store:
     """Reads and writes family_tree.json of one site folder; one writer at a time."""
 
-    def __init__(self, folder, cfg=None, on_change=None):
+    def __init__(self, folder, cfg=None, on_change=None, initialize_git=True):
         from .config import load as load_cfg
         self.folder = Path(folder).resolve()
         self.path = self.folder / "family_tree.json"
         self.cfg = cfg or load_cfg(self.folder)
         self.lang = "ru" if self.cfg.get("content_language") == "ru" else "en"
-        self.lock = threading.Lock()
+        self.lock = site_lock(self.folder)
         self.on_change = on_change or (lambda: None)
         self.git = Git(self.folder)
-        self.has_git = self.git.ready()
+        with self.lock:
+            self.has_git = self.git.ready() if initialize_git else (self.git.ok and self.git.run('rev-parse', '--show-toplevel', check=False).returncode == 0)
 
     def t(self, en, ru):
         return ru if self.lang == "ru" else en
@@ -473,9 +477,88 @@ class Store:
         return hashlib.sha256(self.raw()).hexdigest()[:16]
 
     def _write(self, data):
-        tmp = self.path.with_suffix(".json.tmp")
-        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        os.replace(tmp, self.path)
+        self._write_raw((json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode('utf-8'))
+
+    def _write_raw(self, content):
+        # Unique staging file; the enclosing site lock covers the entire transaction.
+        with tempfile.NamedTemporaryFile(dir=self.folder, prefix='.gene-write-', delete=False) as stream:
+            path = Path(stream.name)
+            try:
+                stream.write(content)
+                stream.flush()
+                os.fsync(stream.fileno())
+            except BaseException:
+                path.unlink(missing_ok=True)
+                raise
+        try:
+            os.chmod(path, self.path.stat().st_mode & 0o777)
+            os.replace(path, self.path)
+        finally:
+            path.unlink(missing_ok=True)
+
+    def _index_snapshot(self):
+        if not self.has_git:
+            return None
+        path = Path(self.git.run('rev-parse', '--git-path', 'index').stdout.decode().strip())
+        if not path.is_absolute():
+            path = self.folder / path
+        return path, path.read_bytes() if path.exists() else None
+
+    @staticmethod
+    def _restore_index(snapshot):
+        if snapshot is not None:
+            path, content = snapshot
+            if content is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.write_bytes(content)
+
+    @staticmethod
+    def _counters(data):
+        counters = dict(data.get('id_counters') or {})
+        ids = [r.get('id') for name in KINDS for r in data.get(name, [])]
+        ids += [r.get(k) for r in data.get('corrections', []) for k in ('person_id', 'family_id', 'record')]
+        for rid in ids:
+            match = re.fullmatch(r'([IFSLRC])(\d+)', str(rid or ''))
+            if match:
+                counters[match[1]] = max(int(counters.get(match[1], 0)), int(match[2]))
+        return counters
+
+    def _persist(self, data, user, message):
+        before = self.raw()
+        previous = json.loads(before)
+        counters = self._counters(previous)
+        for prefix, value in self._counters(data).items():
+            counters[prefix] = max(counters.get(prefix, 0), value)
+        data['id_counters'] = counters
+        index = self._index_snapshot()
+        with tempfile.NamedTemporaryFile(dir=self.folder, prefix='.gene-rollback-', delete=False) as stream:
+            backup = Path(stream.name)
+            try:
+                stream.write(before); stream.flush(); os.fsync(stream.fileno())
+                os.chmod(backup, self.path.stat().st_mode & 0o777)
+            except BaseException:
+                backup.unlink(missing_ok=True)
+                raise
+        try:
+            self._write(data)
+            commit = self._commit(user, message)
+        except BaseException as error:
+            try:
+                os.replace(backup, self.path)
+            except OSError as recovery_error:
+                raise SaveError('Save failed; restore the archive from ' + str(backup), 500,
+                                recovery_file=str(backup)) from recovery_error
+            self._restore_index(index)
+            if isinstance(error, Exception) and not isinstance(error, SaveError):
+                raise SaveError('Save failed and was rolled back: ' + str(error), 500) from error
+            raise
+        backup.unlink(missing_ok=True)
+        try:
+            self.on_change()
+        except Exception as error:
+            raise SaveError('Saved, but rebuild scheduling failed: ' + str(error), 500, commit=commit, saved=True) from error
+        return commit
 
     @staticmethod
     def _find(lst, key, value):
@@ -485,13 +568,13 @@ class Store:
         return None
 
     @staticmethod
-    def next_id(lst, prefix):
+    def next_id(lst, prefix, high_water=0):
         nums = [r.get("id", "") for r in lst if re.fullmatch(prefix + r"\d+", str(r.get("id", "")))]
         if not nums:
-            return prefix + "1"
+            return prefix + str(high_water + 1)
         best = max(nums, key=lambda x: int(x[1:]))
         width = len(best) - 1 if best[1:].startswith("0") or any(x[1:].startswith("0") for x in nums) else 0
-        return prefix + str(int(best[1:]) + 1).zfill(width)
+        return prefix + str(max(int(best[1:]), high_water) + 1).zfill(width)
 
     def _normalize(self, kind, rec):
         rec = _clean(rec)
@@ -513,6 +596,9 @@ class Store:
             for k in ("file", "back"):
                 if rec.get(k) and not re.fullmatch(r"sources/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*", str(rec[k])):
                     raise SaveError(self.t(f"{k}: only files in sources/", f"{k}: только файлы из sources/"), 422)
+        if kind == 'coverage':
+            if not isinstance(rec.get('entries'), list) or any(not isinstance(e, dict) for e in rec['entries']):
+                raise SaveError('coverage entries must be a list of objects', 422)
         if kind == "families":
             rec.setdefault("partners", [])
             rec.setdefault("children", [])
@@ -539,6 +625,10 @@ class Store:
             return rec.get("title") or rec.get("id")
         if kind == "places":
             return rec.get("name") or rec.get("slug")
+        if kind == 'research_resources':
+            return rec.get('name') or rec.get('id')
+        if kind == 'coverage':
+            return rec.get('parish') or rec.get('id')
         if kind == "families":
             return " + ".join(rec.get("partners", [])) or rec.get("id")
         return rec.get("title") or rec.get("id")
@@ -561,13 +651,14 @@ class Store:
             data.setdefault("corrections", []).append({
                 ref: key, "field": field, "previous": prev, "current": cur,
                 "reason": reason or self.t("edited online", "правка в редакторе"), "source_ids": source_ids,
-                "date": today, "author": user["display"]})
+                "date": today, "author": user["display"], "visibility": "private"})
         title = self._title(kind, after or before)
         fields = ", ".join(r[0] for r in changed_rows)[:300]
         data.setdefault("research_log", []).append({
             "date": today,
             "action": self.t(f"Editor: {key} {title}", f"Редактор: {key} {title}"),
             "result": (self.t("changed: ", "изменено: ") + fields) if before is not None and after is not None else changed_rows[0][2],
+            "visibility": "private",
             "scope": f"{user['display']}" + (f": {reason}" if reason else "")})
         return [r[0] for r in changed_rows]
 
@@ -580,7 +671,8 @@ class Store:
     def _commit(self, user, message, extra_paths=()):
         commit = self.git.commit(user["display"], f"{user['name']}@editor.gene-archive", message,
                                  ["family_tree.json", *extra_paths]) if self.has_git else None
-        self.on_change()
+        if self.has_git and not commit:
+            raise SaveError('Git commit failed; data was not saved', 500)
         return commit
 
     def save(self, user, kind, record, base=None, reason="", source_ids=None, dry_run=False):
@@ -605,21 +697,27 @@ class Store:
                 if not key:
                     if not prefix:
                         raise SaveError(self.t("slug is required", "нужен slug"), 422)
-                    key = rec[key_field] = self.next_id(lst, prefix)
+                    key = rec[key_field] = self.next_id(lst, prefix, self._counters(data).get(prefix, 0))
                 rec = {key_field: key, **{k: v for k, v in rec.items() if k != key_field}}
                 lst.append(rec)
                 before = None
             else:
                 bkey = base.get(key_field) if isinstance(base, dict) else None
                 bidx = self._find(lst, key_field, bkey) if bkey else None
+                if kind == 'coverage' and not bkey:
+                    if key:
+                        raise SaveError(self.t("The id is assigned when updating legacy coverage.",
+                                               "Номер назначается при обновлении старой записи покрытия."), 422)
+                    matches = [i for i, value in enumerate(lst) if value == base and not value.get('id')]
+                    bidx = matches[0] if len(matches) == 1 else None
                 if bidx is None:
                     raise SaveError(self.t("The record was deleted by someone else.", "Запись удалил кто-то другой."), 409, current=None)
                 if lst[bidx] != base:
                     raise SaveError(self.t("Someone else changed this record. Reload it and repeat your change.",
                                            "Запись изменил кто-то другой. Откройте её заново и повторите правку."), 409, current=lst[bidx])
                 if not key:
-                    key = rec[key_field] = bkey
-                if key != bkey:
+                    key = rec[key_field] = bkey or self.next_id(lst, prefix, self._counters(data).get(prefix, 0))
+                if bkey and key != bkey:
                     raise SaveError(self.t("The id of a record cannot be changed.", "Номер записи менять нельзя."), 422)
                 before = lst[bidx]
                 lst[bidx] = rec
@@ -630,9 +728,8 @@ class Store:
             if dry_run:   # checked, not written: what the change would be
                 return {"id": key, "version": self.version(), "changed": changed, "record": rec,
                         "warnings": self._warnings(kind, rec, data), "commit": None, "dry_run": True}
-            self._write(data)
             what = self.t("record created", "запись создана") if before is None else ", ".join(changed)[:200]
-            commit = self._commit(user, f"{key} {self._title(kind, rec)}: {what}"
+            commit = self._persist(data, user, f"{key} {self._title(kind, rec)}: {what}"
                                   + (f" — {reason}" if reason else ""))
             return {"id": key, "version": self.version(), "changed": changed, "record": rec,
                     "warnings": self._warnings(kind, rec, data), "commit": commit}
@@ -656,24 +753,24 @@ class Store:
             self._check(original, data)   # references to the record left anywhere are errors
             if dry_run:
                 return {"id": key, "version": self.version(), "commit": None, "dry_run": True}
-            self._write(data)
-            commit = self._commit(user, self.t(f"{key} deleted", f"{key} удалён(а)") + (f" — {reason}" if reason else ""))
+            commit = self._persist(data, user, self.t(f"{key} deleted", f"{key} удалён(а)") + (f" — {reason}" if reason else ""))
             return {"id": key, "version": self.version(), "commit": commit}
 
-    def log(self, user, action, result, scope="", dry_run=False):
+    def log(self, user, action, result, scope="", dry_run=False, visibility="private"):
         """A line in research_log without changing any record: what was searched, where, with what result
         ("nothing found" counts)."""
         if not str(action or "").strip() or not str(result or "").strip():
             raise SaveError(self.t("action and result are required", "нужны action и result"), 422)
+        if visibility not in ('public', 'private'):
+            raise SaveError('visibility: public or private required', 422)
         with self.lock:
             data = self.load()
-            entry = {"date": datetime.date.today().isoformat(), "action": str(action)[:500], "result": str(result)[:2000],
+            entry = {"visibility": visibility, "date": datetime.date.today().isoformat(), "action": str(action)[:500], "result": str(result)[:2000],
                      "scope": (f"{user['display']}: {scope}" if scope else user["display"])[:500]}
             data.setdefault("research_log", []).append(entry)
             if dry_run:
                 return {"entry": entry, "commit": None, "dry_run": True}
-            self._write(data)
-            commit = self._commit(user, self.t("Research log: ", "Журнал поиска: ") + entry["action"][:150])
+            commit = self._persist(data, user, self.t("Research log: ", "Журнал поиска: ") + entry["action"][:150])
             return {"entry": entry, "version": self.version(), "commit": commit}
 
     def upload(self, user, filename, body):
@@ -696,7 +793,13 @@ class Store:
             os.chmod(target, 0o644)
             rel = f"sources/{target.name}"
             if self.has_git:
-                self.git.commit(user["display"], f"{user['name']}@editor.gene-archive", self.t(f"File {rel}", f"Файл {rel}"), [rel])
+                index = self._index_snapshot()
+                try:
+                    self.git.commit(user["display"], f"{user['name']}@editor.gene-archive", self.t(f"File {rel}", f"Файл {rel}"), [rel])
+                except BaseException:
+                    target.unlink(missing_ok=True)
+                    self._restore_index(index)
+                    raise
         return rel
 
     def history(self):
@@ -713,8 +816,7 @@ class Store:
                 "date": today, "action": self.t(f"Editor: version {commit[:8]} restored", f"Редактор: возвращена версия {commit[:8]}"),
                 "result": self.t("family_tree.json brought back to an earlier state", "family_tree.json возвращён к прежнему состоянию"),
                 "scope": user["display"]})
-            self._write(old)
-            c = self._commit(user, self.t(f"Restored version {commit[:8]}", f"Возвращена версия {commit[:8]}"))
+            c = self._persist(old, user, self.t(f"Restored version {commit[:8]}", f"Возвращена версия {commit[:8]}"))
             return {"version": self.version(), "commit": c}
 
 

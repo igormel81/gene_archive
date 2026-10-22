@@ -3409,7 +3409,8 @@
       "source_ids": [
         "S6",
         "S5"
-      ]
+      ],
+      "visibility": "public"
     },
     {
       "person_id": "I9",
@@ -3420,7 +3421,8 @@
       "source_ids": [
         "S12",
         "S11"
-      ]
+      ],
+      "visibility": "public"
     },
     {
       "person_id": "I2",
@@ -3430,7 +3432,8 @@
       "reason": "Spelling as in Michael's baptism register",
       "source_ids": [
         "S1"
-      ]
+      ],
+      "visibility": "public"
     },
     {
       "person_id": "I22",
@@ -3441,7 +3444,8 @@
       "source_ids": [
         "S17",
         "S16"
-      ]
+      ],
+      "visibility": "public"
     },
     {
       "family_id": "F4",
@@ -3451,7 +3455,8 @@
       "reason": "Adoption decree found in the Orphans' Court docket",
       "source_ids": [
         "S13"
-      ]
+      ],
+      "visibility": "public"
     },
     {
       "person_id": "I24",
@@ -3461,7 +3466,8 @@
       "reason": "No record of his birth; the remembered 1885 replaced by an estimate from Margaret's and Robert's years",
       "source_ids": [
         "S16"
-      ]
+      ],
+      "visibility": "public"
     }
   ],
   "research_log": [
@@ -3469,61 +3475,71 @@
       "date": "2025-03-02",
       "action": "Recorded Kate Harper's recollections of the Harper side",
       "result": "Two hours of audio; names and dates for three generations",
-      "scope": "S16"
+      "scope": "S16",
+      "visibility": "public"
     },
     {
       "date": "2025-04-11",
       "action": "Photographed the gravestone at Calvary Cemetery",
       "result": "Years for Michael and Catherine Harper confirmed",
-      "scope": "S19"
+      "scope": "S19",
+      "visibility": "public"
     },
     {
       "date": "2025-06-20",
       "action": "Searched the 1880 US census for Michael Harper in Pittsburgh",
       "result": "Found as a boarder in the Sixth Ward; Honora Harper two doors away",
-      "scope": "S14, I41"
+      "scope": "S14, I41",
+      "visibility": "public"
     },
     {
       "date": "2025-09-08",
       "action": "Searched Louisburgh parish registers 1850–1870",
       "result": "Michael's baptism (1858) and his parents' marriage (1856) found; no baptism for Thomas",
-      "scope": "S1, S2"
+      "scope": "S1, S2",
+      "visibility": "public"
     },
     {
       "date": "2025-11-15",
       "action": "Read Dorothy Harper's notebook and transcribed the Novak dates",
       "result": "Dates for Frank, Helen, Andrew and Rose; the Windber story",
-      "scope": "S25"
+      "scope": "S25",
+      "visibility": "public"
     },
     {
       "date": "2026-01-10",
       "action": "Searched Hamburg emigrant lists for 1892",
       "result": "Josef Novák found with Michal Novák from the same village",
-      "scope": "S9, I42"
+      "scope": "S9, I42",
+      "visibility": "public"
     },
     {
       "date": "2026-02-03",
       "action": "Searched Kapušany baptisms 1860–1875",
       "result": "Josef's baptism of 19 March 1866 found; birth year corrected from 1867",
-      "scope": "S6"
+      "scope": "S6",
+      "visibility": "public"
     },
     {
       "date": "2026-03-22",
       "action": "Requested the adoption file from the Orphans' Court of Somerset County",
       "result": "Petition and decree of 1910 received as a two-page copy",
-      "scope": "S13"
+      "scope": "S13",
+      "visibility": "public"
     },
     {
       "date": "2026-05-14",
       "action": "Compared the 1918 newspaper report with the War Department card",
       "result": "Main death date for Daniel Harper set to 12 October 1918",
-      "scope": "S11, S12"
+      "scope": "S11, S12",
+      "visibility": "public"
     },
     {
       "date": "2026-08-30",
       "action": "Searched the 1901 census of Ireland for Harpers in Louisburgh",
       "result": "Bridget and Mary found; Martin Harper next door added as a possible relative",
-      "scope": "S15, I43"
+      "scope": "S15, I43",
+      "visibility": "public"
     }
   ],
   "research_resources": [

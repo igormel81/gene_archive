@@ -2917,7 +2917,7 @@
     if (loose.length) host.appendChild(el('article', { class: 'res-card', id: 'res-coverage' }, el('h5', { text: T('Прочитанные метрические книги') }), loose.map(coverageGrid)));
   }
   // ---------- register-reading coverage: a year × part grid of what was read in a parish's books
-  var COVER_PARTS = [['births', T('Рождения')], ['marriages', T('Браки')], ['deaths', T('Смерти')]];
+  var COVER_PARTS = [['births', T('Рождения')], ['marriages', T('Браки')], ['deaths', T('Смерти')], ['confessions', T('Исповедные ведомости')], ['revisions', T('Ревизские сказки')], ['census', T('Переписи')]];
   function coverageGrid(c) {
     var by = {}, years = [], count = { complete: 0, partial: 0, not_found: 0 };
     (c.entries || []).forEach(function (e) {

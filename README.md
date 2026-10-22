@@ -10,7 +10,7 @@ Every fact backed by its document.
 [![CI](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml/badge.svg)](https://github.com/igormel81/gene_archive/actions/workflows/ci.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-2e7d32)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776ab)
-![Languages](https://img.shields.io/badge/UI-English%20·%20Русский%20·%20Română-6b5b95)
+![Languages](https://img.shields.io/badge/UI-English%20·%20Русский%20·%20Română%20·%20Українська-6b5b95)
 
 **[▶ Live demo](https://igormel81.github.io/gene_archive/)** ·
 **[Quick start](#quick-start)** ·
@@ -23,7 +23,7 @@ Scans in shoeboxes, dates in a grandmother's notebook, a tree in MyHeritage, sto
 only one aunt still remembers. **gene-archive** gathers all of it into one beautiful website
 your whole family can open on a phone: an interactive tree, a card for every person with the
 documents behind each date, an archive of scans with transcriptions, a map of family places
-and the story of the family — in English, Russian and Romanian.
+and the story of the family — in English, Russian, Romanian and Ukrainian.
 
 Relatives don't just read it. They leave comments, suggest corrections and, with an account,
 edit the archive right in the browser. You keep everything: one JSON file, your own domain,
@@ -44,8 +44,13 @@ free hosting, full history in git, GEDCOM in and out.
 | ✏️ **Edit in the browser** | Accounts for editors and administrators, checks before every save, nobody overwrites anybody, every change is a git commit you can undo. |
 | 🔒 **Private by default** | Living people show only their names — no dates, places or documents, not even in the data file or the GEDCOM export. |
 | 🏠 **Your data, your site** | One JSON file, plain HTML, free hosting on GitHub Pages or Netlify, or your own server. No subscription, no lock-in: GEDCOM import and export. |
-| 🌍 **Three languages** | English, Russian and Romanian interface out of the box; your own texts can be translated too. |
-| 🤖 **AI-ready** | Every new site gets `AGENTS.md` for Claude Code and Codex, plus guides and ready prompts for research in archives and open sources. Its companion [genealogy-mcp](https://github.com/igormel81/genealogy-mcp) gives any AI assistant 114 archives and databases, name variants, old calendars and evidence checks — and writes what it finds into your site through its checks and logs. |
+| 🌍 **Four languages** | English, Russian, Romanian and Ukrainian interface out of the box; your own texts can be translated too. |
+| 🤖 **AI-ready** | Every new site gets `AGENTS.md` for Claude Code and Codex, plus guides and ready prompts for research in archives and open sources. Its companion [genealogy-mcp](https://github.com/igormel81/genealogy-mcp) gives any AI assistant 171 archives and databases, name variants, old calendars and evidence checks — and writes what it finds into your site through its checks and logs. |
+
+Public journals now require review: with `privacy.hide_living=true`, entries in
+`research_log` and `corrections` appear only when explicitly marked `"visibility":"public"`.
+Existing entries stay in the source archive and are private by default. See
+[reliable edits and journal visibility](https://github.com/igormel81/gene_archive/blob/main/docs/reliable-edits.md).
 
 ## Features
 

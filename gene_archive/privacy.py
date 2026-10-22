@@ -137,3 +137,26 @@ def without_hidden(data):
     """Removes documents the family asked to hide (`hidden: true`) and merged backs (`merged_into`)."""
     hidden = {s["id"] for s in data["sources"] if s.get("hidden") or s.get("merged_into")}
     return strip_sources(data, hidden)
+
+
+def public_journals(data, living):
+    """Public output is opt-in for free-text journals; legacy entries stay private.
+
+    Source records keep all original history. Explicit review is necessary because
+    a reason/result may contain private facts about someone other than its record.
+    """
+    private_families = {f['id'] for f in data.get('families', [])
+                        if set(f.get('partners', []) + f.get('children', []) + f.get('adopted_children', [])) & living}
+
+    def safe(entry):
+        if entry.get('visibility') != 'public':
+            return False
+        people = set(entry.get('person_ids') or []) | {entry.get('person_id'), entry.get('record')}
+        families = set(entry.get('family_ids') or []) | {entry.get('family_id'), entry.get('record')}
+        mentions = set(re.findall(r'\bI\d+\b', str(entry)))
+        return not (people | mentions) & living and not families & private_families
+
+    out = dict(data)
+    for kind in ('research_log', 'corrections'):
+        out[kind] = [entry for entry in data.get(kind, []) if safe(entry)]
+    return out
