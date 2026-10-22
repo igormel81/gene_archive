@@ -138,7 +138,7 @@ for (const engine of engines) {
           await page.waitForTimeout(800);   // the story is read on the first search
           await page.fill('#search', sw + ' ');
           await page.waitForTimeout(450);
-          ok(await page.locator('#search-results .sr-group').allTextContents().then((g) => g.some((t) => /Story|История|Istorie|Poveste/.test(t))), P(`search "${sw}" does not reach the story`));
+          ok(await page.locator('#search-results .sr-group').allTextContents().then((g) => g.some((t) => /Story|История|Історія|Istorie|Poveste/.test(t))), P(`search "${sw}" does not reach the story`));
         }
       }
       // the "Share" link of a person leads to its page and on to the card
