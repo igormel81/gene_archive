@@ -52,8 +52,8 @@ with the same dry run, validation, journals and Git history as other records.
 ```
 
 Use the returned resource ID rather than assuming R1 in an existing archive. Save a record
-with its `id` to update it; `op: "delete"` deletes an unreferenced record. Requests in an
-array are sequential independent transactions, not an all-or-nothing batch. A dry-run
+with its `id` to update it; `op: "delete"` deletes an unreferenced record. Without `--atomic`, requests in an
+array are sequential independent transactions, not an all-or-nothing batch. Such a dry-run
 array does not reserve IDs or make one preview visible to the next; preview dependent
 requests separately after saving their prerequisite.
 
@@ -69,3 +69,5 @@ Leads can retain `next`, `checked`, `stage`, `blocked_by`, and `expected_sources
 The engine preserves those fields; it does not infer research permissions from text or
 impose one family's archive-request ban on everyone. The catalogue and online search
 belong to genealogy-mcp; these changes only affect gene-archive.
+
+For tested backups, publication previews and atomic batches, see [archive workflows](archive-workflows.md).

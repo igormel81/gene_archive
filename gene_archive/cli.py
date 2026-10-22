@@ -11,6 +11,9 @@
   gene gedcom <folder> [-o file.ged] [--version 5.5.1|7.0] [--for geni|public]   GEDCOM for MyHeritage, Ancestry, Gramps…
   gene translations <folder> <lang>   list texts of your site without a translation into <lang>
   gene hints [folder] [--json]     what is missing or looks wrong: a to-do list for the research
+  gene backup <folder> -o backup.tar.gz [--state folder]  private backup including server state
+  gene restore backup.tar.gz [<new-folder>] [--check]    verify/build before restoration
+  gene publish-preview <folder> [--json]                publication decisions and file hashes
   gene apply <folder> [--author NAME] [--build] [--dry-run] < changes.json
                                    changes from scripts and AI assistants, checked and logged like the online editor
 
@@ -19,6 +22,9 @@ Messages are in Russian when the system language is Russian (or GENE_LANG=ru).
 import argparse
 import json
 import shutil
+import subprocess
+import sqlite3
+import tarfile
 import sys
 import time
 from pathlib import Path
@@ -313,7 +319,7 @@ def cmd_hints(args):
 def cmd_apply(args):
     import os
     import subprocess
-    from .apply import apply, parse
+    from .apply import apply, atomic_apply, parse
     text = sys.stdin.read() if args.file in (None, "-") else Path(args.file).read_text(encoding="utf-8")
     try:
         requests = parse(text)
@@ -324,7 +330,10 @@ def cmd_apply(args):
     if not author:
         r = subprocess.run(["git", "config", "user.name"], cwd=args.folder, capture_output=True, text=True)
         author = r.stdout.strip() or "gene apply"
-    results = apply(args.folder, requests, author=author, login=args.login, dry_run=args.dry_run)
+    if args.if_version and not args.atomic:
+        sys.exit('--if-version requires --atomic')
+    options = {'if_version': args.if_version} if args.atomic else {}
+    results = (atomic_apply if args.atomic else apply)(args.folder, requests, author=author, login=args.login, dry_run=args.dry_run, **options)
     for r in results:
         print(json.dumps(r, ensure_ascii=False))
     if args.build and not args.dry_run and any(r["ok"] for r in results):
@@ -336,6 +345,34 @@ def cmd_apply(args):
             print(json.dumps({"ok": False, "build_error": str(e)}, ensure_ascii=False))
             return 1
     return 0 if all(r["ok"] for r in results) else 1
+
+
+def cmd_backup(args):
+    from . import backup
+    try:
+        result = backup.create(args.folder, args.out, args.state)
+    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError) as error:
+        sys.exit(str(error))
+    print(json.dumps(result, ensure_ascii=False))
+
+
+def cmd_restore(args):
+    from . import backup
+    try:
+        result = backup.restore(args.archive, args.folder, check=args.check)
+    except (OSError, ValueError, sqlite3.Error, subprocess.SubprocessError, tarfile.TarError) as error:
+        sys.exit(str(error))
+    print(json.dumps(result, ensure_ascii=False))
+
+
+def cmd_publish_preview(args):
+    from . import publication
+    from .build import BuildError
+    try:
+        report = publication.preview(args.folder)
+    except (OSError, ValueError, BuildError) as error:
+        sys.exit(str(error))
+    print(json.dumps(report, ensure_ascii=False, indent=2) if args.json else publication.text(report))
 
 
 def cmd_translations(args):
@@ -433,9 +470,25 @@ def main(argv=None):
                                       "имя для истории и журналов (по умолчанию git user.name)"))
     s.add_argument("--login", default="assistant", help=m("login part of the commit e-mail", "логин в адресе коммита"))
     s.add_argument("--build", action="store_true", help=m("rebuild the site afterwards", "пересобрать сайт после правок"))
+    s.add_argument("--atomic", action="store_true", help=m("apply the whole batch as one transaction and commit", "применить весь пакет одной транзакцией и коммитом"))
+    s.add_argument("--if-version", help=m("require the version returned by an atomic preview", "требовать версию из предпросмотра пакета"))
     s.add_argument("--dry-run", action="store_true", help=m("check only, write nothing", "только проверить, ничего не записывать"))
     s.add_argument("-o", "--out")
     s.set_defaults(fn=cmd_apply)
+    s = sub.add_parser("backup", help=m("private backup of data, documents, history and server state", "резервная копия данных, документов, истории и состояния сервера"))
+    s.add_argument("folder")
+    s.add_argument("-o", "--out", required=True)
+    s.add_argument("--state", help=m("server state folder; defaults to <folder>/.gene-state", "папка состояния сервера; по умолчанию <folder>/.gene-state"))
+    s.set_defaults(fn=cmd_backup)
+    s = sub.add_parser("restore", help=m("verify and restore a backup into a new folder", "проверить и восстановить копию в новую папку"))
+    s.add_argument("archive")
+    s.add_argument("folder", nargs="?")
+    s.add_argument("--check", action="store_true", help=m("test restoration/build in a temporary folder only", "проверить восстановление и сборку только во временной папке"))
+    s.set_defaults(fn=cmd_restore)
+    s = sub.add_parser("publish-preview", help=m("show exactly what the build publishes and hides", "показать, что сборка публикует и скрывает"))
+    s.add_argument("folder", nargs="?", default=".")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_publish_preview)
     s = sub.add_parser("translations", help=m("texts without a translation", "тексты без перевода"))
     s.add_argument("folder")
     s.add_argument("lang")

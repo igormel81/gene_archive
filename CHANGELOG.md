@@ -1,5 +1,26 @@
 # Changelog / История изменений
 
+## 0.8.0 — 2026-10-22
+
+- `gene backup` captures private source files, ignored documents, portable Git history and
+  SQLite server state. `gene restore --check` tests checksums, history, databases and a real
+  build in isolation. Restore publishes only to a new folder and resets sessions/invitations.
+  `gene backup` сохраняет исходники, документы, историю Git, комментарии и пользователей;
+  `gene restore --check` проверяет восстановление настоящей сборкой во временной папке.
+- `gene publish-preview [--json]` runs the real builder on a snapshot and explains which
+  records/fields are public or hidden, journal decisions and every output file's SHA-256.
+  Manual content/media references to hidden documents are explicitly flagged.
+  Предпросмотр показывает фактическую публикацию, скрытые поля и журналы, состав файлов;
+  отдельно предупреждает о ручных ссылках, публикующих файл скрытого документа.
+- `gene apply --atomic` validates related edits in memory and saves them once with one batch
+  commit. Named `as` / `$ref` references link new records; dependent dry runs work, and
+  `--if-version` rejects a changed archive. The default per-operation behavior is retained.
+  Связанные правки — одной транзакцией и коммитом, с зависимым предпросмотром и проверкой
+  версии; обычный режим отдельных правок сохранён.
+- Documentation and generated agent instructions include the new workflows; installed-package
+  CI and 14 new regression scenarios cover successful operations and failures.
+  Команды и ограничения описаны на двух языках; добавлены проверки установки и 14 тестов.
+
 ## 0.7.0 — 2026-10-22
 
 - Protect source archives from unsafe build output paths; use unique temporary/backup

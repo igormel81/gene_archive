@@ -32,6 +32,11 @@ jobs:
           gene validate new-site
           gene build new-site
           test -f new-site/_site/index.html -a -f new-site/_site/ru/index.html
+          gene publish-preview new-site --json > publication.json
+          gene backup new-site -o backup.tar.gz
+          gene restore backup.tar.gz --check
+          gene restore backup.tar.gz restored-site
+          test -f restored-site/_site/index.html
 
   browsers:
     name: Browser checks (Chromium, WebKit)

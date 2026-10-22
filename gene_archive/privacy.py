@@ -148,15 +148,19 @@ def public_journals(data, living):
     private_families = {f['id'] for f in data.get('families', [])
                         if set(f.get('partners', []) + f.get('children', []) + f.get('adopted_children', [])) & living}
 
-    def safe(entry):
-        if entry.get('visibility') != 'public':
-            return False
-        people = set(entry.get('person_ids') or []) | {entry.get('person_id'), entry.get('record')}
-        families = set(entry.get('family_ids') or []) | {entry.get('family_id'), entry.get('record')}
-        mentions = set(re.findall(r'\bI\d+\b', str(entry)))
-        return not (people | mentions) & living and not families & private_families
-
     out = dict(data)
     for kind in ('research_log', 'corrections'):
-        out[kind] = [entry for entry in data.get(kind, []) if safe(entry)]
+        out[kind] = [entry for entry in data.get(kind, []) if journal_exclusion(entry, living, private_families) is None]
     return out
+
+
+def journal_exclusion(entry, living, private_families):
+    """Reason a journal row is excluded under living-person protection, or None."""
+    if entry.get('visibility') != 'public':
+        return 'private_journal' if entry.get('visibility') == 'private' else 'not_reviewed'
+    people = set(entry.get('person_ids') or []) | {entry.get('person_id'), entry.get('record')}
+    families = set(entry.get('family_ids') or []) | {entry.get('family_id'), entry.get('record')}
+    mentions = set(re.findall(r'\bI\d+\b', str(entry)))
+    if (people | mentions) & living or families & private_families:
+        return 'living_reference'
+    return None

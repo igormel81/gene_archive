@@ -139,6 +139,11 @@ Existing entries stay in the source archive and are private by default. See
 gene-archive does not try to be a database of the world's records. It is the place where
 **your** family's evidence and stories live — and where your relatives actually look.
 
+## Archive safety and review
+
+Private backups with tested restoration, exact publication previews and related changes
+as one transaction are available through the CLI. See [commands and examples](docs/archive-workflows.md).
+
 ## Quick start
 
 You need Python 3.10+. [Pillow](https://pypi.org/project/Pillow/) makes thumbnails

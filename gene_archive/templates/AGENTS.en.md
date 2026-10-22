@@ -110,3 +110,15 @@ Schema for checks and hints: https://raw.githubusercontent.com/igormel81/gene_ar
   resource directories/ancestors.
 - Preserve next/checked/stage/blocked_by on leads. Research restrictions belong to the
   individual project; do not copy another family's restrictions without authorization.
+
+## Backups, publication and batches
+
+Before a major import, use `gene backup . -o ../family-backup.tar.gz` (pass `--state`
+if server state lives elsewhere) and `gene restore ../family-backup.tar.gz --check`.
+Backups are private and unencrypted. Restore into a new folder only.
+Run `gene publish-preview . --json` before publishing; review custom HTML/media too.
+For dependent changes use `gene apply . changes.json --atomic --dry-run`, then
+`--atomic --if-version <base_version> --build`. Use `as` and `{"$ref":"alias"}` for
+IDs from earlier operations. Every intermediate operation must validate. Keep the
+old per-operation mode for independent changes only. A build error after a successful
+save does not undo its commit.
