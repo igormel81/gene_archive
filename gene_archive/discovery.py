@@ -209,12 +209,50 @@ class Pages:
         story = (self.data.get("surnames") or {}).get(key, {})
         if story.get("history"):
             body += '<section class="fam-story"><h2>История рода</h2>' + "".join(f"<p>{esc(x)}</p>" for x in story["history"]) + "</section>"
+        for sec in story.get("sections") or []:
+            body += f'<section class="fam-story"><h2>{esc(sec.get("title", ""))}</h2>'
+            body += "".join(f"<p>{esc(x)}</p>" for x in sec.get("paragraphs") or [])
+            if sec.get("items"):
+                body += "<ul>" + "".join(f"<li>{esc(x)}</li>" for x in sec["items"]) + "</ul>"
+            body += "</section>"
         body += '<section class="fam-all"><h2>Люди</h2><ul class="fam-people">'
         body += "".join(self.person_li(q, "../") for q in sorted(dead, key=lambda q: (self.years(q) or "9999", q["display_name"])))
         body += "</ul>"
         if alive:
             body += f'<p class="fam-alive"><span>Ныне живущих:</span> <b>{alive}</b>. <span>Сведения о них не публикуются.</span></p>'
         body += "</section>"
+        # документы рода: всё, на что ссылаются карточки умерших с этой фамилией
+        ids = []
+        def walk(x):
+            if isinstance(x, dict):
+                for k, v in x.items():
+                    if k == "source_ids" and isinstance(v, list):
+                        ids.extend(v)
+                    else:
+                        walk(v)
+            elif isinstance(x, list):
+                for v in x:
+                    walk(v)
+            elif isinstance(x, str):
+                ids.extend(re.findall(r"\bS\d+\b", x))
+        for q in dead:
+            walk(q)
+        cited = [self.sources[i] for i in dict.fromkeys(ids) if i in self.sources]
+        if cited:
+            body += '<section class="fam-docs"><h2>Документы рода</h2><ul>' + "".join(
+                f'<li><a href="../#/sources?doc={s_["id"]}">{esc(s_["id"])}. {esc(s_["title"])}</a></li>' for s_ in cited) + "</ul></section>"
+        # поиски по фамилии из журнала исследований (открытые записи)
+        stem = key[:5].lower()
+        log = [e for e in self.data.get("research_log") or [] if e.get("visibility", "public") == "public"
+               and stem in (e.get("scope") or "").lower()]
+        if log:
+            log = sorted(log, key=lambda e: e.get("date", ""), reverse=True)
+            body += f'<section class="fam-log"><h2>Поиски по фамилии</h2><p><span>Записей в журнале исследований:</span> <b>{len(log)}</b></p><ul>'
+            for e in log[:12]:
+                res = e.get("result", "")
+                res = res if len(res) <= 400 else res[:400].rsplit(" ", 1)[0] + "…"
+                body += f'<li><b>{esc(e.get("date", ""))}</b> {esc(e.get("action", ""))}<br><span>{esc(res)}</span></li>'
+            body += "</ul></section>"
         self.document(path, key, '<div class="fam-page">' + body + "</div>",
                       "Родословная, документы, места и годы жизни.", heading=False, kind="CollectionPage")
         return slug, len(people)
@@ -395,6 +433,14 @@ class Pages:
         rest = [x for x in (pic(sid) for sid in restored) if x]
         photos = {"tree": faces, "people": faces[2:] + faces[:2], "bios": faces, "story": faces[::-1], "archive": rest[-6:] or faces,
                   "restored": rest, "places": rest[6:12] or faces, "questions": rest[12:18] or faces[::-1], "news": rest[-6:][::-1] or faces, "stats": faces}
+        # вкладки «Истории» (разделы с data-tab) — свои ссылки «Поделиться»
+        story_file = site_dir / "content" / "story.html"
+        if self.has_story and story_file.is_file():
+            st = story_file.read_text(encoding="utf-8")
+            for m in re.finditer(r'<section id="([\w-]+)" data-tab="([^"]+)">(.*?)</section>', st, re.S):
+                first = re.search(r"<p>(.*?)</p>", m.group(3), re.S)
+                desc = re.sub(r"<[^>]+>", "", first.group(1)) if first else m.group(2)
+                page("story-" + m.group(1), m.group(2), desc[:300], "#/story/" + m.group(1), photos["story"][:6])
         for key, title, desc, target in self.SECTIONS:
             if (key == "story" and not self.has_story) or (key == "news" and not self.has_news) \
                     or (key == "bios" and not bio_ids) or (key == "restored" and not restored):

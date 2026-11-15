@@ -104,8 +104,8 @@ main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .tree-side-bar { display: contents; }
 .orient { flex: none; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .orient-ic { flex: none; color: var(--accent); }
-.stage.horiz .card { width: 260px; height: 52px; padding: 4px 10px; gap: 0; }
-.stage.horiz .card .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage.horiz .card { width: 260px; height: 62px; padding: 4px 10px; gap: 0; }
+.stage.horiz .card .nm { white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.12; }
 .stage.horiz .card .more { left: auto; right: 10px; transform: none; bottom: -8px; }
 /* «Древо»: ветви и фамилии — колонкой слева, чтобы холсту досталась вся высота */
 #view-tree.active { flex-direction: row; }
@@ -720,8 +720,15 @@ body.doc-open { overflow: hidden; }
 
 /* вероятные связи */
 .card.probable::after { content: "≈"; position: absolute; top: 3px; right: 7px; font: 700 13px var(--sans); color: var(--accent); }
-.card.probable { border-style: dashed; }
+.card.probable { border-style: dashed; border-width: 2px; border-color: var(--muted); opacity: .78; }
+.card.probable:hover, .card.probable.selected { opacity: 1; }
 .probable-note { grid-column: 1 / -1; font: 13px/1.45 var(--sans); color: var(--muted); background: var(--chip); border-radius: 6px; padding: 6px 9px; margin: 2px 0 6px; }
+.candidates { list-style: none; padding: 0; margin: 0 0 8px; }
+.cand { border-left: 3px dashed var(--muted); padding: 4px 0 4px 10px; margin: 0 0 10px; font: 13px/1.45 var(--sans); }
+.cand p { margin: 2px 0; }
+.cand-head { font-size: 14px; }
+.cand-mark { margin-left: 8px; font-size: 12px; color: var(--muted); background: var(--chip); border-radius: 4px; padding: 1px 6px; }
+.cand-unlikely, .cand-rejected { opacity: .75; }
 .wcard.probable { border-style: dashed; }
 .wcard.probable::after { content: "≈"; position: absolute; top: 2px; right: 6px; font: 700 12px var(--sans); color: var(--accent); }
 .res-h { grid-column: 1 / -1; }
@@ -1169,3 +1176,10 @@ ol.bio-srcs a:hover { color: var(--accent); }
   .stat-row .stat-bar { grid-column: 1 / -1; grid-row: 2; }
   .stat-tile b { font-size: 26px; }
 }
+.req-addr { margin-top: 6px; font: 13px/1.45 var(--sans); }
+.req-addr p { margin: 0 0 2px; }
+.req-text { margin-top: 8px; }
+.req-text summary { cursor: pointer; color: var(--accent); font: 13px var(--sans); }
+.req-letter { white-space: pre-wrap; font: 13px/1.5 var(--serif, Georgia, serif); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin: 6px 0 0; max-width: 60ch; }
+.req-copy { font: 12px var(--sans); margin-top: 6px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); color: var(--ink); cursor: pointer; }
+#requests tr.req-letter-row td { border-top: 0; padding-top: 0; }

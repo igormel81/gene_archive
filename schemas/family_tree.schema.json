@@ -327,6 +327,69 @@
         }
       }
     },
+    "archive_requests": {
+      "type": "array",
+      "description": "Archive → Archive requests: documents not available online — which archive, what to ask, why / «Архив → Запросы в архивы»: что запросить, где и зачем",
+      "items": {
+        "type": "object",
+        "required": [
+          "archive",
+          "what",
+          "why"
+        ],
+        "properties": {
+          "archive": {
+            "type": "string"
+          },
+          "cipher": {
+            "type": "string"
+          },
+          "what": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "priority": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "letter": {
+            "type": "string",
+            "description": "ready-to-send request text / готовый текст запроса"
+          },
+          "contact": {
+            "type": "object",
+            "description": "where to send / куда отправлять",
+            "properties": {
+              "postal": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "online": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "source_url": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "coverage": {
       "type": "array",
       "description": "Register-reading coverage: which years and parts of a parish's registers were read, on which film and frames, with what result — shown as a year × part grid in Archive → Sources and on the place page / Учёт прочитанного в метрических книгах: какие годы и части прочитаны, на какой плёнке и кадрах, с каким итогом — сетка «год × часть» в «Архив → Источники» и на странице места",
@@ -427,6 +490,30 @@
               "type": "string"
             },
             "description": ""
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "paragraphs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "description": "extra sections / разделы страницы фамилии"
           }
         }
       },
@@ -688,6 +775,53 @@
         "gedcom_id": {
           "type": "string",
           "description": "id in the imported GEDCOM / номер в импортированном GEDCOM"
+        },
+        "candidates": {
+          "type": "array",
+          "description": "Кандидаты в родню, не вписанные в древо",
+          "items": {
+            "type": "object",
+            "properties": {
+              "person_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "level": {
+                "enum": [
+                  "probable",
+                  "hypothesis",
+                  "unlikely",
+                  "rejected"
+                ]
+              },
+              "assessment": {
+                "type": "string"
+              },
+              "for": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "against": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "source_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
       }
     },

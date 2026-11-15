@@ -28,6 +28,7 @@ DEFAULTS = {
     "questions": [],               # [{"person": "I4", "text": "..."}] questions to relatives
     "story": {},                   # timeline / places / branch_tags / branch_names / branch_colors for the Story page
     "surname_variants": {},        # {"Novák": "Novak"} spellings merged into one surname
+    "surname_order": [],           # surnames in this order in the tree sidebar (e.g. father's line, then mother's)
     "privacy": {"hide_living": True, "living_years": 100},
     "comments": False,             # true when the comments server (gene serve / Docker) is used
     "contact": None,               # {"email": "...", "label": "Write to us"} shown in the header
@@ -82,5 +83,5 @@ def load(site_dir):
 
 def public(cfg):
     """The part of the settings the browser needs (goes into data.json as `site`)."""
-    keys = ("title", "short_title", "base_url", "quick_focus", "story", "surname_variants", "comments")
+    keys = ("title", "short_title", "base_url", "quick_focus", "story", "surname_variants", "surname_order", "comments")
     return {k: cfg[k] for k in keys}
