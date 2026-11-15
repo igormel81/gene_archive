@@ -364,6 +364,7 @@ def _build(site_dir, out, base_url, tmp):
         "research_log": data.get("research_log", []),
         "research_resources": research_resources(data, sources),
         "coverage": data.get("coverage", []),
+        "archive_requests": data.get("archive_requests", []),
         "stats": stats.archive_stats(data, [(k, ids) for k, ids in discovery.Pages(tmp, data, cfg, living, False, False).surname_groups()
                                            if len(ids) >= cfg["min_surname_page"]], living, restored),
         "surnames": data.get("surnames", {}),

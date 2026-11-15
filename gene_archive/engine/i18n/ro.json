@@ -685,5 +685,22 @@
  "Сколько собрано людей, документов и мест, откуда документы, чем подтверждены люди, сколько открытых вопросов и исправлений в каждом роду, рождения по векам и журнал поиска по времени. Ссылка — в меню «Ещё».": "Câte persoane, documente și locuri s-au adunat, de unde provin documentele, ce confirmă persoanele, câte întrebări deschise și corecturi are fiecare neam, nașterile pe secole și jurnalul de căutare în timp. Linkul este în meniul „Mai mult”.",
  "Исповедные ведомости": "Liste de spovedanie",
  "Ревизские сказки": "Liste de revizie",
- "Переписи": "Recensăminte"
+ "Переписи": "Recensăminte",
+ "Документы рода": "Documentele neamului",
+ "Документы, которых нет в открытом доступе: в какой архив писать, что просить и что это даст семье. Имя открывает карточку человека.": "Documente care nu sunt disponibile public: cărei arhive să-i scrieți, ce să cereți și ce ar aduce familiei. Numele deschide fișa persoanei.",
+ "За: ": "Pentru: ",
+ "Запросы в архивы": "Cereri către arhive",
+ "Запросы в архивы · ": "Cereri către arhive · ",
+ "Кандидаты": "Candidați",
+ "Обоснование": "Justificare",
+ "Онлайн-приёмная": "Recepție online",
+ "Приоритет": "Prioritate",
+ "Против: ": "Împotrivă: ",
+ "Разделы истории": "Secțiunile istoriei",
+ "Скопировать": "Copiază",
+ "Статус": "Stare",
+ "Текст запроса": "Textul cererii",
+ "Что запросить": "Ce să ceri",
+ "Поиски по фамилии": "Căutări după nume",
+ "Записей в журнале исследований:": "Înregistrări în jurnalul de cercetare:"
 }

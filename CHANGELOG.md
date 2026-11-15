@@ -1,5 +1,20 @@
 # Changelog / История изменений
 
+## Unreleased
+
+- Person cards show a «Candidates» section (`candidates`: person or name, level, arguments for and
+  against, sources); a branch made only of candidates is marked «≈» in the sidebar.
+  Карточка человека показывает раздел «Кандидаты» с доводами «за» и «против».
+- Story sections with `data-tab` become tabs, like the archive tabs; each tab has its own URL
+  and «Share» page (`s/story-<id>.html`).
+  Разделы «Истории» с `data-tab` — вкладки, у каждой своя ссылка «Поделиться».
+- Surname pages: extra `sections` (title, paragraphs, items), «Family documents» (sources cited by
+  the surname's people) and recent research-log entries for the surname.
+  Страницы фамилий: свои разделы, документы рода и последние поиски из журнала.
+- Archive tab «Archive requests» (`archive_requests`), `surname_order` for the sidebar, placeholder
+  maiden names in surname groups.
+  Вкладка «Запросы в архивы», порядок фамилий в древе, девичьи фамилии в группах.
+
 ## 0.8.0 — 2026-10-22
 
 - `gene backup` captures private source files, ignored documents, portable Git history and

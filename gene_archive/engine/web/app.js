@@ -358,7 +358,7 @@
   // Раскладка считает в абстрактных осях: слот (поперёк поколений) и ряд (поколение).
   // В горизонтальном режиме карточки шире и ниже: поколение занимает колонку, и по высоте помещается больше людей.
   var horiz = store('gene.treeHoriz') === '1';
-  var HCW = 260, HCH = 52;
+  var HCW = 260, HCH = 62;
   function cardW() { return horiz ? HCW : CW; }
   function cardH() { return horiz ? HCH : CH; }
   function geom() {
@@ -559,7 +559,7 @@
       var before = pm, after = sm - (pm + G.MS);                               // до карточки — предки, после — потомки
       var m = after > before
         ? 16 - (pm - Math.min(before, G.RS * 0.8)) * kk                         // потомков больше: человек у начала
-        : vm - 24 - (pm + G.MS + Math.min(after, G.RS * (horiz ? 1.2 : 2))) * kk; // предков больше: у конца
+        : vm - 24 - (pm + G.MS + Math.min(after, G.RS * (horiz ? 1.8 : 2))) * kk; // предков больше: у конца (с поколением детей)
       var c = vc / 2 - (pc + G.CS / 2) * kk;
       // не показывать пустоту за краями древа
       var clamp = function (v, view, size) { return size * kk + 32 <= view ? (view - size * kk) / 2 : Math.min(16, Math.max(v, view - 16 - size * kk)); };
@@ -848,7 +848,7 @@
     var g = opts && opts.line ? surnameGroups().filter(function (x) { return x.key === opts.line; })[0] : null;
     if (g) { lineKey = g.key; line = {}; g.ids.forEach(function (x) { line[x] = true; }); }
     renderTree();
-    if (!opts || !opts.keepView) fit(true);
+    if (!opts || !opts.keepView) { fit(true); revealCard(focusId); }   // человек в центре не должен оказаться за краем
     syncUrl();
   }
   // ---------- person panel
@@ -970,6 +970,18 @@
     var kids = childrenOf(id);
     if (kids.length) relRow(T('Дети'), kids);
     body.appendChild(fam);
+    // кандидаты в родню, не вписанные в древо: кто, доводы за и против, оценка
+    if ((p.candidates || []).length) {
+      body.appendChild(el('h3', { class: 'p-sec', text: T('Кандидаты') }));
+      body.appendChild(el('ul', { class: 'candidates' }, p.candidates.map(function (c) {
+        var who = c.person_id && P[c.person_id] ? personChip(c.person_id) : el('b', { text: c.name || '' });
+        return el('li', { class: 'cand cand-' + (c.level || 'hypothesis') },
+          el('p', { class: 'cand-head' }, who, c.role ? ' — ' + c.role : '', c.assessment ? el('span', { class: 'cand-mark', text: c.assessment }) : null),
+          (c['for'] || []).length ? el('p', null, el('b', { text: T('За: ') }), c['for'].join(' ')) : null,
+          (c.against || []).length ? el('p', null, el('b', { text: T('Против: ') }), c.against.join(' ')) : null,
+          (c.source_ids || []).length ? el('p', { class: 'where' }, c.source_ids.filter(function (s) { return S[s]; }).map(function (s, i) { return [i ? ' ' : '', srcChip(s)]; })) : null);
+      })));
+    }
     body.appendChild(el('h3', { class: 'p-sec', text: T('Как мы связаны') }));
     body.appendChild(kinBlock(id));
 
@@ -1437,7 +1449,7 @@
       }
       if (view === 'places' && r.place && placeBySlug(r.place)) openPlace(r.place);
       else if (view === 'places') placesHome(r.mode);
-      if (view === 'sources') setArchMode(['restored', 'corrections', 'research'].indexOf(r.mode) >= 0 ? r.mode : 'docs');
+      if (view === 'sources') setArchMode(['restored', 'corrections', 'research', 'requests'].indexOf(r.mode) >= 0 ? r.mode : 'docs');
       if (r.doc && (S[r.doc] || (D.merged_sources || {})[r.doc])) { if (docOpen !== r.doc) openDoc(r.doc); } else if (docOpen) closeDoc();
       if (r.person && P[r.person]) { if (selectedId !== r.person) openPerson(r.person); }
       else if (selectedId) closePanel();
@@ -1446,7 +1458,7 @@
   function applyStory() {
     pendingStory = null;
     if (storyNav) storyNav.setPlace(storyPlace, !!storyAnchor);
-    if (storyAnchor) { var t = document.getElementById(storyAnchor); if (t) t.scrollIntoView({ block: 'start', behavior: 'instant' }); }
+    if (storyAnchor) { if (storyTabShow) storyTabShow(storyAnchor); var t = document.getElementById(storyAnchor); if (t) t.scrollIntoView({ block: 'start', behavior: 'instant' }); }
   }
   var lastApplied = null;
   function onUrl() { if (!booted || location.hash === lastApplied) return; lastApplied = location.hash; applyRoute(parseHash(location.hash), false); document.title = pageTitle(); syncUrl(true); }
@@ -1977,6 +1989,7 @@
           a.addEventListener('click', function (e) { e.preventDefault(); openPerson(id); });
         });
         enhanceStory(host);
+        buildStoryTabs(host);
         buildStoryNav(host);
         storyReady = true;
         if (pendingStory && currentView === 'story') applyStory();
@@ -2066,6 +2079,35 @@
     }, { passive: true });
   }
 
+  // Подразделы «Истории», как вкладки «Архива»: раздел с атрибутом data-tab — своя вкладка,
+  // остальные разделы — главная вкладка «История семьи».
+  var storyTabOf = {}, storyTabShow = null, storyTabKey = null;
+  function buildStoryTabs(host) {
+    var secs = Array.prototype.slice.call(host.children).filter(function (s) { return s.matches('section[id]'); });
+    if (!secs.some(function (s) { return s.dataset.tab; })) return;
+    var MAIN = T('История семьи'), names = [MAIN];
+    secs.forEach(function (s) { var t = s.dataset.tab || MAIN; storyTabOf[s.id] = t; if (names.indexOf(t) < 0) names.push(t); });
+    var bar = el('div', { class: 'arch-tabs story-tabs', role: 'tablist', 'aria-label': T('Разделы истории') });
+    var btns = names.map(function (n) {
+      var b = el('button', { type: 'button', role: 'tab', 'aria-selected': 'false', text: n, onclick: function () { show(n); storyAnchor = storyTabKey; syncUrl(true); window.scrollTo({ top: Math.max(0, bar.getBoundingClientRect().top + scrollY - 70) }); } });
+      bar.appendChild(b); return b;
+    });
+    function show(n) {
+      secs.forEach(function (s) { s.hidden = storyTabOf[s.id] !== n; });
+      var own = n === MAIN ? null : secs.filter(function (s) { return storyTabOf[s.id] === n; })[0];
+      storyTabKey = own ? own.id : null;
+      btns.forEach(function (b) { b.setAttribute('aria-selected', String(b.textContent === n)); });
+    }
+    storyTabShow = function (id) {
+      var el2 = id && document.getElementById(id), sec = el2 && (el2.matches('section[id]') ? el2 : el2.closest('section[id]'));
+      while (sec && sec.parentNode !== host) sec = sec.parentNode.closest('section[id]');
+      show(sec && storyTabOf[sec.id] ? storyTabOf[sec.id] : MAIN);
+    };
+    var first = secs[0];
+    first.parentNode.insertBefore(bar, first);
+    show(MAIN);
+  }
+
   var storyNav = null;
   function buildStoryNav(host) {
     if (!$('story-nav')) {   // the story page may omit the slot: put the navigation before the first section
@@ -2074,7 +2116,7 @@
       if (first) first.parentNode.insertBefore(slot, first); else host.insertBefore(slot, host.firstChild);
     }
     var nav = clear($('story-nav'));
-    var go = function (id) { var t = document.getElementById(id); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); storyAnchor = id; syncUrl(true); };
+    var go = function (id) { if (storyTabShow) storyTabShow(id); var t = document.getElementById(id); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); storyAnchor = id; syncUrl(true); };
     var line = el('div', { class: 'tl' });
     STORY_TIME.forEach(function (e) {
       line.appendChild(el('button', { class: 'tl-item', title: e[1], onclick: function () { go(e[2]); } }, el('b', { text: e[0] }), el('span', { text: e[1] })));
@@ -2738,12 +2780,13 @@
   // «Архив»: вкладки «Документы и фотографии» и «Отреставрированные фото»
   var archMode = 'docs';
   function setArchMode(m) {
-    if ((m === 'restored' && $('arch-tab-restored').hidden) || (m === 'research' && $('arch-tab-research').hidden)) m = 'docs';
+    if ((m === 'restored' && $('arch-tab-restored').hidden) || (m === 'research' && $('arch-tab-research').hidden) || (m === 'requests' && $('arch-tab-requests').hidden)) m = 'docs';
     archMode = m;
     $('arch-docs').hidden = m !== 'docs';
     $('arch-restored').classList.toggle('off', m !== 'restored');
     $('arch-corrections').hidden = m !== 'corrections';
     $('arch-research').hidden = m !== 'research';
+    $('arch-requests').hidden = m !== 'requests';
     document.querySelectorAll('.arch-tabs [data-mode]').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.mode === m)); });
   }
   var restSetters = [], restSort = 'year', restMode = 'color';
@@ -2865,6 +2908,7 @@
     if (!list.length) host.appendChild(el('p', { class: 'sub', text: T('Ничего не нашлось. Попробуйте другое слово или сбросьте фильтры.') }));
     renderCorrections();
     renderResearch();
+    renderRequests();
     var rl = clear($('research-log'));
     (D.research_log || []).slice().reverse().forEach(function (r) {
       rl.appendChild(el('details', { class: 'rlog-item' }, el('summary', null, el('span', { class: 'rlog-date', text: fmtDate(r.date) }), ' ', r.action),
@@ -2915,6 +2959,37 @@
     // прочитанные книги, не привязанные к источнику поиска, — отдельным блоком в конце
     var loose = (D.coverage || []).filter(function (c) { return !list.some(function (r) { return r.id === c.resource_id; }); });
     if (loose.length) host.appendChild(el('article', { class: 'res-card', id: 'res-coverage' }, el('h5', { text: T('Прочитанные метрические книги') }), loose.map(coverageGrid)));
+  }
+  // «Запросы в архивы»: что нельзя проверить онлайн — куда писать, что просить и зачем
+  function renderRequests() {
+    var list = D.archive_requests || [];
+    $('arch-tab-requests').hidden = !list.length;
+    if (!list.length) return;
+    $('arch-tab-requests').textContent = T('Запросы в архивы · ') + list.length;
+    var tb = clear($('requests').querySelector('tbody'));
+    list.forEach(function (r) {
+      var ppl = (r.people || []).filter(function (pid) { return P[pid]; });
+      var c = r.contact || {};
+      var pre = r.letter ? el('pre', { class: 'req-letter', text: r.letter }) : null;
+      tb.appendChild(el('tr', { class: 'req-' + (r.priority || '') },
+        el('td', null, el('b', { text: r.archive }), r.cipher ? el('p', { class: 'where', text: r.cipher }) : null,
+          (c.postal || c.email || c.online) ? el('div', { class: 'req-addr' },
+            c.postal ? el('p', { text: c.postal }) : null,
+            c.email ? el('p', null, el('a', { href: 'mailto:' + c.email, text: c.email })) : null,
+            c.online ? el('p', null, el('a', { href: c.online, target: '_blank', rel: 'noopener', text: T('Онлайн-приёмная') })) : null,
+            c.note ? el('p', { class: 'where', text: c.note }) : null) : null),
+        el('td', null, r.what, ppl.length ? el('p', { class: 'where' }, ppl.map(function (pid, i) {
+          return [i ? ', ' : '', el('a', { href: '#/tree/' + pid + '?person=' + pid, text: P[pid].display_name, onclick: function (e) { e.preventDefault(); openPerson(pid); } })]; })) : null,
+          null),
+        el('td', { text: r.why }),
+        el('td', { text: r.priority || '' }),
+        el('td', { text: r.status || '' })));
+      if (pre) tb.appendChild(el('tr', { class: 'req-letter-row' }, el('td', { colspan: '5' }, el('details', { class: 'req-text' }, el('summary', { text: T('Текст запроса') }),
+            el('button', { type: 'button', class: 'req-copy', text: T('Скопировать'), onclick: function (e) {
+              var b = e.currentTarget;
+              if (navigator.clipboard) navigator.clipboard.writeText(r.letter).then(function () { b.textContent = T('Скопировано'); });
+            } }), pre))));
+    });
   }
   // ---------- register-reading coverage: a year × part grid of what was read in a parish's books
   var COVER_PARTS = [['births', T('Рождения')], ['marriages', T('Браки')], ['deaths', T('Смерти')], ['confessions', T('Исповедные ведомости')], ['revisions', T('Ревизские сказки')], ['census', T('Переписи')]];
@@ -3042,6 +3117,7 @@
     if (selectedId && $('panel').classList.contains('open')) return selectedId;
     if (currentView === 'places') return selectedPlace ? 'place-' + selectedPlace : 'places';
     if (currentView === 'sources') return archMode === 'restored' ? 'restored' : 'archive';
+    if (currentView === 'story' && storyTabKey) return 'story-' + storyTabKey;
     return { story: 'story', people: 'people', questions: 'questions', stats: 'stats' }[currentView] || 'tree';
   }
   function shareLink(btn, key) {
@@ -3157,11 +3233,13 @@
   }
   function surnamesOf(p) {
     var out = [];
-    if (p.placeholder) return out;
+    // заглушка считается, только если это прямой предок (у неё указано родство): «Шелудько Пётр, прапрадедушка»
+    if (p.placeholder && !p.relation) return out;
     var k = surnameKey(p.surname);
     if (k) out.push(k);
-    var m = /\(([А-ЯЁA-Z][^)\s]*)\)/.exec(p.display_name);
-    if (m) { var mk = surnameKey(m[1]); if (mk && out.indexOf(mk) < 0) out.push(mk); }
+    // девичья фамилия: поле birth_surname или «(урожд. Иванова)» / «(Иванова)» в имени
+    var bs = p.birth_surname || ((/\((?:урожд\.\s*)?([А-ЯЁA-Z][^)\s]*)\)/.exec(p.display_name) || [])[1]);
+    if (bs) { var mk = surnameKey(bs); if (mk && out.indexOf(mk) < 0) out.push(mk); }
     return out;
   }
   function surnameGroups() {
@@ -3193,7 +3271,12 @@
       });
       // линия фамилии обычно идёт по мужчине: при равенстве предпочитаем носителя фамилии по рождению
       return { key: k, ids: ids, focus: tops[0] || ids[0] };
-    }).sort(function (a, b) { return b.ids.length - a.ids.length || a.key.localeCompare(b.key, LOCALE.lang); });
+    }).sort(function (a, b) {
+      // порядок родов можно задать в site.json → surname_order (например, по линиям отца и матери)
+      var ord = SITE.surname_order || [], ia = ord.indexOf(a.key), ib = ord.indexOf(b.key);
+      if (ia >= 0 || ib >= 0) return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib);
+      return b.ids.length - a.ids.length || a.key.localeCompare(b.key, LOCALE.lang);
+    });
   }
   function renderBranches() {
     var host = clear($('branches'));
@@ -3205,7 +3288,7 @@
       host.appendChild(el('button', {
         class: 'sn', title: g.ids.length + T(' чел. · в центре: ') + P[g.focus].display_name,
         onclick: function () { setFocus(g.focus, { line: g.key }); }
-      }, g.key, el('small', { text: ' ' + g.ids.length })));
+      }, g.key, el('small', { text: ' ' + (g.ids.every(function (x) { return P[x].research_status === 'unlinked_candidate' || P[x].placeholder; }) ? '≈' : '') + g.ids.length })));
     });
   }
 
