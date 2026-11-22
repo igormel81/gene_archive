@@ -89,10 +89,10 @@ def redact(data, living):
     out["people"] = people
     families = []
     for f in data["families"]:
-        # a marriage concerns both partners: if either of them is living, its details stay private
+        # a family event concerns both partners: if either is living, its details stay private
         if any(x in living for x in f.get("partners", [])):
             private_src |= set(f.get("source_ids", [])) | _mentions(f)
-            f = {k: v for k, v in f.items() if k not in ("marriage", "notes", "source_ids", "probable_note")}
+            f = {k: v for k, v in f.items() if k not in ("marriage", "divorce", "notes", "source_ids", "probable_note")}
             f["source_ids"] = []
         else:
             public_src |= set(f.get("source_ids", [])) | _mentions(f)

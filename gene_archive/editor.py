@@ -578,7 +578,7 @@ class Store:
 
     def _normalize(self, kind, rec):
         rec = _clean(rec)
-        for ev in ("birth", "death", "burial", "marriage"):
+        for ev in ("birth", "death", "burial", "marriage", "divorce"):
             if isinstance(rec.get(ev), dict) and rec[ev].get("date"):
                 rec[ev]["date"] = normalize_date(rec[ev]["date"])
         for alt in ("birth_alternatives", "death_alternatives"):

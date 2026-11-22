@@ -89,12 +89,12 @@ Anything else (`"before the war"`) is an error: put such wording in `note`.
 | `identity_source_ids` | no | documents that prove who this person is |
 | `birth`, `death`, `burial` | no | events, see below |
 | `birth_alternatives`, `death_alternatives` | no | conflicting versions of the same event |
-| `residences` | no | where the person lived or what happened where; `date` here is free text |
+| `residences` | no | where the person lived or what happened where; `place_event_kind` names the event, `value` describes it, and `date` is free text |
 | `research_status` | no | `unlinked_candidate` = "possibly a relative", drawn dashed |
 | `research_note` | no | why the link is uncertain |
 | `living` | no | `true`/`false` overrides the automatic living-person rule (see Privacy) |
 
-**Event** (`birth`, `death`, `burial`, `marriage`): `date`, `place_as_recorded` (as written in the source),
+**Event** (`birth`, `death`, `burial`, `marriage`, `divorce`): `date`, `place_as_recorded` (as written in the source),
 `place_slugs` (links to `places`), `status`, `source_ids`, `note`.
 `note` is shown on the person's card on its own line under the date: the cause of death, Old or New
 Style, "calculated from the age", how to find the grave. The card shows a death or a burial even

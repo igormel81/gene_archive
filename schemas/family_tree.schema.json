@@ -627,6 +627,10 @@
           "type": "string",
           "description": "residence, baptism, burial, work… / проживание, крещение, погребение, работа…"
         },
+        "value": {
+          "type": "string",
+          "description": "event or attribute value / значение события или атрибута"
+        },
         "source_ids": {
           "$ref": "#/$defs/sourceIds"
         },
@@ -883,6 +887,10 @@
         },
         "marriage": {
           "$ref": "#/$defs/event"
+        },
+        "divorce": {
+          "$ref": "#/$defs/event",
+          "description": "divorce event / развод"
         },
         "source_ids": {
           "$ref": "#/$defs/sourceIds"

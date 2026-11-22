@@ -852,10 +852,12 @@
     syncUrl();
   }
   // ---------- person panel
-  function srcChip(id) {
+  function srcChip(id, named) {
     var s = S[id];
     if (!s) return null;
-    return el('button', { class: 'src', title: s.title, text: id, onclick: function () { showSource(id); } });
+    var description = id + ' — ' + s.title;
+    return el('button', { class: named === true ? 'src src-named' : 'src', title: description,
+      'aria-label': description, text: named === true ? s.title : id, onclick: function () { showSource(id); } });
   }
   // Текст записи с кнопками документов: «(S27, S136)» — только кнопки, без скобок, одной неразрывной группой
   function noteText(n) {
@@ -874,17 +876,36 @@
     var p = P[id];
     return el('button', { class: 'chip', onclick: function () { openPerson(id); } }, p.display_name, lifespan(p) ? el('small', { text: lifespan(p) }) : null, note ? el('small', { text: note }) : null);
   }
+  function eventDetails(note) {
+    return el('details', { class: 'ev-note' }, el('summary', { text: T('Подробности') }), el('div', null, noteText(note)));
+  }
   function eventText(ev) {
     var parts = [];
     if (ev.date) parts.push(fmtDate(ev.date) + (ev.status === 'estimated' ? T(' (оценка)') : ''));
     // номер документа в тексте места («повторное свидетельство, S232») уже стоит кнопкой рядом — из текста убираем
     if (ev.place_as_recorded) parts.push(ev.place_as_recorded.replace(/,?\s*\bS\d+\b/g, '').replace(/\(\s*\)/g, '').replace(/\s+\)/g, ')').trim());
-    var out = [parts.join(', ') || T('дата неизвестна'), ' '].concat((ev.source_ids || []).map(srcChip));
+    var out = [parts.join(', ') || T('дата неизвестна'), ' '].concat((ev.source_ids || []).map(function (id) { return srcChip(id, true); }));
     // пояснение к дате — отдельной строкой: причина смерти, стиль календаря, «рассчитано по возрасту», как найти могилу
-    if (ev.note) out.push(el('span', { class: 'ev-note' }, noteText(ev.note)));
+    if (ev.note) out.push(eventDetails(ev.note));
     return out;
   }
   function hasEvent(ev) { return !!(ev && (ev.date || ev.place_as_recorded || ev.note)); }
+  var PROFILE_EVENT_LABELS = {
+    residence: 'Проживание', birth: 'Рождение', death: 'Смерть', burial: 'Погребение',
+    education: 'Образование', occupation: 'Род занятий', graduation: 'Окончание учёбы',
+    'military service': 'Военная служба', baptism: 'Крещение', cremation: 'Кремация',
+    census: 'Перепись', emigration: 'Эмиграция', immigration: 'Иммиграция',
+    event: 'Событие', fact: 'Факт'
+  };
+  function lifeEventLabel(kind) {
+    return T(Object.prototype.hasOwnProperty.call(PROFILE_EVENT_LABELS, kind) ? PROFILE_EVENT_LABELS[kind] : kind.charAt(0).toUpperCase() + kind.slice(1));
+  }
+  function lifeEvent(r, label) {
+    var heading = [r.value, fmtDate(r.date), r.place].filter(Boolean).join(' · ');
+    return el('li', null, label ? el('b', { text: label }) : null,
+      label && heading ? ' · ' : '', heading, ' ', (r.source_ids || []).map(function (id) { return srcChip(id, true); }),
+      r.note ? eventDetails(r.note) : null);
+  }
   function personSources(p) {
     var ids = [];
     function collect(value) {
@@ -894,7 +915,7 @@
       else if (value && typeof value === 'object') Object.keys(value).forEach(function (key) { collect(value[key]); });
     }
     collect(p);
-    (spouseFams[p.id] || []).forEach(function (f) { collect(f.source_ids); collect(f.marriage); });
+    (spouseFams[p.id] || []).forEach(function (f) { collect(f.source_ids); collect(f.marriage); collect(f.divorce); });
     if (parentFam[p.id]) collect(parentFam[p.id].source_ids);
     return ids.sort(function (a, b) { return Number(a.slice(1)) - Number(b.slice(1)); });
   }
@@ -931,7 +952,7 @@
     body.appendChild(el('div', { class: 'p-actions' },
       id !== focusId ? el('button', { class: 'btn primary', text: T('Поставить в центр древа'), onclick: function () { showView('tree'); setFocus(id); } }) : el('span', { class: 'btn', text: T('Сейчас в центре древа') }),
       (D.bios || []).indexOf(id) >= 0 ? el('button', { class: 'btn', text: T('Биография'), onclick: function () { openBio(id); } }) : null,
-      el('button', { class: 'btn', text: T('Добавить сведения'), onclick: function () { var t = body.querySelector('textarea'); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.focus({ preventScroll: true }); } } }),
+      SITE.comments ? el('button', { class: 'btn', text: T('Добавить сведения'), onclick: function () { var t = body.querySelector('.comments + form textarea'); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.focus({ preventScroll: true }); } } }) : null,
       el('button', { class: 'btn', text: T('Поделиться'), title: T('Ссылка на эту карточку — с именем и фото в превью'), onclick: function (e) { shareLink(e.currentTarget, id); } })));
 
     var facts = el('dl', { class: 'facts' });
@@ -942,17 +963,12 @@
     if (hasEvent(p.death)) fact(T('Смерть'), eventText(p.death));
     (p.death_alternatives || []).forEach(function (a) { fact(T('Смерть (по другому документу)'), eventText(a)); });
     if (hasEvent(p.burial)) fact(T('Погребение'), eventText(p.burial));
-    (spouseFams[id] || []).forEach(function (f) {
-      if (f.marriage) {
-        var other = f.partners.filter(function (x) { return x !== id; })[0];
-        fact(T('Брак') + (other ? T(' с ') + P[other].given_names.split(' ')[0] : ''), eventText(f.marriage));
-      }
-    });
-    // все места жизни — одним блоком, глагол по полу человека
-    if ((p.residences || []).length) fact(p.sex === 'F' ? T('Жила') : p.sex === 'M' ? T('Жил') : T('Жил(а)'), el('ul', { class: 'lived-list' }, p.residences.map(function (r) {
-      return el('li', null, [r.place, r.date ? ' · ' + r.date : '', r.note ? ' — ' + r.note : '']);
+    var life = p.residences || [];
+    var homes = life.filter(function (r) { return !r.place_event_kind || r.place_event_kind === 'residence'; });
+    if (homes.length) fact(p.sex === 'F' ? T('Жила') : p.sex === 'M' ? T('Жил') : T('Жил(а)'), el('ul', { class: 'lived-list' }, homes.map(function (r) {
+      return lifeEvent(r);
     })));
-    if (!facts.childNodes.length) fact(T('Даты'), el('span', { class: 'empty', text: T('пока неизвестны — подскажите, если знаете') }));
+    if (!facts.childNodes.length) fact(T('Даты'), el('span', { class: 'empty', text: T(SITE.comments ? 'пока неизвестны — подскажите, если знаете' : 'пока неизвестны') }));
     body.appendChild(facts);
 
     body.appendChild(el('h3', { class: 'p-sec', text: T('Семья') }));
@@ -965,8 +981,20 @@
     if (parentsProbable(id)) fam.appendChild(el('dd', { class: 'probable-note' }, el('b', { text: P[id].research_status === 'unlinked_candidate' ? T('≈ Возможная родня. ') : T('≈ Вероятная связь. ') }), probableNote(id)));
     var sibs = siblingsOf(id);
     if (sibs.length) relRow(T('Братья и сёстры'), sibs);
-    var sps = spousesOf(id);
-    if (sps.length) relRow(T('Супруги'), sps);
+    (spouseFams[id] || []).forEach(function (f) {
+      var other = f.partners.filter(function (x) { return x !== id; })[0];
+      var privateUnion = p.living || (other && P[other].living);
+      var former = f.relation === 'divorced' && (!privateUnion || f.divorce);
+      var legacyDivorce = former && !f.divorce && (f.notes || []).find(function (n) { return /^Divorce(?:: |\.$)/.test(n); });
+      if (!(other || f.marriage || f.divorce || legacyDivorce)) return;
+      fam.appendChild(el('dt', { text: T(former ? 'Бывшие супруги' : 'Супруги') }));
+      fam.appendChild(el('dd', null,
+        other ? personChip(other) : null,
+        f.marriage ? el('div', null, T('Брак') + ' · ', eventText(f.marriage)) : null,
+        f.divorce ? el('div', null, T('Развод') + ' · ', eventText(f.divorce)) : null,
+        legacyDivorce ? el('div', null, T('Развод'), eventDetails(legacyDivorce.replace(/^Divorce(?:: |\.$)/, '') || T('дата неизвестна'))) : null
+      ));
+    });
     var kids = childrenOf(id);
     if (kids.length) relRow(T('Дети'), kids);
     body.appendChild(fam);
@@ -985,6 +1013,13 @@
     body.appendChild(el('h3', { class: 'p-sec', text: T('Как мы связаны') }));
     body.appendChild(kinBlock(id));
 
+    var events = life.filter(function (r) { return r.place_event_kind && r.place_event_kind !== 'residence'; });
+    if (events.length) {
+      body.appendChild(el('h3', { class: 'p-sec', text: T('События жизни') }));
+      body.appendChild(el('ul', { class: 'notes' }, events.map(function (r) {
+        return lifeEvent(r, lifeEventLabel(r.place_event_kind));
+      })));
+    }
     if (p.notes && p.notes.length) {
       body.appendChild(el('h3', { class: 'p-sec', text: T('Что известно') }));
       body.appendChild(el('ul', { class: 'notes' }, p.notes.map(function (n) {
@@ -1012,12 +1047,14 @@
       })));
     }
 
-    body.appendChild(el('h3', { class: 'p-sec cm', text: T('Комментарии и уточнения') }));
-    var list = el('div', { class: 'comments' });
-    body.appendChild(list);
-    renderCommentList(list, byPerson[id] || [], T('Пока никто ничего не добавил. Помните что-то о ') + (p.sex === 'F' ? T('ней') : p.sex === 'M' ? T('нём') : T('этом человеке')) + T('? Даты, места, истории, фотографии — всё пригодится.'));
-    body.appendChild(commentForm(id, opts.placeholder));
-    body.appendChild(proposalForm(id));
+    if (SITE.comments) {
+      body.appendChild(el('h3', { class: 'p-sec cm', text: T('Комментарии и уточнения') }));
+      var list = el('div', { class: 'comments' });
+      body.appendChild(list);
+      renderCommentList(list, byPerson[id] || [], T('Пока никто ничего не добавил. Помните что-то о ') + (p.sex === 'F' ? T('ней') : p.sex === 'M' ? T('нём') : T('этом человеке')) + T('? Даты, места, истории, фотографии — всё пригодится.'));
+      body.appendChild(commentForm(id, opts.placeholder));
+      body.appendChild(proposalForm(id));
+    }
 
     var panel = $('panel');
     panel.classList.add('open');
@@ -1026,7 +1063,7 @@
     if (window.matchMedia('(max-width: 720px)').matches) $('scrim').hidden = false;
     else requestAnimationFrame(function () { revealCard(id); });
     syncUrl();
-    if (opts.compose) setTimeout(function () { var t = body.querySelector('textarea'); if (t) { t.scrollIntoView({ block: 'center' }); t.focus({ preventScroll: true }); } }, 260);
+    if (opts.compose && SITE.comments) setTimeout(function () { var t = body.querySelector('textarea'); if (t) { t.scrollIntoView({ block: 'center' }); t.focus({ preventScroll: true }); } }, 260);
   }
   function closePanel() {
     $('panel').classList.remove('open');
@@ -1170,6 +1207,16 @@
     sameParents: function (a, b) { return !!parentFam[a] && parentFam[a] === parentFam[b]; },
     probable: function (x) { return parentsProbable(x); }
   };
+  function formerPartners(a, b) {
+    var unions = (spouseFams[a] || []).filter(function (f) { return f.partners.indexOf(b) >= 0; });
+    return unions.length > 0 && unions.every(function (f) {
+      return f.relation === 'divorced' && (f.divorce || (!P[a].living && !P[b].living));
+    });
+  }
+  function partnerWord(a, b) {
+    if (!formerPartners(a, b)) return stepWord('spouse', P[b].sex);
+    return T(P[b].sex === 'M' ? 'бывший муж' : P[b].sex === 'F' ? 'бывшая жена' : 'бывший супруг / бывшая супруга');
+  }
   function stepWord(kind, sex) {
     var w = { parent: [T('отец'), T('мать'), T('родитель')], child: [T('сын'), T('дочь'), T('ребёнок')], spouse: [T('муж'), T('жена'), T('супруг(а)')] }[kind];
     return sex === 'M' ? w[0] : sex === 'F' ? w[1] : w[2];
@@ -1180,9 +1227,9 @@
     var name = function (k, sex, x) { return Kinship.name(lang, k.up, k.down, sex, k.half, k.half ? P[k.ca].sex : null) + (x || ''); };
     var text = r.type === 'self' ? T('это тот же человек')
       : r.type === 'blood' ? name(r, P[b].sex)
-      : r.type === 'spouse' ? stepWord('spouse', P[b].sex)
-      : r.type === 'spouse_of' ? stepWord('spouse', P[b].sex) + ' · ' + P[r.via].display_name + ' — ' + name(r.rel, P[r.via].sex)
-      : r.type === 'of_spouse' ? name(r.rel, P[b].sex) + ' · ' + T('по линии супруга: ') + P[r.via].display_name
+      : r.type === 'spouse' ? partnerWord(a, b)
+      : r.type === 'spouse_of' ? partnerWord(r.via, b) + ' · ' + P[r.via].display_name + ' — ' + name(r.rel, P[r.via].sex)
+      : r.type === 'of_spouse' ? name(r.rel, P[b].sex) + ' · ' + T(formerPartners(a, r.via) ? 'по линии бывшего супруга: ' : 'по линии супруга: ') + P[r.via].display_name
       : r.type === 'chain' ? T('свойственник (родство через браки)') : T('связь в древе не найдена');
     var probable = r.probable || (r.rel && r.rel.probable);
     return { text: text + (probable ? T(' — вероятно: одно из звеньев не доказано') : ''), path: r.path };
@@ -1208,7 +1255,10 @@
       if (k.path.length > 2) {
         var steps = el('p', { class: 'kin-path' }, el('span', { class: 'kin-lbl', text: T('Цепочка: ') }));
         k.path.forEach(function (x, i) {
-          if (i) steps.appendChild(el('span', { class: 'kin-arrow', text: ' → ' + stepWord(Kinship.step(kinGraph, k.path[i - 1], x), P[x].sex) + ': ' }));
+          if (i) {
+            var previous = k.path[i - 1], step = Kinship.step(kinGraph, previous, x);
+            steps.appendChild(el('span', { class: 'kin-arrow', text: ' → ' + (step === 'spouse' ? partnerWord(previous, x) : stepWord(step, P[x].sex)) + ': ' }));
+          }
           steps.appendChild(el('a', { href: '#/tree/' + x + '?person=' + x, text: P[x].display_name, onclick: function (e) { e.preventDefault(); openPerson(x); } }));
         });
         out.appendChild(steps);
@@ -2232,7 +2282,9 @@
         if (!recordPlaces(r).some(function (x) { return x.slug === pl.slug; })) return;
         var kind = r.place_event_kind || item.kind, date = r.date || T('Дата не указана');
         if (events.some(function (e) { return e.kind === kind && e.people.indexOf(p.id) >= 0 && e.date === fmtDate(date); })) return;
-        events.push({ date: fmtDate(date), text: p.display_name + ' — ' + labels[kind] + ': ' + (r.place_as_recorded || r.place) + (r.note ? '. ' + r.note : ''), people: [p.id], sources: r.source_ids || [], key: placeDateKey(date) });
+        var details = [r.place_as_recorded || r.place, r.value, r.note].filter(Boolean).join(' · ');
+        events.push({ date: fmtDate(date), text: p.display_name + ' — ' + (labels[kind] || lifeEventLabel(kind)) + (details ? ': ' + details : ''),
+          people: [p.id], sources: r.source_ids || [], key: placeDateKey(date) });
       });
     });
     events.sort(function (a, b) { return a.key - b.key || a.date.localeCompare(b.date, 'ru'); });
@@ -3325,7 +3377,7 @@
       D.people.forEach(function (p) {   // readable, the way the card says it: «р. ок. 1832, Louisburgh · † 1891»
         function ev(e, mark) { return e && (e.date || e.place_as_recorded) ? mark + [e.date ? fmtDate(e.date) : '', e.place_as_recorded || ''].filter(Boolean).join(', ') : ''; }
         var parts = [(p.aliases || []).join(', '), ev(p.birth, T('р. ')), ev(p.death, '† '), ev(p.burial, '⚱ ')]
-          .concat((p.residences || []).map(function (r) { return [r.place, r.date ? '(' + r.date + ')' : ''].filter(Boolean).join(' '); }))
+          .concat((p.residences || []).map(function (r) { return [r.place, fmtDate(r.date), r.value, r.note].filter(Boolean).join(' '); }))
           .concat([str(p.notes)]);
         add('person', p.id, p.display_name, parts.filter(Boolean).join(' · '), [p.relation, lifespan(p)].filter(Boolean).join(' · '));
       });

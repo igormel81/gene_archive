@@ -21,7 +21,11 @@ The file is offered on the Archive page as family_tree.ged; `gene gedcom` writes
 import datetime
 import re
 
+from .ged_import import convert_date
+
 MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+RESIDENCE_TAGS = {"residence": "RESI", "occupation": "OCCU", "education": "EDUC",
+                  "graduation": "GRAD", "military service": "MILI", "fact": "FACT"}
 VERSIONS = ("5.5.1", "7.0")
 PROFILES = ("archive", "geni", "public")
 WORDS = {   # fixed texts of the geni/public profiles, in the language of the site's content
@@ -188,11 +192,20 @@ def build(data, title="Family archive", today=None, version="5.5.1", profile="ar
             for alt in ([] if other else p.get(f"{key}_alternatives", [])):
                 _event(w, tag, alt, sources)
         for r in p.get("residences", []):
-            w.line(1, "RESI")
+            kind = r.get("place_event_kind") or "residence"
+            tag = RESIDENCE_TAGS.get(kind, "EVEN")
+            w.text(1, tag, tidy(r.get("value", "")))
+            if tag == "EVEN" and kind != "event":
+                w.text(2, "TYPE", kind)
             if r.get("place"):
                 w.text(2, "PLAC", tidy(r["place"]))
             if r.get("date"):
-                w.text(2, "NOTE", r["date"])   # a free-text period, not a GEDCOM date
+                if convert_date(r["date"]):
+                    w.line(2, "DATE", ged_date(r["date"]))
+                else:
+                    w.text(2, "NOTE", r["date"])
+            if r.get("note") and tidy(r["note"]):
+                w.text(2, "NOTE", tidy(r["note"]))
             for s in r.get("source_ids", []):
                 if s in sources:
                     w.line(2, "SOUR", f"@{s}@")
@@ -241,7 +254,9 @@ def build(data, title="Family archive", today=None, version="5.5.1", profile="ar
             _event(w, "MARR", f["marriage"], sources, tidy)
         elif f.get("relation") in ("spouses", "divorced"):
             w.line(1, "MARR", "Y")
-        if f.get("relation") == "divorced":
+        if "divorce" in f:
+            _event(w, "DIV", f["divorce"], sources, tidy)
+        elif f.get("relation") == "divorced":
             w.line(1, "DIV", "Y")
         if f.get("probable_note") and tidy(f["probable_note"]):
             w.text(1, "NOTE", tidy(f["probable_note"]))
