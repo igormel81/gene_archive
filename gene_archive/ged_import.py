@@ -27,6 +27,7 @@ import re
 import sys
 from collections import Counter
 from dataclasses import dataclass, field
+from html import unescape
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
@@ -305,6 +306,11 @@ def _paragraphs(text: str) -> list[str]:
     return paras
 
 
+def event_text(text: str) -> str:
+    text = re.sub(r"</(?:p|li)>|<br\s*/?>", " ", unescape(text), flags=re.I)
+    return " ".join(re.sub(r"</?[a-zA-Z][^>]*>", "", text).split())
+
+
 def _name_parts(value: str) -> tuple[str, str, str]:
     """Split ``Given /Surname/ Suffix`` into (given, surname, suffix)."""
     m = re.match(r"^(.*?)/(.*?)/(.*)$", value)
@@ -494,21 +500,27 @@ class Importer:
             entry["date"] = re.sub(r"\s+", " ", raw)
         entry["place_event_kind"] = kind
         ids, details = self.citations(node)
+        for note in node.all("NOTE", "SNOTE"):
+            for record in (note, self.notes.get(note.pointer)):
+                if record is not None:
+                    cited, locators = self.citations(record)
+                    ids.extend(cited)
+                    details.extend(locators)
         ids += self.media(node)
         if ids:
             entry["source_ids"] = _unique(ids)
-        value = node.text().strip().replace("\n", " ")
+        value = event_text(node.text())
+        if value and value.upper() != "Y":
+            entry["value"] = value
         notes = []
         if type_ and node.tag not in ("EVEN", "FACT"):
             notes.append(type_)
-        if value and value.upper() != "Y":
-            notes.append(value)
         for tag, prefix in (("AGE", "age "), ("CAUS", "cause: "), ("AGNC", "")):
             if node.sub_text(tag):
                 notes.append(prefix + node.sub_text(tag))
-        notes += self.notes_of(node) + details
+        notes = _unique(event_text(t) for t in notes + self.notes_of(node) + details)
         if notes:
-            entry["note"] = "; ".join(n.replace("\n", " ") for n in notes)
+            entry["note"] = "; ".join(notes)
         self.skip_unknown(node, EVENT_SUBTAGS | {"DATA"})
         return entry
 
@@ -690,8 +702,8 @@ class Importer:
         if len(partners) > 2:
             self.warn(f"{who}: more than two partners; only the first two were kept")
         marriages = rec.all("MARR")
-        divorced = rec.all("DIV", "ANUL")
-        if divorced:
+        divorces = rec.all("DIV")
+        if divorces or rec.first("ANUL"):
             family["relation"] = "divorced"
         elif marriages or len(partners) >= 2:
             family["relation"] = "spouses"
@@ -699,13 +711,19 @@ class Importer:
             family["relation"] = ""
         if marriages:
             family["marriage"] = self.event(marriages[0], who, "marriage")
+        if divorces:
+            divorce = self.event(divorces[0], who, "divorce")
+            value = event_text(divorces[0].text())
+            if value and value.upper() != "Y":
+                divorce["note"] = "; ".join(filter(None, (value, divorce.get("note"))))
+            family["divorce"] = divorce
         ids, details = self.citations(rec)
         ids += self.media(rec)
         family["source_ids"] = ids
         notes = []
         for n in rec.all("NOTE", "SNOTE"):
             notes += _paragraphs(self.note_text(n))
-        for node in marriages[1:] + divorced + rec.all(*FAMILY_EVENT_LABELS):
+        for node in marriages[1:] + divorces[1:] + rec.all(*FAMILY_EVENT_LABELS):
             label = "Marriage" if node.tag == "MARR" else "Divorce" if node.tag == "DIV" \
                 else FAMILY_EVENT_LABELS[node.tag]
             ev = self.event(node, who, label.lower())

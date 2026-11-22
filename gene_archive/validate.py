@@ -189,7 +189,8 @@ def validate(data, root=Path("."), cfg=None):
         need_sources(fid, f.get("source_ids"))
         text_sources(fid, f.get("notes"))
         text_sources(fid, f.get("probable_note"))
-        check_event(f"{fid} marriage", f.get("marriage"))
+        for key in ("marriage", "divorce"):
+            check_event(f"{fid} {key}", f.get(key))
 
     # --- sources
     for s in data["sources"]:

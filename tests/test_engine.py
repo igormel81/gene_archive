@@ -612,6 +612,37 @@ class EstimateBirth(unittest.TestCase):
         self.assertIn("старшего ребёнка (1883)", note(got["A"], "ru"))
 
 
+class PersonPage(unittest.TestCase):
+    def test_static_profile_has_a_prominent_tree_link_and_one_sourced_event(self):
+        from gene_archive.discovery import Pages
+
+        person = {"id": "I1", "display_name": "Anne Example", "residences": [{
+            "place_event_kind": "education", "value": "Metalwork course", "note": "S1: p. 9",
+            "source_ids": ["S1"],
+        }]}
+        data = {"people": [person], "sources": [{"id": "S1", "title": "School register"}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            pages = Pages(Path(tmp), data, {"short_title": "Example"}, set(), False, False)
+            pages.person(person)
+            page = (Path(tmp) / "people/I1.html").read_text()
+        self.assertEqual(page.count("Metalwork course"), 1)
+        self.assertLess(page.index("#/tree/I1?person=I1"), page.index("Metalwork course"))
+        self.assertIn("School register", page)
+        self.assertIn("p. 9", page)
+
+    def test_divorce_dates_stay_private_and_roundtrip_in_the_archive_export(self):
+        from gene_archive.ged_import import import_gedcom
+
+        tree = copy.deepcopy(DATA)
+        family = tree["families"][0]
+        family["divorce"] = {"date": "1960-07", "note": "Family event kept private"}
+        full = import_gedcom(ged_export.build(tree))
+        self.assertEqual(full["families"][0]["divorce"]["date"], "1960-07")
+        public = privacy.redact(tree, {family["partners"][0]})
+        self.assertNotIn("divorce", public["families"][0])
+        self.assertNotIn("Family event kept private", ged_export.build(public))
+
+
 @unittest.skipUnless(shutil.which("node"), "node is not installed")
 class YearLabels(unittest.TestCase):
     """Years under names in the tree: a range is not shown as one exact year."""

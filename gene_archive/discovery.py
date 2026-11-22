@@ -22,6 +22,13 @@ STYLE = """body{display:block}main.archive-page{max-width:820px;margin:auto;padd
 TR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюяіїєґ",
               ["a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
                "f", "kh", "ts", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya", "i", "yi", "ye", "g"]))
+PROFILE_EVENT_LABELS = {
+    "residence": "Проживание", "birth": "Рождение", "death": "Смерть", "burial": "Погребение",
+    "education": "Образование", "occupation": "Род занятий", "graduation": "Окончание учёбы",
+    "military service": "Военная служба", "baptism": "Крещение", "cremation": "Кремация",
+    "census": "Перепись", "emigration": "Эмиграция", "immigration": "Иммиграция",
+    "event": "Событие", "fact": "Факт",
+}
 YEAR = re.compile(r"(ABT |AFT |BEF |EST |CAL )?(?:\d{1,2} )?(?:[A-Z]{3} )?(\d{4})")
 RANGE = re.compile(r"(?:BET|FROM) \D*(\d{4}) (?:AND|TO) \D*(\d{4})$")
 
@@ -135,6 +142,7 @@ class Pages:
             return
         if p.get("research_status") == "unlinked_candidate":
             body += '<p class="notice">Возможная родня: связь с нашей семьёй не установлена.</p>'
+        body += f'<p><a href="../#/tree/{pid}?person={pid}">Открыть карточку в древе и семейные связи</a></p>'
         for key, label in (("birth", "Рождение"), ("death", "Смерть"), ("burial", "Погребение")):
             ev = p.get(key) or {}
             values = [ev.get("date"), ev.get("place_as_recorded")]
@@ -144,11 +152,29 @@ class Pages:
                 body += '<p class="ev-note">' + esc(ev["note"]) + "</p>"
         if p.get("aliases"):
             body += "<p><b>Варианты имени:</b> " + esc("; ".join(p["aliases"])) + "</p>"
+        events = p.get("residences", [])
+        if events:
+            body += "<h2>События жизни</h2><ul>"
+            for event in events:
+                kind = event.get("place_event_kind") or "residence"
+                label = PROFILE_EVENT_LABELS.get(kind, kind.capitalize())
+                values = [event[k] for k in ("value", "date", "place") if event.get(k)]
+                body += f"<li><b>{esc(label)}</b>" + (" · " + esc(" · ".join(values)) if values else "")
+                for sid in event.get("source_ids", []):
+                    if sid in self.sources:
+                        title = self.sources[sid]["title"]
+                        body += f' <a href="../#/sources?doc={esc(sid)}" aria-label="{esc(sid)} — {esc(title)}" title="{esc(sid)}">{esc(title)}</a>'
+                if event.get("note"):
+                    body += f'<details><summary>Подробности</summary><p>{esc(event["note"])}</p></details>'
+                body += "</li>"
+            body += "</ul>"
         notes = p.get("notes", [])
         body += "".join("<p>" + esc(n) + "</p>" for n in notes)
         ids = set(p.get("identity_source_ids", []))
         for key in ("birth", "death", "burial"):
             ids.update((p.get(key) or {}).get("source_ids", []))
+        for event in events:
+            ids.update(event.get("source_ids", []))
         for n in notes:
             ids.update(re.findall(r"\bS\d+\b", n))
         cited = [self.sources[i] for i in sorted(ids, key=lambda v: int(v[1:])) if i in self.sources]
@@ -162,7 +188,6 @@ class Pages:
                     body += f' — <a href="../{esc(s["file"])}">Копия в архиве</a>'
                 body += "</li>"
             body += "</ul>"
-        body += f'<p><a href="../#/tree/{pid}?person={pid}">Открыть карточку в древе и семейные связи</a></p>'
         entity = {"@type": "Person", "name": name}
         if p.get("aliases"):
             entity["alternateName"] = p["aliases"]

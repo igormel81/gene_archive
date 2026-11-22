@@ -98,7 +98,7 @@ SAMPLE = HEAD_55 + """0 @I1@ INDI
 1 HUSB @I5@
 1 WIFE @I6@
 1 MARR
-1 DIV
+1 DIV By court order
 2 DATE 1960
 0 @S1@ SOUR
 1 TITL Millbrook parish register
@@ -224,12 +224,45 @@ class ImportTests(unittest.TestCase):
         res = by_gid(self.people, "@I1@")["residences"]
         occu = next(r for r in res if r["place_event_kind"] == "occupation")
         self.assertEqual(occu, {"place": "Millbrook", "date": "FROM 1920 TO 1930",
-                                "place_event_kind": "occupation", "note": "Blacksmith"})
+                                "place_event_kind": "occupation", "value": "Blacksmith"})
         resi = next(r for r in res if r["place_event_kind"] == "residence")
         self.assertEqual(resi["place"], "12 Mill Lane, Millbrook")
         self.assertEqual(resi["date"], "BET 1931 AND 1935")
         even = next(r for r in res if r["place_event_kind"] == "fair")
-        self.assertEqual(even["note"], "Won a prize")
+        self.assertEqual(even["value"], "Won a prize")
+
+    def test_event_keeps_value_and_citations_from_inline_and_shared_notes(self):
+        extra = """1 EDUC <p>Metalwork</p>
+2 DATE FROM 1920 TO 1923
+2 AGNC Training school
+2 NOTE <b>First year</b>
+3 SOUR @S1@
+4 PAGE p. 5
+2 NOTE @NS@
+3 SOUR @S2@
+4 PAGE p. 6
+0 @NS@ NOTE &lt;i&gt;Passed&lt;/i&gt;
+1 SOUR @S1@
+2 PAGE p. 7
+"""
+        fixture = SAMPLE.replace("0 TRLR", "0 @NEW@ INDI\n1 NAME Test /Person/\n" + extra + "0 TRLR")
+        event, = by_gid(import_gedcom(fixture)["people"], "@NEW@")["residences"]
+        self.assertEqual(event["value"], "Metalwork")
+        self.assertEqual(event["source_ids"], ["S1", "S4", "S2"])
+        self.assertEqual(event["note"], "Training school; First year; Passed; S1: p. 5; S2: p. 6; S1: p. 7")
+
+    def test_residence_events_roundtrip_without_becoming_vital_facts(self):
+        from gene_archive import ged_export
+
+        fixture = SAMPLE.replace("1 OCCU Blacksmith", "1 EVEN A lead\n2 TYPE birth\n2 DATE 1888\n1 OCCU Blacksmith")
+        data = import_gedcom(ged_export.build(import_gedcom(fixture)))
+        person = data["people"][0]
+        self.assertNotIn("birth_alternatives", person)
+        lead = next(r for r in person["residences"] if r["place_event_kind"] == "birth")
+        self.assertEqual(lead["value"], "A lead")
+        self.assertEqual(lead["date"], "1888")
+        job = next(r for r in person["residences"] if r["place_event_kind"] == "occupation")
+        self.assertEqual(job["value"], "Blacksmith")
 
     def test_notes_conc_cont_and_shared(self):
         notes = by_gid(self.people, "@I1@")["notes"]
@@ -275,7 +308,9 @@ class ImportTests(unittest.TestCase):
         self.assertEqual(f2["children"], ["I1"])
         self.assertEqual(f2["relation"], "")
         self.assertEqual(f3["relation"], "divorced")
-        self.assertIn("Divorce: 1960.", f3["notes"])
+        self.assertEqual(f3["divorce"]["date"], "1960")
+        self.assertEqual(f3["divorce"]["note"], "By court order")
+        self.assertNotIn("Divorce: 1960.", f3["notes"])
 
     def test_root_default_and_selection(self):
         self.assertEqual(self.data["root_person_id"], "I1")
